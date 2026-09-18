@@ -1,4 +1,3 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { X, RotateCcw, Check, SlidersHorizontal } from 'lucide-react';
 import { useTheme } from '../../../../context/ThemeContext';

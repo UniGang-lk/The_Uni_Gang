@@ -16,7 +16,7 @@ import PremiumPageLoader from '../ui/PremiumPageLoader';
 
 const ProposalTeaserSection = () => {
   const navigate = useNavigate();
-  const [isNavigating, setIsNavigating] = useState(false);
+  const [isNavigating] = useState(false);
 
   const handleOpenHub = () => {
     navigate('/proposals');

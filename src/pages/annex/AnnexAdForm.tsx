@@ -162,7 +162,7 @@ const formSchema = z.object({
   universityId: z.string().min(1, 'Selecting a university or institution is required'),
   customInstitution: z.string().optional(),
   listingType: z.enum(['LANDLORD_RENT', 'ROOMMATE_WANTED']),
-  landlordPresence: z.enum(['INDEPENDENT', 'ON_SITE']).default('INDEPENDENT'),
+  landlordPresence: z.enum(['INDEPENDENT', 'ON_SITE']),
   curfewTime: z.string().optional(),
   visitorPolicy: z.string().optional(),
   busRoute: z.string().optional(),

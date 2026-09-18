@@ -11,7 +11,6 @@ import {
   User2, 
   Heart, 
   Lock, 
-  Globe,
   Sparkles,
   Info
 } from 'lucide-react';

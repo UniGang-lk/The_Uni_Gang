@@ -1,4 +1,3 @@
-import React from 'react';
 import { Heart, ShieldCheck, MapPin, Briefcase, Crown, Check, Lock, Eye } from 'lucide-react';
 import { WatermarkOverlay } from '../privacy/WatermarkOverlay';
 import { useTheme } from '../../../../context/ThemeContext';
@@ -321,7 +320,7 @@ export default function ProposalSearchResultCard({
               </span>
             )}
 
-            {isVerified && <ShieldCheck size={15} className="text-blue-500 shrink-0" title="Verified Profile" />}
+            {isVerified && <span title="Verified Profile"><ShieldCheck size={15} className="text-blue-500 shrink-0" /></span>}
           </div>
 
           <p className="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-2 flex-wrap">

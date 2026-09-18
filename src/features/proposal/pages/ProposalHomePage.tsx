@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Compass, Send, Heart, Eye, CheckCircle2, Crown, ArrowRight, ShieldCheck, Lock, MessageCircle, Settings, Home, GraduationCap, User2, Sparkles, Inbox, Check, X, Clock, Award } from 'lucide-react';
-import { cx, PrimaryButton, Card } from '../components/ui/ProposalPrimitives';
+import { Compass, Send, Heart, Eye, CheckCircle2, Crown, ArrowRight, ShieldCheck, Lock, MessageCircle, Settings, GraduationCap, User2, Sparkles, Inbox, Check, X, Clock, Award } from 'lucide-react';
+import { cx } from '../components/ui/ProposalPrimitives';
 import { proposalApi } from '../api/proposalApi';
 import { useTheme } from '../../../context/ThemeContext';
 import astroCoupleHero from '../../../assets/astro_couple_hero.png';
@@ -9,11 +9,11 @@ import astroCoupleHero from '../../../assets/astro_couple_hero.png';
 export default function ProposalHomePage({
   setPage,
   openProfile,
-  goToLanding
+  goToLanding: _goToLanding
 }: {
   setPage: (page: string) => void;
   openProfile: (p: any) => void;
-  goToLanding: () => void;
+  goToLanding?: () => void;
 }) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -32,7 +32,7 @@ export default function ProposalHomePage({
   const [activeCardModal, setActiveCardModal] = useState<'sent' | 'received' | 'views' | 'matches' | null>(null);
 
   // Lists for Interactive Card Modals
-  const [sentProposalsList, setSentProposalsList] = useState([
+  const [sentProposalsList] = useState([
     {
       id: 'sent_1',
       code: 'BR000158',
@@ -329,7 +329,7 @@ export default function ProposalHomePage({
             onClick={s.onClick}
             className={cx(
               "p-4 sm:p-4.5 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition-all duration-300 hover:-translate-y-0.5",
-              s.onClick ? "cursor-pointer hover:shadow-md hover:border-rose-400/40" : "hover:shadow-sm"
+              "cursor-pointer hover:shadow-md hover:border-rose-400/40"
             )}
           >
             <div className="flex items-center justify-between mb-2">

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Search, SlidersHorizontal, RotateCcw, Save, Crown, Check } from 'lucide-react';
 import { useTheme } from '../../../../context/ThemeContext';
 
@@ -6,7 +5,7 @@ export interface SearchFilterState {
   codeSearch: string;
   vipOnly: boolean;
   sortBy: string;
-  lookingFor: 'Groom' | 'Bride';
+  lookingFor: 'Groom' | 'Bride' | 'All';
   minAge: string;
   maxAge: string;
   minHeight: string;

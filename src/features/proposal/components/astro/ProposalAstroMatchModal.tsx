@@ -3,14 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, 
   X, 
-  CheckCircle2, 
-  AlertCircle, 
   Crown, 
   Download, 
-  ShieldCheck,
   ChevronDown,
-  ChevronUp,
-  Heart
+  ChevronUp
 } from 'lucide-react';
 import { 
   NAKSHATRAS, 
@@ -18,7 +14,7 @@ import {
   calculateAstroPorondam, 
   AstroMatchReport 
 } from '../../utils/astroEngine';
-import { cx, PrimaryButton } from '../ui/ProposalPrimitives';
+import { PrimaryButton } from '../ui/ProposalPrimitives';
 
 interface ProposalAstroMatchModalProps {
   isOpen: boolean;
