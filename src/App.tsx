@@ -4,6 +4,7 @@ import Layout from './components/layout/Layout';
 import SubLayout from './components/layout/SubLayout';
 import ScrollHandler from './components/layout/ScrollHandler';
 import PremiumPageLoader from './components/ui/PremiumPageLoader';
+import PageErrorBoundary from './components/ui/PageErrorBoundary';
 
 // Home Sections Imports (Direct for Instant Home rendering)
 import Hero from './components/home/Hero';
@@ -50,7 +51,8 @@ function App() {
   return (
     <Router>
       <ScrollHandler />
-      <Suspense fallback={<PremiumPageLoader isLoading={true} message="Loading Page..." />}>
+      <PageErrorBoundary>
+        <Suspense fallback={<PremiumPageLoader isLoading={true} message="Loading Page..." />}>
         <Routes>
           {/* Home Route containing all sections inline */}
           <Route
@@ -139,6 +141,7 @@ function App() {
           <Route path="*" element={<SubLayout><NotFound /></SubLayout>} />
         </Routes>
       </Suspense>
+      </PageErrorBoundary>
 
       <WhatsAppButton />
       <AdPopup />
