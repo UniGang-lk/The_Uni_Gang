@@ -179,7 +179,7 @@ export default function ProposalFullProfilePage({
                 className="w-full py-3.5 px-3 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-amber-500 hover:from-purple-700 hover:to-amber-600 text-white font-black text-xs shadow-lg shadow-purple-500/20 flex items-center justify-center gap-1.5 cursor-pointer border border-purple-400/30 transition-all hover:scale-[1.02]"
               >
                 <Sparkles size={15} className="text-amber-300" />
-                <span>Astro Match 🔮</span>
+                <span>Astro Match (පොරොන්දම්)</span>
               </button>
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function ProposalFullProfilePage({
             <Lock size={16} className="text-amber-500 shrink-0 mt-0.5" />
             <div>
               <span className="font-bold block mb-0.5 text-amber-800 dark:text-amber-200">
-                🔒 Privacy Protection Notice
+                Privacy Protection Notice
               </span>
               Full name, contact details, birthday and exact address are protected and revealed only after mutual proposal acceptance.
             </div>
@@ -215,7 +215,7 @@ export default function ProposalFullProfilePage({
             {/* Partner Preference Box */}
             <div className="bg-gradient-to-br from-rose-500/10 via-pink-500/5 to-transparent rounded-2xl p-5 border border-rose-500/20 shadow-sm text-xs leading-relaxed font-sinhala">
               <p className="font-extrabold text-rose-500 mb-1 flex items-center gap-1">
-                <Sparkles size={14} /> 💕 Partner Preference (සහකරු / සහකාරිය පිළිබඳ අපේක්ෂා):
+                <Sparkles size={14} /> Partner Preference (සහකරු / සහකාරිය පිළිබඳ අපේක්ෂා):
               </p>
               <p className="font-bold text-slate-800 dark:text-slate-200">
                 {profile.prompt_ideal_partner || `සමාන අධ්‍යාපන සුදුසුකම් ඇති, යහපත් ගුණධර්ම සහිත වෛද්‍ය/ඉංජිනේරු/කථිකාචාර්ය/මෘදුකාංග ඉංජිනේරු වැනි ගෞරවනීය රැකියාවක නිරත සහකරුවෙකු/සහකාරියක් සොයයි.`}
@@ -242,9 +242,9 @@ export default function ProposalFullProfilePage({
                   { label: 'Height (ft)', value: profile.height || '5.4 ft' },
                   { label: 'Age', value: `${profile.age || 31} years` },
                   { label: 'Civil Status', value: profile.civilStatus || 'Never Married (අවිවාහක)' },
-                  { label: 'Drinking Habits', value: profile.social_drinking_level || profile.drinkingStatus || 'Non-drinker 🚭' },
-                  { label: 'Smoking Habits', value: profile.smokingStatus || 'Non-smoker 🚭' },
-                  { label: 'Food / Diet Preference', value: profile.dietaryPreference || profile.diet || 'Non-Vegetarian 🍗' },
+                  { label: 'Drinking Habits', value: (profile.social_drinking_level || profile.drinkingStatus || 'Non-drinker').replace(/[^\w\s\/-]/g, '').trim() },
+                  { label: 'Smoking Habits', value: (profile.smokingStatus || 'Non-smoker').replace(/[^\w\s\/-]/g, '').trim() },
+                  { label: 'Food / Diet Preference', value: (profile.dietaryPreference || profile.diet || 'Non-Vegetarian').replace(/[^\w\s\/-]/g, '').trim() },
                 ].map((row, i) => (
                   <div key={i} className="flex justify-between items-center px-5 py-2.5 font-sans">
                     <span className="font-semibold text-slate-500">{row.label}</span>

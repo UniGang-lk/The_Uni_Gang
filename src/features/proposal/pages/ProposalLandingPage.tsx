@@ -201,7 +201,7 @@ export default function ProposalLandingPage({
                     onClick={onGetStarted}
                     className="w-full py-4 rounded-full bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-xs shadow-xl shadow-rose-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer text-center flex items-center justify-center gap-2.5 tracking-wider border-none"
                   >
-                    <span>පොරොන්දම් බලන්න (Astro Hub 🔮 →)</span>
+                    <span>පොරොන්දම් බලන්න (Astro Hub →)</span>
                     <ArrowRight size={16} strokeWidth={3} />
                   </button>
                 </div>
@@ -486,7 +486,7 @@ export default function ProposalLandingPage({
             Join thousands of verified undergraduates and alumni across Sri Lanka who are already writing their success stories.
           </p>
           <PrimaryButton onClick={onGetStarted} icon={Heart} className="px-8 py-4 text-xs font-extrabold shadow-[0_0_35px_rgba(244,63,94,0.4)]">
-            {hasProposalProfile ? 'Go to My Proposal Dashboard 💖' : 'Join Uni Porondam Today'}
+            {hasProposalProfile ? 'Go to My Proposal Dashboard' : 'Join Uni Porondam Today'}
           </PrimaryButton>
         </section>
       </div>

@@ -566,14 +566,14 @@ const Events = () => {
                     className="w-14 h-14 rounded-xl object-cover border border-slate-200 dark:border-slate-800 shrink-0"
                   />
                   <div className="text-left max-w-[210px]">
-                    <span className="text-[9px] font-black uppercase tracking-wider text-rose-500 block truncate">
-                      📍 {event.uni || event.university || 'Campus Fest'}
+                    <span className="text-[9px] font-black uppercase tracking-wider text-rose-500 flex items-center gap-1 truncate">
+                      <LuMapPin size={11} className="shrink-0" /> {event.uni || event.university || 'Campus Fest'}
                     </span>
                     <h4 className="text-sm font-extrabold text-slate-900 dark:text-white truncate my-0.5">
                       {event.title}
                     </h4>
-                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block">
-                      📅 {event.date || 'Upcoming'} • {event.price ? `Rs. ${event.price}` : 'Free Entry'}
+                    <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                      <LuCalendar size={11} className="shrink-0" /> {event.date || 'Upcoming'} • {event.price ? `Rs. ${event.price}` : 'Free Entry'}
                     </span>
                   </div>
                 </div>

@@ -237,7 +237,6 @@ export default function ProposalHomePage({
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
               <span>Ayubowan, {currentUser.name ? currentUser.name.split(" ")[0] : 'Member'}</span>
-              <span className="text-xl">👋</span>
             </h1>
             <p className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
               <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -361,7 +360,7 @@ export default function ProposalHomePage({
             <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 grid place-items-center text-emerald-500 mb-4">
               <ShieldCheck size={32} strokeWidth={2.5} />
             </div>
-            <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Verified Campus Profile 🛡️</h3>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Verified Campus Profile</h3>
             <p className="text-xs font-semibold text-emerald-500 uppercase tracking-wider mt-1">Status: Active & Authenticated</p>
 
             <div className="mt-6 space-y-4 text-xs font-medium text-slate-600 dark:text-slate-300">
@@ -626,7 +625,9 @@ export default function ProposalHomePage({
                       <div className="min-w-0">
                         <h4 className="font-extrabold text-sm text-slate-900 dark:text-white truncate flex items-center gap-1.5">
                           <span>{item.name}</span>
-                          <span className="text-[10px] bg-pink-500/10 text-pink-500 font-bold px-2 py-0.5 rounded-full border border-pink-500/20">Matched 💕</span>
+                          <span className="text-[10px] bg-pink-500/10 text-pink-500 font-bold px-2.5 py-0.5 rounded-full border border-pink-500/20 inline-flex items-center gap-1">
+                            <Heart size={10} className="fill-pink-500" /> Matched
+                          </span>
                         </h4>
                         <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{item.age} yrs • {item.district} • {item.profession}</p>
                       </div>
@@ -729,7 +730,7 @@ export default function ProposalHomePage({
                 onClick={() => setPage('astro')}
                 className="w-full sm:w-auto px-7 py-3.5 rounded-full bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-xs shadow-xl shadow-rose-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer text-center flex items-center justify-center gap-2 tracking-wider border-none"
               >
-                <span>පොරොන්දම් බලන්න (Astro Hub 🔮 →)</span>
+                <span>පොරොන්දම් බලන්න (Astro Hub →)</span>
                 <ArrowRight size={16} strokeWidth={3} />
               </button>
             </div>

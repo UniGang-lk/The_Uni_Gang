@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import {
     LuArrowRight, LuGraduationCap, LuSearch, LuArrowLeft, LuPlus,
-    LuHeart, LuMapPin, LuBedDouble, LuMap
+    LuHeart, LuMapPin, LuBedDouble, LuMap, LuHouse, LuShieldCheck,
+    LuBus, LuFootprints, LuZap, LuDroplets, LuUtensils
 } from "react-icons/lu";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
@@ -50,7 +51,7 @@ const LeafletListMap = ({ items, centerUniId, maxDistance }: { items: any[], cen
                 L.marker([centerLat, centerLng], {
                     icon: L.divIcon({
                         className: 'custom-div-icon',
-                        html: `<div style='background: linear-gradient(135deg, #1e40af, #3b82f6); color:white; padding:6px 12px; border-radius:12px; font-weight:900; font-size:10px; border:2px solid white; box-shadow:0 10px 20px rgba(30,64,175,0.3); text-transform:uppercase; letter-spacing:0.5px;'>🏫 ${selectedUniName}</div>`,
+                        html: `<div style='background: linear-gradient(135deg, #1e40af, #3b82f6); color:white; padding:6px 12px; border-radius:12px; font-weight:900; font-size:10px; border:2px solid white; box-shadow:0 10px 20px rgba(30,64,175,0.3); text-transform:uppercase; letter-spacing:0.5px; display:inline-flex; align-items:center; gap:5px;'><svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M22 10v6M2 10l10-5 10 5-10 5z'/><path d='M6 12v5c3 3 9 3 12 0v-5'/></svg> ${selectedUniName}</div>`,
                         iconSize: [140, 36]
                     })
                 }).addTo(map);
@@ -70,7 +71,7 @@ const LeafletListMap = ({ items, centerUniId, maxDistance }: { items: any[], cen
                     }).addTo(map);
 
                     // Radius Tag Popup Label
-                    radiusCircle.bindTooltip(`📍 ${radiusKm} KM Proximity Radius around ${selectedUniName}`, {
+                    radiusCircle.bindTooltip(`${radiusKm} KM Proximity Radius around ${selectedUniName}`, {
                         permanent: true,
                         direction: 'top',
                         className: 'bg-blue-900 text-white text-xs font-bold px-2 py-1 rounded-md border border-white/30'
@@ -86,7 +87,7 @@ const LeafletListMap = ({ items, centerUniId, maxDistance }: { items: any[], cen
                 if (item.latitude && item.longitude) {
                     const price = parseFloat(item.price || 0).toLocaleString();
                     const walkTime = item.walk_time_mins || item.walkTimeMins || 5;
-                    const distanceStr = item.distanceToUni ? `🚶 ${walkTime} mins walk (${item.distanceToUni} km)` : `🚶 ${walkTime} mins walk to gate`;
+                    const distanceStr = item.distanceToUni ? `${walkTime} mins walk (${item.distanceToUni} km)` : `${walkTime} mins walk to gate`;
 
                     const marker = L.marker([parseFloat(item.latitude), parseFloat(item.longitude)]).addTo(map);
                     marker.bindPopup(`
@@ -369,7 +370,7 @@ const AnnexList = () => {
                                     {/* Stand 3: Proximity Limit */}
                                     <div className="flex-1 w-full flex flex-col px-6 py-2 rounded-2xl hover:bg-white/50 dark:hover:bg-slate-800/30 transition-all">
                                         <label className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-1.5">
-                                            <span className="text-blue-800 dark:text-blue-400">📍</span> Proximity Limit
+                                            <LuMapPin className="text-blue-800 dark:text-blue-400 text-xs" /> Proximity Limit
                                         </label>
                                         <select
                                             className="w-full bg-transparent border-none focus:ring-0 focus:outline-none text-slate-900 dark:text-white font-bold cursor-pointer appearance-none py-1"
@@ -545,8 +546,8 @@ const AnnexList = () => {
                                                                             <LuMapPin className="text-[14px] text-blue-800/60 dark:text-blue-400/60 flex-shrink-0" />
                                                                             {item.address}
                                                                         </p>
-                                                                        <span className="text-[10px] font-black bg-blue-500/10 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/20">
-                                                                            🚶 {item.walk_time_mins || item.walkTimeMins || 5} mins walk to gate
+                                                                        <span className="text-[10px] font-black bg-blue-500/10 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/20 inline-flex items-center gap-1">
+                                                                            <LuFootprints size={11} className="shrink-0" /> {item.walk_time_mins || item.walkTimeMins || 5} mins walk to gate
                                                                         </span>
                                                                     </div>
                                                                 </div>
@@ -557,32 +558,32 @@ const AnnexList = () => {
                                                                     <LuBedDouble className="text-sm text-slate-400" /> {item.beds} Beds
                                                                 </span>
                                                                 {item.landlordPresence === 'INDEPENDENT' || item.landlord_presence === 'INDEPENDENT' ? (
-                                                                    <span className="text-[9px] font-black bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md">
-                                                                        🏠 Independent
+                                                                    <span className="text-[9px] font-black bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                                                        <LuHouse size={11} /> Independent
                                                                     </span>
                                                                 ) : item.landlordPresence === 'ON_SITE' || item.landlord_presence === 'ON_SITE' ? (
-                                                                    <span className="text-[9px] font-black bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-md">
-                                                                        👨‍👩‍👧 On-Site Landlord
+                                                                    <span className="text-[9px] font-black bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                                                        <LuShieldCheck size={11} /> On-Site Landlord
                                                                     </span>
                                                                 ) : null}
                                                                 {item.busRoute || item.bus_route ? (
-                                                                    <span className="text-[9px] font-black bg-blue-500/10 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-md line-clamp-1 max-w-[180px]">
-                                                                        🚌 {item.busRoute || item.bus_route}
+                                                                    <span className="text-[9px] font-black bg-blue-500/10 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-md line-clamp-1 max-w-[180px] inline-flex items-center gap-1">
+                                                                        <LuBus size={11} /> {item.busRoute || item.bus_route}
                                                                     </span>
                                                                 ) : null}
                                                                 {item.has_power_backup || item.hasPowerBackup ? (
-                                                                    <span className="text-[9px] font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-md">
-                                                                        ⚡ Generator/UPS
+                                                                    <span className="text-[9px] font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                                                        <LuZap size={11} /> Generator/UPS
                                                                     </span>
                                                                 ) : null}
                                                                 {(item.has_water_tank !== false && item.hasWaterTank !== false) ? (
-                                                                    <span className="text-[9px] font-black bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 px-2 py-0.5 rounded-md">
-                                                                        🚰 Water Tank
+                                                                    <span className="text-[9px] font-black bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                                                        <LuDroplets size={11} /> Water Tank
                                                                     </span>
                                                                 ) : null}
                                                                 {(item.is_cooking_allowed !== false && item.isCookingAllowed !== false) ? (
-                                                                    <span className="text-[9px] font-black bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md">
-                                                                        🍳 Cooking Allowed
+                                                                    <span className="text-[9px] font-black bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                                                        <LuUtensils size={11} /> Cooking Allowed
                                                                     </span>
                                                                 ) : null}
                                                             </div>

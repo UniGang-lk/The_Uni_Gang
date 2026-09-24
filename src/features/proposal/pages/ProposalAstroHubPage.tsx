@@ -326,7 +326,7 @@ export default function ProposalAstroHubPage({ setPage }: { setPage: (p: string)
                     </option>
                     {NAKSHATRAS.map((n) => (
                       <option key={n.id} value={n.id} className={isDark ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'}>
-                        {n.id === 0 ? '✨ 0. දන්නේ නැත (Auto Calculate)' : `${n.id}. ${n.nameSinhala} (${n.name})`}
+                        {n.id === 0 ? '0. දන්නේ නැත (Auto Calculate)' : `${n.id}. ${n.nameSinhala} (${n.name})`}
                       </option>
                     ))}
                   </select>
@@ -518,7 +518,7 @@ export default function ProposalAstroHubPage({ setPage }: { setPage: (p: string)
                     </option>
                     {NAKSHATRAS.map((n) => (
                       <option key={n.id} value={n.id} className={isDark ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'}>
-                        {n.id === 0 ? '✨ 0. දන්නේ නැත (Auto Calculate)' : `${n.id}. ${n.nameSinhala} (${n.name})`}
+                        {n.id === 0 ? '0. දන්නේ නැත (Auto Calculate)' : `${n.id}. ${n.nameSinhala} (${n.name})`}
                       </option>
                     ))}
                   </select>

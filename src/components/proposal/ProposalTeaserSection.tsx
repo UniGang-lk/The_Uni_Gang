@@ -7,7 +7,8 @@ import {
   LuShieldCheck,
   LuMessageSquare,
   LuChevronRight,
-  LuLock
+  LuLock,
+  LuMapPin
 } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
 import TiltCard from '../ui/TiltCard';
@@ -91,7 +92,7 @@ const ProposalTeaserSection = () => {
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
                 className="absolute top-1/2 -left-8 -translate-y-1/2 z-40 px-3.5 py-2 rounded-2xl bg-blue-500/20 border border-blue-500/40 text-blue-300 backdrop-blur-xl shadow-2xl flex items-center gap-2 text-xs font-black uppercase tracking-wider"
               >
-                <LuGraduationCap size={16} /> Student Verified 🎓
+                <LuGraduationCap size={16} /> Student Verified
               </motion.div>
 
               {/* Floating Icon 4: Phone Masking Shield (Mid Right) */}
@@ -100,7 +101,7 @@ const ProposalTeaserSection = () => {
                 transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
                 className="absolute top-1/2 -right-6 -translate-y-1/2 z-40 px-3.5 py-2 rounded-2xl bg-purple-500/20 border border-purple-500/40 text-purple-300 backdrop-blur-xl shadow-2xl flex items-center gap-2 text-xs font-black uppercase tracking-wider"
               >
-                <LuShieldCheck size={16} /> Privacy Shield 🔒
+                <LuShieldCheck size={16} /> Privacy Shield
               </motion.div>
 
               {/* Outer Glowing Glass Wrapper Container */}
@@ -135,11 +136,11 @@ const ProposalTeaserSection = () => {
                           alt="Dilini Perera"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         />
-                        <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-rose-500 text-white shadow-md">
-                          Verified Undergrad 🎓
+                        <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-rose-500 text-white shadow-md inline-flex items-center gap-1">
+                          <LuGraduationCap size={10} /> Verified Undergrad
                         </span>
-                        <span className="absolute bottom-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-slate-950/80 backdrop-blur-md text-white border border-white/20">
-                          📍 Kandy • 23 yrs
+                        <span className="absolute bottom-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-slate-950/80 backdrop-blur-md text-white border border-white/20 inline-flex items-center gap-1">
+                          <LuMapPin size={10} /> Kandy • 23 yrs
                         </span>
                       </div>
 
@@ -161,11 +162,11 @@ const ProposalTeaserSection = () => {
                           alt="Kasun Bandara"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                         />
-                        <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-amber-500 text-white shadow-md">
-                          Verified Alumni 🏫
+                        <span className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider bg-amber-500 text-white shadow-md inline-flex items-center gap-1">
+                          <LuGraduationCap size={10} /> Verified Alumni
                         </span>
-                        <span className="absolute bottom-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-slate-950/80 backdrop-blur-md text-white border border-white/20">
-                          📍 Colombo • 25 yrs
+                        <span className="absolute bottom-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-slate-950/80 backdrop-blur-md text-white border border-white/20 inline-flex items-center gap-1">
+                          <LuMapPin size={10} /> Colombo • 25 yrs
                         </span>
                       </div>
 
@@ -235,7 +236,7 @@ const ProposalTeaserSection = () => {
                   <LuGraduationCap size={20} />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white mb-0.5">🎓 100% Student & Alumni Verification</h4>
+                  <h4 className="text-sm font-bold text-white mb-0.5">100% Student & Alumni Verification</h4>
                   <p className="text-xs text-slate-400 font-medium leading-relaxed">
                     Student ID & `.ac.lk` mail මගින් 100% Genuine ශ්‍රී ලාංකික Campus matches බව තහවුරු කිරීම.
                   </p>
@@ -247,7 +248,7 @@ const ProposalTeaserSection = () => {
                   <LuLock size={20} />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white mb-0.5">🔒 Anti-Leak Contact Security Filter</h4>
+                  <h4 className="text-sm font-bold text-white mb-0.5">Anti-Leak Contact Security Filter</h4>
                   <p className="text-xs text-slate-400 font-medium leading-relaxed">
                     Phone Numbers / Contact Leaks වැළැක්වීමේ automated Regex Privacy Engine එක.
                   </p>

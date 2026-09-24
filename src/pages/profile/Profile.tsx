@@ -4,7 +4,7 @@ import {
   LuEye, LuEyeOff, LuFacebook, LuLinkedin,
   LuMessageSquare, LuActivity, LuChevronRight, LuShieldCheck,
   LuCalendar, LuLayoutGrid, LuTrophy, LuSettings, LuLogOut, LuBriefcase, LuX, LuSend, LuTrash2, LuMegaphone, LuShoppingBag, LuStar,
-  LuClock
+  LuClock, LuHouse, LuGraduationCap, LuBell, LuLifeBuoy
 } from 'react-icons/lu';
 import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
@@ -229,7 +229,7 @@ const Profile = () => {
     }
   }, [selectedAnnexChat]);
 
-  // 🔔 Real-time Socket Audio Chimes & Desktop Push Notifications Listener
+  // Real-time Socket Audio Chimes & Desktop Push Notifications Listener
   useEffect(() => {
     requestNotificationPermission();
 
@@ -245,7 +245,7 @@ const Profile = () => {
 
     socket.on('new_annex_message', (data: any) => {
       playNotificationSound();
-      triggerPushNotification('🏠 New Annex Inquiry Message', {
+      triggerPushNotification('New Annex Inquiry Message', {
         body: data.message?.message || 'You received a new inquiry message for your annex listing.'
       });
       fetchAnnexChats();
@@ -253,14 +253,14 @@ const Profile = () => {
 
     socket.on('new_market_message', (data: any) => {
       playNotificationSound();
-      triggerPushNotification('🎁 New Marketplace Message', {
+      triggerPushNotification('New Marketplace Message', {
         body: data.message?.message || 'You received a new message regarding a marketplace item.'
       });
     });
 
     socket.on('new_event_message', (data: any) => {
       playNotificationSound();
-      triggerPushNotification('📅 New Event Inquiry Message', {
+      triggerPushNotification('New Event Inquiry Message', {
         body: data.message?.message || 'You received a new message regarding a campus event.'
       });
       fetchEventChats();
@@ -1037,7 +1037,7 @@ const Profile = () => {
                             <div className="flex items-start justify-between gap-4 relative z-10">
                               <div>
                                 <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider mb-2">
-                                  🎓 Official Student Verification
+                                  <LuGraduationCap className="w-4 h-4 text-white shrink-0" /> Official Student Verification
                                 </div>
                                 <h3 className="text-xl font-black text-white mb-2 flex items-center gap-2">
                                   Verify your .ac.lk Email for Instant Auto-Approval & Blue Badge!
@@ -1420,8 +1420,8 @@ const Profile = () => {
                       <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">Audio Notifications</h3>
                       <div className="flex justify-between items-center">
                         <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">Web Audio Notification Sound Chimes</span>
-                        <button type="button" onClick={() => playNotificationSound()} className="px-4 py-2 bg-blue-500/10 text-blue-600 font-bold rounded-xl text-xs border border-blue-500/20 cursor-pointer">
-                          Test Sound Chime 🔔
+                        <button type="button" onClick={() => playNotificationSound()} className="px-4 py-2 bg-blue-500/10 text-blue-600 font-bold rounded-xl text-xs border border-blue-500/20 cursor-pointer flex items-center gap-1.5">
+                          <LuBell size={13} /> Test Sound Chime
                         </button>
                       </div>
                     </div>
@@ -2276,7 +2276,7 @@ const Profile = () => {
                                       <span className="font-bold text-slate-500 block mb-1">Delivery Address:</span>
                                       {order.delivery_location} • Phone: {order.delivery_phone}
                                       <p className="mt-1 text-slate-405">
-                                        Payment Method: <span className="font-bold text-slate-600 dark:text-slate-300">{order.payment_method === 'BANK_TRANSFER' ? '🏦 Direct Bank Transfer' : '💵 Cash on Delivery (COD)'}</span>
+                                        Payment Method: <span className="font-bold text-slate-600 dark:text-slate-300">{order.payment_method === 'BANK_TRANSFER' ? 'Direct Bank Transfer' : 'Cash on Delivery (COD)'}</span>
                                       </p>
                                       {order.notes && (
                                         <p className="mt-2 italic text-slate-400">"{order.notes}"</p>
@@ -2448,46 +2448,46 @@ const Profile = () => {
                               setInboxTab('annex');
                               fetchAnnexChats();
                             }}
-                            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all inline-flex items-center gap-1.5 ${
                               inboxTab === 'annex'
                                 ? 'bg-blue-600 text-white shadow-md'
                                 : 'text-slate-400 hover:text-slate-700 dark:hover:text-white bg-transparent border-none cursor-pointer'
                             }`}
                           >
-                            🏠 Bodim / Annexes ({annexChats.length})
+                            <LuHouse size={14} /> Bodim / Annexes ({annexChats.length})
                           </button>
                           <button
                             type="button"
                             onClick={() => setInboxTab('marketplace')}
-                            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all inline-flex items-center gap-1.5 ${
                               inboxTab === 'marketplace'
                                 ? 'bg-indigo-600 text-white shadow-md'
                                 : 'text-slate-400 hover:text-slate-700 dark:hover:text-white bg-transparent border-none cursor-pointer'
                             }`}
                           >
-                            🎁 Marketplace ({marketplaceChats.length})
+                            <LuShoppingBag size={14} /> Marketplace ({marketplaceChats.length})
                           </button>
                           <button
                             type="button"
                             onClick={() => setInboxTab('events')}
-                            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all inline-flex items-center gap-1.5 ${
                               inboxTab === 'events'
                                 ? 'bg-pink-600 text-white shadow-md'
                                 : 'text-slate-400 hover:text-slate-700 dark:hover:text-white bg-transparent border-none cursor-pointer'
                             }`}
                           >
-                            📅 Events ({eventChats.length})
+                            <LuCalendar size={14} /> Events ({eventChats.length})
                           </button>
                           <button
                             type="button"
                             onClick={() => setInboxTab('support')}
-                            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all inline-flex items-center gap-1.5 ${
                               inboxTab === 'support'
                                 ? 'bg-rose-600 text-white shadow-md'
                                 : 'text-slate-400 hover:text-slate-700 dark:hover:text-white bg-transparent border-none cursor-pointer'
                             }`}
                           >
-                            🛠️ Support ({supportProblems.length})
+                            <LuLifeBuoy size={14} /> Support ({supportProblems.length})
                           </button>
                         </div>
                       )}
@@ -2534,7 +2534,7 @@ const Profile = () => {
                                               <h4 className="text-base font-black text-slate-800 dark:text-white group-hover:text-blue-500 transition-colors truncate">
                                                 {otherName}
                                               </h4>
-                                              <p className="text-slate-400 dark:text-slate-500 text-xs font-bold truncate mt-0.5">Regarding: 🏠 {annexTitle}</p>
+                                              <p className="text-slate-400 dark:text-slate-500 text-xs font-bold truncate mt-0.5 flex items-center gap-1">Regarding: <LuHouse size={12} className="text-blue-500 shrink-0" /> {annexTitle}</p>
                                             </div>
                                           </div>
                                           <LuChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
@@ -2570,7 +2570,7 @@ const Profile = () => {
                                       <h3 className="text-lg font-black text-slate-800 dark:text-white leading-tight">
                                         {(selectedAnnexChat.student_id === localStorage.getItem('userId') ? selectedAnnexChat.landlord : selectedAnnexChat.student)?.name}
                                       </h3>
-                                      <p className="text-slate-400 dark:text-slate-500 text-xs font-bold truncate">Listing: 🏠 {selectedAnnexChat.annex?.title}</p>
+                                      <p className="text-slate-400 dark:text-slate-500 text-xs font-bold truncate flex items-center gap-1">Listing: <LuHouse size={12} className="text-blue-500 shrink-0" /> {selectedAnnexChat.annex?.title}</p>
                                     </div>
                                   </div>
                                 </div>

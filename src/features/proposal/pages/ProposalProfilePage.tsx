@@ -70,9 +70,9 @@ export default function ProposalProfilePage({ setPage }: { setPage: (p: string) 
 
     // 4. Mindset & Sri Lankan Prompts
     past_affairs_openness: 'Open to partners with past affairs',
-    social_drinking_level: 'Non-drinker 🚭',
-    smokingStatus: 'Non-smoker 🚭',
-    dietaryPreference: 'Non-Vegetarian 🍗',
+    social_drinking_level: 'Non-drinker',
+    smokingStatus: 'Non-smoker',
+    dietaryPreference: 'Non-Vegetarian',
     prompt_about_me: '',
     prompt_ideal_partner: '',
     blurPhoto: true
@@ -450,9 +450,9 @@ export default function ProposalProfilePage({ setPage }: { setPage: (p: string) 
                       onChange={handleChange}
                       className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50 font-sans font-bold"
                     >
-                      <option value="University">Campus Graduate / University Student 🎓</option>
-                      <option value="Professional Qualification">Working Professional / Technical Specialist 💼</option>
-                      <option value="General / Business">Business Enterprise / Entrepreneur & General 🏢</option>
+                      <option value="University">Campus Graduate / University Student</option>
+                      <option value="Professional Qualification">Working Professional / Technical Specialist</option>
+                      <option value="General / Business">Business Enterprise / Entrepreneur & General</option>
                     </select>
                   </div>
 
@@ -591,10 +591,10 @@ export default function ProposalProfilePage({ setPage }: { setPage: (p: string) 
                   <div>
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Dietary Preference</label>
                     <select name="dietaryPreference" value={formData.dietaryPreference} onChange={handleChange} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-3 text-xs">
-                      <option value="Non-Vegetarian 🍗">Non-Vegetarian 🍗</option>
-                      <option value="Vegetarian 🥗">Vegetarian 🥗</option>
-                      <option value="Vegan 🌿">Vegan 🌿</option>
-                      <option value="Halal 🕌">Halal 🕌</option>
+                      <option value="Non-Vegetarian">Non-Vegetarian</option>
+                      <option value="Vegetarian">Vegetarian</option>
+                      <option value="Vegan">Vegan</option>
+                      <option value="Halal">Halal</option>
                     </select>
                   </div>
 
@@ -610,8 +610,8 @@ export default function ProposalProfilePage({ setPage }: { setPage: (p: string) 
                   <div>
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Drinking Lifestyle</label>
                     <select name="social_drinking_level" value={formData.social_drinking_level} onChange={handleChange} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-3 text-xs">
-                      <option value="Non-drinker 🚭">Non-drinker 🚭</option>
-                      <option value="Social/Occasional Drinker 🍷">Social/Occasional Drinker 🍷</option>
+                      <option value="Non-drinker">Non-drinker</option>
+                      <option value="Social/Occasional Drinker">Social/Occasional Drinker</option>
                       <option value="Regular Drinker">Regular Drinker</option>
                     </select>
                   </div>
@@ -619,8 +619,8 @@ export default function ProposalProfilePage({ setPage }: { setPage: (p: string) 
                   <div>
                     <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Smoking Lifestyle</label>
                     <select name="smokingStatus" value={formData.smokingStatus} onChange={handleChange} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-3 text-xs">
-                      <option value="Non-smoker 🚭">Non-smoker 🚭</option>
-                      <option value="Social/Occasional Smoker 🚬">Social/Occasional Smoker 🚬</option>
+                      <option value="Non-smoker">Non-smoker</option>
+                      <option value="Social/Occasional Smoker">Social/Occasional Smoker</option>
                       <option value="Regular Smoker">Regular Smoker</option>
                     </select>
                   </div>
@@ -636,7 +636,7 @@ export default function ProposalProfilePage({ setPage }: { setPage: (p: string) 
 
                   <div>
                     <label className="text-xs font-bold text-rose-500 uppercase tracking-wider mb-2 flex items-center gap-1">
-                      <Sparkles size={14} /> 💕 Partner Preference (සහකරු / සහකාරිය පිළිබඳ අපේක්ෂා)
+                      <Sparkles size={14} /> Partner Preference (සහකරු / සහකාරිය පිළිබඳ අපේක්ෂා)
                     </label>
                     <textarea required name="prompt_ideal_partner" value={formData.prompt_ideal_partner} onChange={handleChange} rows={3} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50 font-sinhala" />
                   </div>

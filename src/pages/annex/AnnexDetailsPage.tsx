@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   LuStar, LuBadgeCheck, LuWifi, LuBath, LuSnowflake, LuCar, LuUtensils,
-  LuZap,
-  LuMessageCircle, LuX, LuCircleCheckBig, LuCheck
+  LuZap, LuMessageCircle, LuX, LuCircleCheckBig, LuCheck,
+  LuShieldCheck, LuHouse, LuClock, LuUsers, LuBus, LuFootprints,
+  LuDroplets, LuLock, LuLightbulb, LuBanknote, LuShare2, LuCalculator, LuMapPin
 } from 'react-icons/lu';
 import SEO from '../../components/SEO';
 import VerifiedBadge from '../../components/ui/VerifiedBadge';
@@ -193,7 +194,7 @@ const AnnexDetailsPage = () => {
 
       <SEO
         title={annex ? `${annex.title} - Annex details` : "Loading details..."}
-        description={annex ? `🚶 ${annex.walkTimeMins || 5} mins walk to ${annex.university ? annex.university.name : 'Campus'}. ${annex.address}. Verified Student Accommodation.` : undefined}
+        description={annex ? `${annex.walkTimeMins || 5} mins walk to ${annex.university ? annex.university.name : 'Campus'}. ${annex.address}. Verified Student Accommodation.` : undefined}
         image={annex && annex.images && annex.images[0] ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${annex.images[0].imageUrl}` : undefined}
         schemaData={annex ? {
           "@context": "https://schema.org",
@@ -312,8 +313,8 @@ const AnnexDetailsPage = () => {
                   <div className="p-5 rounded-3xl bg-blue-50/60 dark:bg-slate-800/60 border border-blue-200/60 dark:border-slate-700 shadow-sm space-y-4">
                     <div className="flex justify-between items-center">
                       <div>
-                        <h3 className="text-xs font-black uppercase tracking-widest text-blue-800 dark:text-blue-300">
-                          🧮 Rent & Bill Splitter Calculator
+                        <h3 className="text-xs font-black uppercase tracking-widest text-blue-800 dark:text-blue-300 flex items-center gap-1.5">
+                          <LuCalculator className="text-sm shrink-0" /> Rent & Bill Splitter Calculator
                         </h3>
                         <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                           Estimate per-student cost when sharing this annex
@@ -380,7 +381,7 @@ const AnnexDetailsPage = () => {
                 {/* Location Map */}
                 <div className="space-y-4">
                   <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
-                    Location proximity: {annex.distanceToUni ? `📍 ${annex.distanceToUni} km to campus` : ''}
+                    Location proximity: {annex.distanceToUni ? `${annex.distanceToUni} km to campus` : ''}
                   </h2>
                   <div className="p-1 rounded-[2rem] border border-white/40 dark:border-slate-700/50 bg-white/40 dark:bg-slate-800/40">
                     <LeafletDetailMap
@@ -486,46 +487,46 @@ const AnnexDetailsPage = () => {
                   <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Sri Lanka Student Utilities</h2>
                   <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                     <div className={`p-3.5 rounded-2xl flex items-center gap-2.5 border text-xs font-bold ${annex.landlordPresence === 'ON_SITE' ? 'bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400'}`}>
-                      <span className="text-base">{annex.landlordPresence === 'ON_SITE' ? '👨‍👩‍👧' : '🏠'}</span> {annex.landlordPresence === 'ON_SITE' ? 'Landlord Lives On-Site' : 'Independent (No Landlord on-site)'}
+                      {annex.landlordPresence === 'ON_SITE' ? <LuShieldCheck size={16} className="shrink-0" /> : <LuHouse size={16} className="shrink-0" />} {annex.landlordPresence === 'ON_SITE' ? 'Landlord Lives On-Site' : 'Independent (No Landlord on-site)'}
                     </div>
                     {annex.curfewTime && (
                       <div className="p-3.5 rounded-2xl flex items-center gap-2.5 border text-xs font-bold bg-indigo-500/10 border-indigo-500/20 text-indigo-700 dark:text-indigo-400">
-                        <span className="text-base">🕒</span> Gate Rules: {annex.curfewTime}
+                        <LuClock size={16} className="shrink-0" /> Gate Rules: {annex.curfewTime}
                       </div>
                     )}
                     {annex.visitorPolicy && (
                       <div className="p-3.5 rounded-2xl flex items-center gap-2.5 border text-xs font-bold bg-purple-500/10 border-purple-500/20 text-purple-700 dark:text-purple-400">
-                        <span className="text-base">👥</span> Visitors: {annex.visitorPolicy}
+                        <LuUsers size={16} className="shrink-0" /> Visitors: {annex.visitorPolicy}
                       </div>
                     )}
                     {annex.busRoute && (
                       <div className="p-3.5 rounded-2xl flex items-center gap-2.5 border text-xs font-bold bg-blue-500/10 border-blue-500/20 text-blue-700 dark:text-blue-400 col-span-2 lg:col-span-3">
-                        <span className="text-base">🚌</span> Transit: {annex.busRoute}
+                        <LuBus size={16} className="shrink-0" /> Transit: {annex.busRoute}
                       </div>
                     )}
                     <div className={`p-3.5 rounded-2xl flex items-center gap-2.5 border text-xs font-bold ${annex.walkTimeMins ? 'bg-blue-500/10 border-blue-500/20 text-blue-700 dark:text-blue-400' : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500'}`}>
-                      <span className="text-base">🚶</span> {annex.walkTimeMins || 5} mins walk to gate
+                      <LuFootprints size={16} className="shrink-0" /> {annex.walkTimeMins || 5} mins walk to gate
                     </div>
                     <div className={`p-3.5 rounded-2xl flex items-center gap-2.5 border text-xs font-bold ${annex.hasPowerBackup ? 'bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400' : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-400 line-through'}`}>
-                      <span className="text-base">⚡</span> Inverter / Generator
+                      <LuZap size={16} className="shrink-0" /> Inverter / Generator
                     </div>
                     <div className={`p-3.5 rounded-2xl flex items-center gap-2.5 border text-xs font-bold ${annex.hasWaterTank !== false ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-700 dark:text-cyan-400' : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-400 line-through'}`}>
-                      <span className="text-base">🚰</span> 24h Water Storage Tank
+                      <LuDroplets size={16} className="shrink-0" /> 24h Water Storage Tank
                     </div>
                     <div className={`p-3.5 rounded-2xl flex items-center gap-2.5 border text-xs font-bold ${annex.isCookingAllowed !== false ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-400 line-through'}`}>
-                      <span className="text-base">🍳</span> Cooking Facilities Allowed
+                      <LuUtensils size={16} className="shrink-0" /> Cooking Facilities Allowed
                     </div>
                     <div className={`p-3.5 rounded-2xl flex items-center gap-2.5 border text-xs font-bold ${annex.hasSeparateEntrance ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-700 dark:text-indigo-400' : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-400 line-through'}`}>
-                      <span className="text-base">🔒</span> Separate Entrance & Keys
+                      <LuLock size={16} className="shrink-0" /> Separate Entrance & Keys
                     </div>
                     <div className={`p-3.5 rounded-2xl flex items-center gap-2.5 border text-xs font-bold ${annex.hasSeparateMeter ? 'bg-purple-500/10 border-purple-500/20 text-purple-700 dark:text-purple-400' : 'bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-400 line-through'}`}>
-                      <span className="text-base">💡</span> Separate Electricity Meter
+                      <LuLightbulb size={16} className="shrink-0" /> Separate Electricity Meter
                     </div>
                     <div className="p-3.5 rounded-2xl flex items-center gap-2.5 border text-xs font-bold bg-pink-500/10 border-pink-500/20 text-pink-700 dark:text-pink-400">
-                      <span className="text-base">🚻</span> {annex.genderPolicy === 'GIRLS_ONLY' ? 'Girls Only' : annex.genderPolicy === 'BOYS_ONLY' ? 'Boys Only' : 'Any Student'}
+                      <LuUsers size={16} className="shrink-0" /> {annex.genderPolicy === 'GIRLS_ONLY' ? 'Girls Only' : annex.genderPolicy === 'BOYS_ONLY' ? 'Boys Only' : 'Any Student'}
                     </div>
                     <div className="p-3.5 rounded-2xl flex items-center gap-2.5 border text-xs font-bold bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400">
-                      <span className="text-base">💵</span> Key Money: {annex.keyMoneyMonths || 1} Month(s)
+                      <LuBanknote size={16} className="shrink-0" /> Key Money: {annex.keyMoneyMonths || 1} Month(s)
                     </div>
                   </div>
                 </div>
@@ -582,7 +583,7 @@ const AnnexDetailsPage = () => {
                       }}
                       className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3.5 rounded-full font-bold shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 active:scale-95 text-sm cursor-pointer border-none"
                     >
-                      <LuMessageCircle className="text-xl shrink-0" /> 💬 Send Inquiry
+                      <LuMessageCircle className="text-xl shrink-0" /> Send Inquiry
                     </button>
                     <a
                       href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this student accommodation on The Uni Gang: ${annex.title}\n\nhttps://unigang.lk/share/annex/${annex.id}`)}`}
@@ -590,7 +591,7 @@ const AnnexDetailsPage = () => {
                       rel="noreferrer"
                       className="bg-[#25D366] hover:bg-[#20bd5a] text-white px-5 py-3.5 rounded-full font-bold shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 active:scale-95 text-sm cursor-pointer border-none decoration-none whitespace-nowrap"
                     >
-                      📲 Share Link
+                      <LuShare2 className="text-lg shrink-0" /> Share Link
                     </a>
                   </div>
                 </div>

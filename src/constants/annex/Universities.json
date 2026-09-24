@@ -1,146 +1,53 @@
 [
-    {
-        "id": "1",
-        "name": "University of Colombo",
-        "latitude": 6.9016,
-        "longitude": 79.8589
-    },
-    {
-        "id": "2",
-        "name": "University of Peradeniya",
-        "latitude": 7.2549,
-        "longitude": 80.5925
-    },
-    {
-        "id": "3",
-        "name": "University of Sri Jayewardenepura",
-        "latitude": 6.9062,
-        "longitude": 79.9018
-    },
-    {
-        "id": "4",
-        "name": "University of Kelaniya",
-        "latitude": 6.9740,
-        "longitude": 79.9160
-    },
-    {
-        "id": "5",
-        "name": "University of Moratuwa",
-        "latitude": 6.7969,
-        "longitude": 79.9018
-    },
-    {
-        "id": "6",
-        "name": "University of Jaffna",
-        "latitude": 9.6615,
-        "longitude": 80.0255
-    },
-    {
-        "id": "7",
-        "name": "University of Ruhuna",
-        "latitude": 5.9745,
-        "longitude": 80.5491
-    },
-    {
-        "id": "8",
-        "name": "The Open University of Sri Lanka",
-        "latitude": 6.9178,
-        "longitude": 79.9013
-    },
-    {
-        "id": "9",
-        "name": "Eastern University, Sri Lanka",
-        "latitude": 7.7333,
-        "longitude": 81.6833
-    },
-    {
-        "id": "10",
-        "name": "South Eastern University of Sri Lanka",
-        "latitude": 7.3211,
-        "longitude": 81.7862
-    },
-    {
-        "id": "11",
-        "name": "Rajarata University of Sri Lanka",
-        "latitude": 8.3484,
-        "longitude": 80.4011
-    },
-    {
-        "id": "12",
-        "name": "Sabaragamuwa University of Sri Lanka",
-        "latitude": 6.7136,
-        "longitude": 80.7872
-    },
-    {
-        "id": "13",
-        "name": "Wayamba University of Sri Lanka",
-        "latitude": 7.6050,
-        "longitude": 80.2143
-    },
-    {
-        "id": "14",
-        "name": "Uva Wellassa University",
-        "latitude": 6.9934,
-        "longitude": 81.0550
-    },
-    {
-        "id": "15",
-        "name": "University of the Visual & Performing Arts",
-        "latitude": 6.9154,
-        "longitude": 79.8568
-    },
-    {
-        "id": "16",
-        "name": "Gampaha Wickramarachchi University of Indigenous Medicine",
-        "latitude": 7.1000,
-        "longitude": 79.9980
-    },
-    {
-        "id": "17",
-        "name": "Institute of Technology University of Moratuwa (ITUM)",
-        "latitude": 6.7969,
-        "longitude": 79.9018
-    },
-    {
-        "id": "18",
-        "name": "Informatics Institute of Technology (IIT)",
-        "latitude": 6.9022,
-        "longitude": 79.8612
-    },
-    {
-        "id": "19",
-        "name": "NSBM Green University",
-        "latitude": 6.8241,
-        "longitude": 80.0361
-    },
-    {
-        "id": "20",
-        "name": "SLIIT (Sri Lanka Institute of Information Technology)",
-        "latitude": 6.9148,
-        "longitude": 79.9729
-    },
-    {
-        "id": "21",
-        "name": "NIBM (National Institute of Business Management)",
-        "latitude": 6.9270,
-        "longitude": 79.8611
-    },
-    {
-        "id": "22",
-        "name": "Aquinas College of Higher Studies",
-        "latitude": 6.9155,
-        "longitude": 79.8600
-    },
-    {
-        "id": "23",
-        "name": "ICBT Campus",
-        "latitude": 6.9167,
-        "longitude": 79.8500
-    },
-    {
-        "id": "0",
-        "name": "Other / Not Listed",
-        "latitude": 7.8731,
-        "longitude": 80.7718
-    }
+  { "id": "1", "name": "University of Colombo", "latitude": 6.9016, "longitude": 79.8589 },
+  { "id": "2", "name": "University of Peradeniya", "latitude": 7.2549, "longitude": 80.5925 },
+  { "id": "3", "name": "University of Sri Jayewardenepura", "latitude": 6.9062, "longitude": 79.9018 },
+  { "id": "4", "name": "University of Kelaniya", "latitude": 6.9740, "longitude": 79.9160 },
+  { "id": "5", "name": "University of Moratuwa", "latitude": 6.7969, "longitude": 79.9018 },
+  { "id": "6", "name": "University of Jaffna", "latitude": 9.6615, "longitude": 80.0255 },
+  { "id": "7", "name": "University of Ruhuna (Matara)", "latitude": 5.9381, "longitude": 80.5760 },
+  { "id": "8", "name": "The Open University of Sri Lanka (Nawala)", "latitude": 6.8856, "longitude": 79.8837 },
+  { "id": "9", "name": "Eastern University, Sri Lanka (Chenkalady)", "latitude": 7.7844, "longitude": 81.5794 },
+  { "id": "10", "name": "South Eastern University of Sri Lanka (Oluvil)", "latitude": 7.2974, "longitude": 81.8500 },
+  { "id": "11", "name": "Rajarata University of Sri Lanka (Mihintale)", "latitude": 8.3588, "longitude": 80.5050 },
+  { "id": "12", "name": "Sabaragamuwa University of Sri Lanka (Belihuloya)", "latitude": 6.7136, "longitude": 80.7872 },
+  { "id": "13", "name": "Wayamba University of Sri Lanka (Kuliyapitiya)", "latitude": 7.4725, "longitude": 80.0381 },
+  { "id": "14", "name": "Uva Wellassa University (Badulla)", "latitude": 6.9822, "longitude": 81.0772 },
+  { "id": "15", "name": "University of the Visual & Performing Arts", "latitude": 6.9154, "longitude": 79.8601 },
+  { "id": "16", "name": "Gampaha Wickramarachchi University of Indigenous Medicine", "latitude": 7.0945, "longitude": 80.0195 },
+  { "id": "17", "name": "University of Vavuniya", "latitude": 8.7548, "longitude": 80.4072 },
+  { "id": "18", "name": "Institute of Technology University of Moratuwa (ITUM Diyagama)", "latitude": 6.8183, "longitude": 80.0162 },
+  { "id": "19", "name": "General Sir John Kotelawala Defence University (KDU Ratmalana)", "latitude": 6.8193, "longitude": 79.8864 },
+  { "id": "20", "name": "KDU Southern Campus (Sooriyawewa)", "latitude": 6.3242, "longitude": 81.0028 },
+  { "id": "21", "name": "Sri Lanka Law College (Colombo 12)", "latitude": 6.9388, "longitude": 79.8569 },
+  { "id": "22", "name": "Ocean University of Sri Lanka (Mattakkuliya)", "latitude": 6.9744, "longitude": 79.8708 },
+  { "id": "23", "name": "Buddhasravaka Bhikshu University (Anuradhapura)", "latitude": 8.3377, "longitude": 80.4069 },
+  { "id": "24", "name": "Buddhist and Pali University of Sri Lanka (Homagama)", "latitude": 6.8419, "longitude": 80.0034 },
+  { "id": "25", "name": "SLIIT - Malabe Main Campus", "latitude": 6.9148, "longitude": 79.9729 },
+  { "id": "26", "name": "SLIIT - Metropolitan Campus (Kollupitiya)", "latitude": 6.9084, "longitude": 79.8517 },
+  { "id": "27", "name": "NSBM Green University (Homagama / Pitipana)", "latitude": 6.8241, "longitude": 80.0361 },
+  { "id": "28", "name": "Informatics Institute of Technology (IIT Bambalapitiya)", "latitude": 6.8872, "longitude": 79.8601 },
+  { "id": "29", "name": "NIBM - National Institute of Business Management (Colombo 07)", "latitude": 6.9067, "longitude": 79.8708 },
+  { "id": "30", "name": "NIBM - Kandy Campus", "latitude": 7.2906, "longitude": 80.6337 },
+  { "id": "31", "name": "CINEC Campus (Malabe)", "latitude": 6.9103, "longitude": 79.9678 },
+  { "id": "32", "name": "Horizon Campus (Malabe)", "latitude": 6.9152, "longitude": 79.9806 },
+  { "id": "33", "name": "SLTC Research University (Padukka)", "latitude": 6.8497, "longitude": 80.1172 },
+  { "id": "34", "name": "ICBT Campus - Colombo (Bambalapitiya)", "latitude": 6.8887, "longitude": 79.8588 },
+  { "id": "35", "name": "ICBT Campus - Kandy", "latitude": 7.2895, "longitude": 80.6288 },
+  { "id": "36", "name": "Aquinas College of Higher Studies (Colombo 08)", "latitude": 6.9208, "longitude": 79.8786 },
+  { "id": "37", "name": "KIU - Kaatsu International University (Battaramulla)", "latitude": 6.9079, "longitude": 79.9234 },
+  { "id": "38", "name": "Saegis Campus (Nugegoda / Kohuwala)", "latitude": 6.8624, "longitude": 79.8893 },
+  { "id": "39", "name": "BMS - Business Management School (Wellawatte)", "latitude": 6.8772, "longitude": 79.8617 },
+  { "id": "40", "name": "APIIT Sri Lanka (Colombo 02)", "latitude": 6.9205, "longitude": 79.8553 },
+  { "id": "41", "name": "ESOFT Metro Campus (Colombo 04)", "latitude": 6.8923, "longitude": 79.8584 },
+  { "id": "42", "name": "Curtin Colombo (Nawala)", "latitude": 6.8920, "longitude": 79.8872 },
+  { "id": "43", "name": "SLIATE - ATI Mattakkuliya", "latitude": 6.9782, "longitude": 79.8785 },
+  { "id": "44", "name": "SLIATE - ATI Dehiwala", "latitude": 6.8491, "longitude": 79.8711 },
+  { "id": "45", "name": "SLIATE - ATI Labuduwa (Galle)", "latitude": 6.0682, "longitude": 80.2319 },
+  { "id": "46", "name": "SLIATE - ATI Kandy", "latitude": 7.2842, "longitude": 80.6231 },
+  { "id": "47", "name": "National Institute of Education (NIE Maharagama)", "latitude": 6.8488, "longitude": 79.9272 },
+  { "id": "48", "name": "Arthur C Clarke Institute (Katubedda)", "latitude": 6.7937, "longitude": 79.9002 },
+  { "id": "49", "name": "Sri Lanka German Training Institute (SLGTI Kilinochchi)", "latitude": 9.3908, "longitude": 80.4072 },
+  { "id": "50", "name": "Sri Lanka German Railway Technical Training Centre (Ratmalana)", "latitude": 6.8202, "longitude": 79.8894 },
+  { "id": "0", "name": "Other / Not Listed (වෙනත් ආයතනයක්)", "latitude": 7.8731, "longitude": 80.7718 }
 ]

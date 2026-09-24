@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuSearch, LuPlus, LuShoppingBag, LuBriefcase, LuShieldCheck,
   LuStar, LuX, LuSend, LuChevronLeft, LuChevronRight, LuBadgeCheck,
-  LuTrash2, LuArrowLeft, LuUpload
+  LuTrash2, LuArrowLeft, LuUpload, LuBuilding
 } from 'react-icons/lu';
 import MarketplaceCard from '../../components/market/MarketplaceCard';
 import { VerificationModal } from '../../features/proposal/components/verification/VerificationModal';
@@ -125,8 +125,7 @@ const MarketplaceHome: React.FC = () => {
 
       if (priceChanged) {
         saveCart(updatedCart);
-        toast('Cart prices updated to match latest store rates.', {
-          icon: '🔄',
+        toast.success('Cart prices updated to match latest store rates.', {
           style: {
             borderRadius: '16px',
             background: '#334155',
@@ -1137,7 +1136,9 @@ const MarketplaceHome: React.FC = () => {
                       {cartPayment === 'BANK_TRANSFER' && (
                         <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300 text-left">
                           <div className="p-4 bg-indigo-500/5 border border-indigo-500/20 rounded-2xl text-[11px] text-slate-700 dark:text-slate-300">
-                            <p className="font-bold text-indigo-600 dark:text-indigo-400 mb-1">🏦 Bank Account Details</p>
+                            <p className="font-bold text-indigo-600 dark:text-indigo-400 mb-1 flex items-center gap-1.5">
+                              <LuBuilding size={14} /> Bank Account Details
+                            </p>
                             <p><strong>Bank:</strong> Sampath Bank</p>
                             <p><strong>Account Name:</strong> The Uni Gang Store</p>
                             <p><strong>Account Number:</strong> 1234 5678 9012</p>

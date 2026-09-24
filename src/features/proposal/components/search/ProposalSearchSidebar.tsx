@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal, RotateCcw, Save, Crown, Check } from 'lucide-react';
+import { Search, SlidersHorizontal, RotateCcw, ChevronDown, Crown } from 'lucide-react';
 import { useTheme } from '../../../../context/ThemeContext';
 
 export interface SearchFilterState {
@@ -6,6 +6,7 @@ export interface SearchFilterState {
   vipOnly: boolean;
   sortBy: string;
   lookingFor: 'Groom' | 'Bride' | 'All';
+  ageRange?: string;
   minAge: string;
   maxAge: string;
   minHeight: string;
@@ -27,11 +28,44 @@ export interface SearchFilterState {
   nicVerified: string;
 }
 
+const SRI_LANKA_DISTRICTS = [
+  'All',
+  'Colombo',
+  'Gampaha',
+  'Kalutara',
+  'Kandy',
+  'Matale',
+  'Nuwara Eliya',
+  'Galle',
+  'Matara',
+  'Hambantota',
+  'Jaffna',
+  'Kilinochchi',
+  'Mannar',
+  'Vavuniya',
+  'Mullaitivu',
+  'Batticaloa',
+  'Ampara',
+  'Trincomalee',
+  'Kurunegala',
+  'Puttalam',
+  'Anuradhapura',
+  'Polonnaruwa',
+  'Badulla',
+  'Moneragala',
+  'Ratnapura',
+  'Kegalle',
+];
+
+const RELIGIONS = ['All', 'Buddhist', 'Catholic', 'Hindu', 'Islam'];
+
+const AGE_RANGES = ['All', '18-25', '26-30', '31-35', '36-40', '41-50', '50+'];
+
 interface ProposalSearchSidebarProps {
   filters: SearchFilterState;
   onFilterChange: (filters: SearchFilterState) => void;
   onResetFilters: () => void;
-  onSaveFilters?: () => void;
+  onOpenAdvancedDrawer?: () => void;
   className?: string;
 }
 
@@ -39,7 +73,7 @@ export default function ProposalSearchSidebar({
   filters,
   onFilterChange,
   onResetFilters,
-  onSaveFilters,
+  onOpenAdvancedDrawer,
   className = '',
 }: ProposalSearchSidebarProps) {
   const { theme } = useTheme();
@@ -52,369 +86,217 @@ export default function ProposalSearchSidebar({
     });
   };
 
+  const hasActiveFilters =
+    Boolean(filters.codeSearch) ||
+    filters.district !== 'All' && filters.district !== 'Any' ||
+    filters.religion !== 'All' && filters.religion !== 'Any' ||
+    (filters.ageRange && filters.ageRange !== 'All') ||
+    filters.lookingFor !== 'All' ||
+    filters.vipOnly;
+
   return (
     <aside
-      className={`w-full lg:w-[320px] rounded-3xl p-5 sm:p-6 border shadow-xl font-sans transition-colors duration-300 ${
-        isDark
-          ? 'bg-slate-900/90 border-slate-800 text-white'
-          : 'bg-white border-slate-200 text-slate-900'
+      className={`w-full rounded-[2rem] p-6 border shadow-sm font-sans transition-colors duration-300 ${
+        isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200/90 text-slate-900'
       } ${className}`}
     >
-      {/* 1. FIND BY CODE (Matching Reference Screenshot 5) */}
-      <div className="mb-6">
-        <label className="text-[11px] font-black uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5 font-sans">
-          <Search size={14} className="text-rose-500" /> FIND BY CODE
-        </label>
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="e.g. GR000149"
-            value={filters.codeSearch}
-            onChange={(e) => handleChange('codeSearch', e.target.value)}
-            className={`w-full px-4 py-2.5 rounded-xl text-xs font-bold border focus:outline-none focus:ring-2 focus:ring-rose-500/50 transition-all ${
-              isDark
-                ? 'bg-slate-950 border-slate-800 text-white placeholder:text-slate-600'
-                : 'bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400'
-            }`}
-          />
-        </div>
+      {/* ── HEADER ── */}
+      <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
+          Filters
+        </h3>
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={onResetFilters}
+            className="text-xs font-bold text-rose-500 hover:text-rose-600 dark:hover:text-rose-400 flex items-center gap-1 transition-colors cursor-pointer"
+          >
+            <RotateCcw size={12} />
+            <span>Reset</span>
+          </button>
+        )}
       </div>
 
-      {/* 2. FILTER SETTINGS HEADER + RESET & SAVE BUTTONS (Matching Screenshot 5) */}
-      <div className="mb-6 pt-4 border-t border-slate-200 dark:border-slate-800">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5 font-sans">
-            <SlidersHorizontal size={14} className="text-rose-500" /> FILTER SETTINGS
-          </span>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onResetFilters}
-              className="px-2.5 py-1 rounded-lg text-[10px] font-extrabold border flex items-center gap-1 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            >
-              <RotateCcw size={12} /> Reset
-            </button>
-            <button
-              type="button"
-              onClick={onSaveFilters}
-              className="px-2.5 py-1 rounded-lg text-[10px] font-extrabold bg-rose-500 text-white flex items-center gap-1 hover:bg-rose-600 transition-colors shadow-sm"
-            >
-              <Save size={12} /> Save
-            </button>
+      <div className="space-y-5 pt-5">
+        {/* ── 1. SEARCH INPUT (Name or Job) ── */}
+        <div>
+          <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 mb-2 block font-sans">
+            Search
+          </label>
+          <div className="relative">
+            <Search
+              size={15}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            />
+            <input
+              type="text"
+              placeholder="Name or Job..."
+              value={filters.codeSearch}
+              onChange={(e) => handleChange('codeSearch', e.target.value)}
+              className={`w-full pl-9 pr-3.5 py-2.5 rounded-xl border text-xs font-semibold placeholder:text-slate-400 transition-all focus:outline-none focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 ${
+                isDark
+                  ? 'bg-slate-950 border-slate-800 text-white placeholder:text-slate-600'
+                  : 'bg-slate-50/70 border-slate-200 text-slate-900'
+              }`}
+            />
           </div>
         </div>
-      </div>
 
-      {/* 3. SHOW ONLY: VIP ELITE PROFILES TOGGLE (Matching Screenshot 4 & 5) */}
-      <div className="mb-6">
-        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2 block font-sans">
-          SHOW ONLY
-        </span>
-        <button
-          type="button"
-          onClick={() => handleChange('vipOnly', !filters.vipOnly)}
-          className={`w-full py-2.5 px-4 rounded-xl border text-xs font-black flex items-center justify-center gap-2 transition-all ${
-            filters.vipOnly
-              ? 'bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-300 text-slate-950 border-amber-300 shadow-md scale-[1.02]'
-              : isDark
-              ? 'bg-slate-950 border-slate-800 text-slate-300 hover:border-amber-500/40'
-              : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-amber-400'
-          }`}
-        >
-          <Crown size={15} className={filters.vipOnly ? 'text-slate-950' : 'text-amber-500'} fill={filters.vipOnly ? 'currentColor' : 'none'} />
-          <span>VIP Elite Profiles</span>
-          {filters.vipOnly && <Check size={14} strokeWidth={3} className="ml-auto" />}
-        </button>
-      </div>
+        {/* ── 2. DISTRICT DROPDOWN ── */}
+        <div>
+          <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 mb-2 block font-sans">
+            District
+          </label>
+          <div className="relative">
+            <select
+              value={filters.district === 'Any' ? 'All' : filters.district}
+              onChange={(e) => handleChange('district', e.target.value)}
+              className={`w-full px-3.5 py-2.5 pr-8 rounded-xl border text-xs font-semibold appearance-none cursor-pointer transition-all focus:outline-none focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 ${
+                isDark
+                  ? 'bg-slate-950 border-slate-800 text-white'
+                  : 'bg-slate-50/70 border-slate-200 text-slate-900'
+              }`}
+            >
+              {SRI_LANKA_DISTRICTS.map((d) => (
+                <option key={d} value={d} className={isDark ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'}>
+                  {d}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={14}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            />
+          </div>
+        </div>
 
-      {/* 4. SORT BY DROPDOWN (Matching Screenshot 4 & 5) */}
-      <div className="mb-5">
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5 block font-sans">
-          SORT BY
-        </label>
-        <select
-          value={filters.sortBy}
-          onChange={(e) => handleChange('sortBy', e.target.value)}
-          className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold border focus:outline-none focus:ring-2 focus:ring-rose-500/50 cursor-pointer ${
-            isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-          }`}
-        >
-          <option value="Any">Any</option>
-          <option value="Latest">Latest Published</option>
-          <option value="AgeLowHigh">Age: Low to High</option>
-          <option value="AgeHighLow">Age: High to Low</option>
-        </select>
-      </div>
+        {/* ── 3. RELIGION DROPDOWN ── */}
+        <div>
+          <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 mb-2 block font-sans">
+            Religion
+          </label>
+          <div className="relative">
+            <select
+              value={filters.religion === 'Any' ? 'All' : filters.religion}
+              onChange={(e) => handleChange('religion', e.target.value)}
+              className={`w-full px-3.5 py-2.5 pr-8 rounded-xl border text-xs font-semibold appearance-none cursor-pointer transition-all focus:outline-none focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 ${
+                isDark
+                  ? 'bg-slate-950 border-slate-800 text-white'
+                  : 'bg-slate-50/70 border-slate-200 text-slate-900'
+              }`}
+            >
+              {RELIGIONS.map((r) => (
+                <option key={r} value={r} className={isDark ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'}>
+                  {r}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={14}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            />
+          </div>
+        </div>
 
-      {/* 5. I'M LOOKING FOR: GROOM / BRIDE TOGGLE (Matching Screenshot 4 & 5) */}
-      <div className="mb-5">
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-2 block font-sans">
-          I'M LOOKING FOR
-        </label>
-        <div className="grid grid-cols-2 gap-2.5">
-          <button
-            type="button"
-            onClick={() => handleChange('lookingFor', 'Groom')}
-            className={`py-2.5 px-3 rounded-xl border text-xs font-extrabold flex items-center justify-center gap-2 transition-all ${
-              filters.lookingFor === 'Groom'
-                ? 'bg-rose-500 text-white border-rose-500 shadow-md'
+        {/* ── 4. AGE RANGE PILLS (MATCHING SCREENSHOT 1) ── */}
+        <div>
+          <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 mb-2.5 block font-sans">
+            Age Range
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {AGE_RANGES.map((range) => {
+              const active = (filters.ageRange || 'All') === range;
+              return (
+                <button
+                  key={range}
+                  type="button"
+                  onClick={() => handleChange('ageRange', range)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border ${
+                    active
+                      ? 'bg-rose-500 text-white border-rose-500 shadow-sm shadow-rose-500/30'
+                      : isDark
+                      ? 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                      : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-900'
+                  }`}
+                >
+                  {range}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── 5. LOOKING FOR (BRIDE / GROOM) ── */}
+        <div>
+          <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 mb-2.5 block font-sans">
+            Looking For
+          </label>
+          <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl border bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800">
+            {(['All', 'Bride', 'Groom'] as const).map((gender) => {
+              const active = filters.lookingFor === gender;
+              return (
+                <button
+                  key={gender}
+                  type="button"
+                  onClick={() => handleChange('lookingFor', gender)}
+                  className={`py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
+                    active
+                      ? 'bg-rose-500 text-white shadow-sm font-black'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  {gender === 'Bride' ? '👰 Bride' : gender === 'Groom' ? '🤵 Groom' : 'All'}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── 6. VIP PROFILES ONLY ── */}
+        <div className="pt-2">
+          <label
+            onClick={() => handleChange('vipOnly', !filters.vipOnly)}
+            className={`flex items-center justify-between p-3 rounded-2xl border cursor-pointer transition-all ${
+              filters.vipOnly
+                ? 'bg-amber-500/10 border-amber-500/40 text-amber-500 font-extrabold'
                 : isDark
-                ? 'bg-slate-950 border-slate-800 text-slate-300'
-                : 'bg-slate-50 border-slate-200 text-slate-700'
+                ? 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
             }`}
           >
-            <span>🤵</span> Groom
-          </button>
-          <button
-            type="button"
-            onClick={() => handleChange('lookingFor', 'Bride')}
-            className={`py-2.5 px-3 rounded-xl border text-xs font-extrabold flex items-center justify-center gap-2 transition-all ${
-              filters.lookingFor === 'Bride'
-                ? 'bg-rose-500 text-white border-rose-500 shadow-md'
-                : isDark
-                ? 'bg-slate-950 border-slate-800 text-slate-300'
-                : 'bg-slate-50 border-slate-200 text-slate-700'
-            }`}
-          >
-            <span>👰</span> Bride
-          </button>
+            <span className="flex items-center gap-2 text-xs font-bold">
+              <Crown size={15} className="text-amber-500 fill-amber-500" />
+              <span>VIP Profiles Only</span>
+            </span>
+            <div
+              className={`w-4 h-4 rounded-md border flex items-center justify-center transition-all ${
+                filters.vipOnly
+                  ? 'bg-amber-500 border-amber-500 text-slate-950'
+                  : 'border-slate-300 dark:border-slate-700'
+              }`}
+            >
+              {filters.vipOnly && <span className="text-[10px] font-black">✓</span>}
+            </div>
+          </label>
         </div>
-      </div>
 
-      {/* 6. AGE RANGE (MIN - MAX) (Matching Screenshot 4) */}
-      <div className="mb-5">
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5 block font-sans">
-          AGE RANGE
-        </label>
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            placeholder="Min"
-            value={filters.minAge}
-            onChange={(e) => handleChange('minAge', e.target.value)}
-            className={`w-full px-3 py-2 rounded-xl text-xs font-bold border text-center focus:outline-none focus:ring-2 focus:ring-rose-500/50 ${
-              isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-            }`}
-          />
-          <span className="text-slate-400 font-bold text-xs">–</span>
-          <input
-            type="text"
-            placeholder="Max"
-            value={filters.maxAge}
-            onChange={(e) => handleChange('maxAge', e.target.value)}
-            className={`w-full px-3 py-2 rounded-xl text-xs font-bold border text-center focus:outline-none focus:ring-2 focus:ring-rose-500/50 ${
-              isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-            }`}
-          />
-        </div>
-      </div>
-
-      {/* 7. HEIGHT RANGE (FT) (Matching Screenshot 4) */}
-      <div className="mb-5">
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5 block font-sans">
-          HEIGHT RANGE (FT)
-        </label>
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            placeholder="Min"
-            value={filters.minHeight}
-            onChange={(e) => handleChange('minHeight', e.target.value)}
-            className={`w-full px-3 py-2 rounded-xl text-xs font-bold border text-center focus:outline-none focus:ring-2 focus:ring-rose-500/50 ${
-              isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-            }`}
-          />
-          <span className="text-slate-400 font-bold text-xs">–</span>
-          <input
-            type="text"
-            placeholder="Max"
-            value={filters.maxHeight}
-            onChange={(e) => handleChange('maxHeight', e.target.value)}
-            className={`w-full px-3 py-2 rounded-xl text-xs font-bold border text-center focus:outline-none focus:ring-2 focus:ring-rose-500/50 ${
-              isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-            }`}
-          />
-        </div>
-      </div>
-
-      {/* 8. COUNTRY (Matching Screenshot 4) */}
-      <div className="mb-4">
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1 block font-sans">
-          COUNTRY
-        </label>
-        <select
-          value={filters.country}
-          onChange={(e) => handleChange('country', e.target.value)}
-          className={`w-full px-3 py-2 rounded-xl text-xs font-bold border focus:outline-none cursor-pointer ${
-            isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-          }`}
-        >
-          <option value="Any">Any</option>
-          <option value="Sri Lanka">Sri Lanka</option>
-          <option value="Abroad">Abroad</option>
-        </select>
-      </div>
-
-      {/* 9. DISTRICT (Matching Screenshot 3 & 4) */}
-      <div className="mb-4">
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1 block font-sans">
-          DISTRICT
-        </label>
-        <select
-          value={filters.district}
-          onChange={(e) => handleChange('district', e.target.value)}
-          className={`w-full px-3 py-2 rounded-xl text-xs font-bold border focus:outline-none cursor-pointer ${
-            isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-          }`}
-        >
-          <option value="Any">Any</option>
-          <option value="Colombo">Colombo</option>
-          <option value="Gampaha">Gampaha</option>
-          <option value="Kandy">Kandy</option>
-          <option value="Galle">Galle</option>
-          <option value="Kurunegala">Kurunegala</option>
-          <option value="Matale">Matale</option>
-          <option value="Kalutara">Kalutara</option>
-        </select>
-      </div>
-
-      {/* 10. ETHNICITY (Matching Screenshot 3) */}
-      <div className="mb-4">
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1 block font-sans">
-          ETHNICITY
-        </label>
-        <select
-          value={filters.ethnicity}
-          onChange={(e) => handleChange('ethnicity', e.target.value)}
-          className={`w-full px-3 py-2 rounded-xl text-xs font-bold border focus:outline-none cursor-pointer ${
-            isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-          }`}
-        >
-          <option value="Any">Any</option>
-          <option value="Sinhalese">Sinhalese</option>
-          <option value="Tamil">Tamil</option>
-          <option value="Muslim">Muslim</option>
-          <option value="Burger">Burger</option>
-        </select>
-      </div>
-
-      {/* 11. CASTE (Matching Screenshot 3) */}
-      <div className="mb-4">
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1 block font-sans">
-          CASTE
-        </label>
-        <select
-          value={filters.caste}
-          onChange={(e) => handleChange('caste', e.target.value)}
-          className={`w-full px-3 py-2 rounded-xl text-xs font-bold border focus:outline-none cursor-pointer ${
-            isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-          }`}
-        >
-          <option value="Any">Any</option>
-          <option value="Govigama">Govigama</option>
-          <option value="Karava">Karava</option>
-          <option value="Salagama">Salagama</option>
-          <option value="Bathgama">Bathgama</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-
-      {/* 12. RELIGION (Matching Screenshot 3) */}
-      <div className="mb-4">
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1 block font-sans">
-          RELIGION
-        </label>
-        <select
-          value={filters.religion}
-          onChange={(e) => handleChange('religion', e.target.value)}
-          className={`w-full px-3 py-2 rounded-xl text-xs font-bold border focus:outline-none cursor-pointer ${
-            isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-          }`}
-        >
-          <option value="Any">Any</option>
-          <option value="Buddhist">Buddhist</option>
-          <option value="Catholic">Catholic / Christian</option>
-          <option value="Hindu">Hindu</option>
-          <option value="Islam">Islam</option>
-        </select>
-      </div>
-
-      {/* 13. CIVIL STATUS (Matching Screenshot 3) */}
-      <div className="mb-4">
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1 block font-sans">
-          CIVIL STATUS
-        </label>
-        <select
-          value={filters.civilStatus}
-          onChange={(e) => handleChange('civilStatus', e.target.value)}
-          className={`w-full px-3 py-2 rounded-xl text-xs font-bold border focus:outline-none cursor-pointer ${
-            isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-          }`}
-        >
-          <option value="Any">Any</option>
-          <option value="Never Married">Never Married (අවිවාහක)</option>
-          <option value="Divorced">Divorced (දික්කසාද වූ)</option>
-          <option value="Widowed">Widowed (වැන්දඹු)</option>
-        </select>
-      </div>
-
-      {/* 14. PROFESSION (Matching Screenshot 2 & 3) */}
-      <div className="mb-4">
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1 block font-sans">
-          PROFESSION
-        </label>
-        <select
-          value={filters.profession}
-          onChange={(e) => handleChange('profession', e.target.value)}
-          className={`w-full px-3 py-2 rounded-xl text-xs font-bold border focus:outline-none cursor-pointer ${
-            isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-          }`}
-        >
-          <option value="Any">Any</option>
-          <option value="Doctor">Doctor</option>
-          <option value="Engineer">Engineer</option>
-          <option value="Lecturer">Lecturer</option>
-          <option value="Accountant">Accountant</option>
-          <option value="Teacher">Teacher</option>
-          <option value="Government Servant">Government Servant</option>
-        </select>
-      </div>
-
-      {/* 15. MONTHLY INCOME (Matching Screenshot 2) */}
-      <div className="mb-4">
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1 block font-sans">
-          MONTHLY INCOME
-        </label>
-        <select
-          value={filters.monthlyIncome}
-          onChange={(e) => handleChange('monthlyIncome', e.target.value)}
-          className={`w-full px-3 py-2 rounded-xl text-xs font-bold border focus:outline-none cursor-pointer ${
-            isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-          }`}
-        >
-          <option value="Any">Any</option>
-          <option value="Rs 50,000 - Rs 100,000">Rs 50,000 - Rs 100,000</option>
-          <option value="Rs 100,000 - Rs 200,000">Rs 100,000 - Rs 200,000</option>
-          <option value="Rs 200,000 - Rs 300,000">Rs 200,000 - Rs 300,000</option>
-          <option value="Rs 300,000+">Rs 300,000+</option>
-        </select>
-      </div>
-
-      {/* 16. NIC VERIFIED (Matching Screenshot 1) */}
-      <div className="mb-2">
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1 block font-sans">
-          NIC VERIFIED
-        </label>
-        <select
-          value={filters.nicVerified}
-          onChange={(e) => handleChange('nicVerified', e.target.value)}
-          className={`w-full px-3 py-2 rounded-xl text-xs font-bold border focus:outline-none cursor-pointer ${
-            isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-          }`}
-        >
-          <option value="Any">Any</option>
-          <option value="Verified Only">Verified Only</option>
-        </select>
+        {/* ── 7. ADVANCED FILTERS MODAL CTA (20+ FILTERS) ── */}
+        {onOpenAdvancedDrawer && (
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+            <button
+              type="button"
+              onClick={onOpenAdvancedDrawer}
+              className={`w-full py-2.5 px-4 rounded-xl border text-xs font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                isDark
+                  ? 'border-slate-800 bg-slate-950 hover:bg-slate-800 text-slate-300 hover:text-white'
+                  : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900'
+              }`}
+            >
+              <SlidersHorizontal size={14} className="text-rose-500" />
+              <span>More Filters (20+)</span>
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

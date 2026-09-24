@@ -3,10 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, X } from 'lucide-react';
 import { PrimaryButton, GhostButton } from '../components/ui/ProposalPrimitives';
 import ProposalSearchHeader from '../components/search/ProposalSearchHeader';
-import ProposalSearchTopFilterBar from '../components/search/ProposalSearchTopFilterBar';
+import ProposalSearchSidebar, { SearchFilterState } from '../components/search/ProposalSearchSidebar';
 import ProposalAdvancedFilterDrawer from '../components/search/ProposalAdvancedFilterDrawer';
 import ProposalSearchResultCard, { CandidateProfile } from '../components/search/ProposalSearchResultCard';
-import { SearchFilterState } from '../components/search/ProposalSearchSidebar';
 import { useTheme } from '../../../context/ThemeContext';
 import toast from 'react-hot-toast';
 
@@ -186,16 +185,17 @@ const DEFAULT_FILTERS: SearchFilterState = {
   codeSearch: '',
   vipOnly: false,
   sortBy: 'Any',
-  lookingFor: 'Bride',
+  lookingFor: 'All',
+  ageRange: 'All',
   minAge: '',
   maxAge: '',
   minHeight: '',
   maxHeight: '',
   country: 'Any',
-  district: 'Any',
+  district: 'All',
   ethnicity: 'Any',
   caste: 'Any',
-  religion: 'Any',
+  religion: 'All',
   civilStatus: 'Any',
   profession: 'Any',
   monthlyIncome: 'Any',
@@ -221,23 +221,55 @@ export default function ProposalDiscoverPage({
   const [filters, setFilters] = useState<SearchFilterState>(DEFAULT_FILTERS);
   const [candidates] = useState<CandidateProfile[]>(INITIAL_CANDIDATES);
   const [isAdvancedDrawerOpen, setIsAdvancedDrawerOpen] = useState(false);
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [selectedInterestProfile, setSelectedInterestProfile] = useState<CandidateProfile | null>(null);
-
-  // Active filter counter
-  const activeFilterCount = Object.entries(filters).filter(([key, val]) => {
-    if (key === 'lookingFor') return false;
-    if (typeof val === 'boolean') return val === true;
-    return val !== '' && val !== 'Any';
-  }).length;
 
   // Filter calculation logic
   const filteredCandidates = candidates.filter((item) => {
+    // 1. VIP only
     if (filters.vipOnly && !item.isVIP) return false;
-    if (filters.codeSearch && !item.code.toLowerCase().includes(filters.codeSearch.toLowerCase())) return false;
-    if (filters.district !== 'Any' && item.district !== filters.district) return false;
-    if (filters.profession !== 'Any' && item.profession !== filters.profession) return false;
-    if (filters.religion !== 'Any' && item.religion !== filters.religion) return false;
-    if (filters.civilStatus !== 'Any' && item.civilStatus && !item.civilStatus.includes(filters.civilStatus)) return false;
+
+    // 2. Looking for (Bride / Groom / All)
+    if (filters.lookingFor && filters.lookingFor !== 'All') {
+      if (filters.lookingFor === 'Bride' && !item.code.startsWith('BR')) return false;
+      if (filters.lookingFor === 'Groom' && !item.code.startsWith('GR')) return false;
+    }
+
+    // 3. Search query (matches code, name, profession, or district)
+    if (filters.codeSearch && filters.codeSearch.trim() !== '') {
+      const q = filters.codeSearch.toLowerCase().trim();
+      const matchCode = item.code.toLowerCase().includes(q);
+      const matchName = item.name.toLowerCase().includes(q);
+      const matchJob = item.profession.toLowerCase().includes(q);
+      const matchDist = item.district.toLowerCase().includes(q);
+      if (!matchCode && !matchName && !matchJob && !matchDist) return false;
+    }
+
+    // 4. District
+    if (filters.district && filters.district !== 'All' && filters.district !== 'Any') {
+      if (!item.district.toLowerCase().includes(filters.district.toLowerCase())) return false;
+    }
+
+    // 5. Religion
+    if (filters.religion && filters.religion !== 'All' && filters.religion !== 'Any') {
+      if (item.religion && !item.religion.toLowerCase().includes(filters.religion.toLowerCase())) return false;
+    }
+
+    // 6. Age Range (18-25, 26-30, 31-35, 36-40, 41-50, 50+)
+    if (filters.ageRange && filters.ageRange !== 'All') {
+      const age = item.age;
+      if (filters.ageRange === '18-25' && (age < 18 || age > 25)) return false;
+      if (filters.ageRange === '26-30' && (age < 26 || age > 30)) return false;
+      if (filters.ageRange === '31-35' && (age < 31 || age > 35)) return false;
+      if (filters.ageRange === '36-40' && (age < 36 || age > 40)) return false;
+      if (filters.ageRange === '41-50' && (age < 41 || age > 50)) return false;
+      if (filters.ageRange === '50+' && age < 50) return false;
+    }
+
+    // 7. Advanced parameters if set
+    if (filters.profession && filters.profession !== 'Any' && item.profession !== filters.profession) return false;
+    if (filters.civilStatus && filters.civilStatus !== 'Any' && item.civilStatus && !item.civilStatus.includes(filters.civilStatus)) return false;
+
     return true;
   });
 
@@ -253,72 +285,131 @@ export default function ProposalDiscoverPage({
   };
 
   return (
-    <div className={`w-full min-h-screen py-8 px-4 sm:px-6 lg:px-12 font-sans transition-colors duration-300 ${
+    <div className={`w-full min-h-screen py-8 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-300 ${
       isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'
     }`}>
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-[1550px] mx-auto">
+        
+        {/* ── TWO-COLUMN MAIN LAYOUT: LEFT FILTERS SIDEBAR + RIGHT CANDIDATES AREA ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* 1. LEFT SEARCH & FILTER SIDEBAR (MATCHING SCREENSHOT 1) */}
+          <div className="hidden lg:block lg:col-span-4 xl:col-span-3 lg:sticky lg:top-24">
+            <ProposalSearchSidebar
+              filters={filters}
+              onFilterChange={setFilters}
+              onResetFilters={() => setFilters(DEFAULT_FILTERS)}
+              onOpenAdvancedDrawer={() => setIsAdvancedDrawerOpen(true)}
+            />
+          </div>
 
-        {/* 1. SEARCH HEADER CONTROLS */}
-        <ProposalSearchHeader
-          totalResults={filteredCandidates.length > 0 ? filteredCandidates.length * 502 : 4022}
-          currentPage={1}
-          totalPages={202}
-          layoutMode={layoutMode}
-          onLayoutModeChange={setLayoutMode}
-          onToggleMobileFilters={() => setIsAdvancedDrawerOpen(true)}
-          showingOnlyVIP={filters.vipOnly}
-        />
+          {/* 2. RIGHT AREA: SEARCH MATCHES HEADER + 3-COLUMN CARDS GRID */}
+          <div className="lg:col-span-8 xl:col-span-9 space-y-6">
+            
+            {/* SEARCH HEADER CONTROLS (Layout View Switch, Pagination, Mobile Filter Trigger) */}
+            <ProposalSearchHeader
+              totalResults={filteredCandidates.length > 0 ? filteredCandidates.length * 502 : 4022}
+              currentPage={1}
+              totalPages={202}
+              layoutMode={layoutMode}
+              onLayoutModeChange={setLayoutMode}
+              onToggleMobileFilters={() => setIsMobileFilterOpen(true)}
+              showingOnlyVIP={filters.vipOnly}
+            />
 
-        {/* 2. TOP HORIZONTAL QUICK-FILTER PILL BAR (REPLACES HEAVY LEFT SIDEBAR) */}
-        <ProposalSearchTopFilterBar
-          filters={filters}
-          onFilterChange={setFilters}
-          onOpenAdvancedDrawer={() => setIsAdvancedDrawerOpen(true)}
-          activeFilterCount={activeFilterCount}
-        />
+            {/* CANDIDATE RESULTS GRID (OUR PERFECT UNTOUCHED CARDS!) */}
+            <div className="w-full">
+              {filteredCandidates.length === 0 ? (
+                <div className={`p-12 text-center rounded-3xl border ${
+                  isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                }`}>
+                  <h3 className="text-xl font-bold mb-2">No matching profiles found</h3>
+                  <p className="text-sm text-slate-500 mb-6">Try resetting some of your filters to view more profiles.</p>
+                  <PrimaryButton onClick={() => setFilters(DEFAULT_FILTERS)} className="px-6 py-2.5">
+                    Reset All Filters
+                  </PrimaryButton>
+                </div>
+              ) : layoutMode === 'grid' ? (
+                /* 3-COLUMN CARDS GRID */
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {filteredCandidates.map((profile) => (
+                    <ProposalSearchResultCard
+                      key={profile.id}
+                      profile={profile}
+                      layoutMode="grid"
+                      onSendInterest={handleSendInterest}
+                      onViewProfile={openProfile}
+                    />
+                  ))}
+                </div>
+              ) : (
+                /* SLEEK COMPACT LIST VIEW */
+                <div className="space-y-5">
+                  {filteredCandidates.map((profile) => (
+                    <ProposalSearchResultCard
+                      key={profile.id}
+                      profile={profile}
+                      layoutMode="compact"
+                      onSendInterest={handleSendInterest}
+                      onViewProfile={openProfile}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
 
-        {/* 3. FULL-WIDTH 3-COLUMN CANDIDATE RESULTS GRID */}
-        <div className="w-full">
-          {filteredCandidates.length === 0 ? (
-            <div className={`p-12 text-center rounded-3xl border ${
-              isDark ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
-            }`}>
-              <h3 className="text-xl font-bold mb-2">No matching profiles found</h3>
-              <p className="text-sm text-slate-500 mb-6">Try resetting some of your filters to view more profiles.</p>
-              <PrimaryButton onClick={() => setFilters(DEFAULT_FILTERS)} className="px-6 py-2.5">
-                Reset All Filters
-              </PrimaryButton>
-            </div>
-          ) : layoutMode === 'grid' ? (
-            /* MODERN 3-COLUMN GRID GALLERY VIEW (FULL WIDTH SCREEN REAL ESTATE) */
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCandidates.map((profile) => (
-                <ProposalSearchResultCard
-                  key={profile.id}
-                  profile={profile}
-                  layoutMode="grid"
-                  onSendInterest={handleSendInterest}
-                  onViewProfile={openProfile}
-                />
-              ))}
-            </div>
-          ) : (
-            /* SLEEK COMPACT LIST VIEW */
-            <div className="space-y-5">
-              {filteredCandidates.map((profile) => (
-                <ProposalSearchResultCard
-                  key={profile.id}
-                  profile={profile}
-                  layoutMode="compact"
-                  onSendInterest={handleSendInterest}
-                  onViewProfile={openProfile}
-                />
-              ))}
-            </div>
-          )}
+          </div>
+
         </div>
 
       </div>
+
+      {/* MOBILE FILTER MODAL DRAWER */}
+      <AnimatePresence>
+        {isMobileFilterOpen && (
+          <div className="fixed inset-0 z-[120] lg:hidden bg-slate-950/80 backdrop-blur-md flex justify-end p-0">
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 250 }}
+              className={`w-full max-w-sm h-full overflow-y-auto p-4 flex flex-col justify-between shadow-2xl ${
+                isDark ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'
+              }`}
+            >
+              <div>
+                <div className="flex items-center justify-between pb-3 mb-2 border-b border-slate-200 dark:border-slate-800">
+                  <span className="font-black text-sm">Search Filters</span>
+                  <button
+                    onClick={() => setIsMobileFilterOpen(false)}
+                    className="p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                <ProposalSearchSidebar
+                  filters={filters}
+                  onFilterChange={setFilters}
+                  onResetFilters={() => setFilters(DEFAULT_FILTERS)}
+                  onOpenAdvancedDrawer={() => {
+                    setIsMobileFilterOpen(false);
+                    setIsAdvancedDrawerOpen(true);
+                  }}
+                />
+              </div>
+
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+                <PrimaryButton
+                  onClick={() => setIsMobileFilterOpen(false)}
+                  className="w-full py-3 text-xs font-bold"
+                >
+                  Show ({filteredCandidates.length}) Profiles
+                </PrimaryButton>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* 4. SLIDE-OVER ADVANCED FILTER DRAWER (20+ FILTERS) */}
       <ProposalAdvancedFilterDrawer

@@ -30,7 +30,7 @@ export function ProfileGamification({ completionPct, missingTasks, onTaskClick }
             )}
           </h3>
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">
-            {completionPct === 100 ? "Your profile is fully complete. You have earned 2 days of Premium!" : "Complete your profile to unlock a free Premium trial and a Verified badge."}
+            {completionPct === 100 ? "Your profile is fully complete and verified." : "Complete your profile to increase visibility and get a Verified badge."}
           </p>
         </div>
         <div className="w-14 h-14 rounded-full border-4 border-slate-100 dark:border-slate-800 flex items-center justify-center relative shadow-inner shrink-0">
@@ -66,7 +66,8 @@ export function ProfileGamification({ completionPct, missingTasks, onTaskClick }
         </div>
       )}
 
-      {completionPct === 100 && (
+      {/* Free Premium Trial disabled for redesign */}
+      {/* completionPct === 100 && (
         <div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white flex items-center justify-between relative z-10 shadow-lg shadow-emerald-500/20 animate-fade-up">
           <div className="flex items-center gap-3">
             <Trophy size={24} className="text-emerald-100 drop-shadow-md" />
@@ -76,7 +77,7 @@ export function ProfileGamification({ completionPct, missingTasks, onTaskClick }
             </div>
           </div>
         </div>
-      )}
+      ) */}
     </Card>
   );
 }

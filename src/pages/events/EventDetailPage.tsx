@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     LuArrowLeft, LuCalendar, LuMapPin, LuGraduationCap,
-    LuTicket, LuZap, LuShare2, LuSparkles, LuCheck, LuLoader, LuCloudUpload
+    LuTicket, LuZap, LuShare2, LuSparkles, LuCheck, LuLoader, LuCloudUpload, LuCircleAlert
 } from "react-icons/lu";
 import { api } from '../../api';
 import toast from 'react-hot-toast';
@@ -302,7 +302,9 @@ const EventDetailPage: React.FC = () => {
                                 />
                             </div>
                             {attendeeCount >= event.capacity && (
-                                <p className="text-[10px] text-red-500 font-bold uppercase mt-1">🚨 Event is at full capacity!</p>
+                                <p className="text-[10px] text-red-500 font-bold uppercase mt-1 flex items-center gap-1">
+                                    <LuCircleAlert size={12} className="shrink-0" /> Event is at full capacity!
+                                </p>
                             )}
                         </div>
                     )}

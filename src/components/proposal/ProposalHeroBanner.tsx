@@ -1,5 +1,4 @@
-import { motion } from 'framer-motion';
-import { LuSparkles, LuGraduationCap, LuSearch, LuArrowRight, LuUsers, LuLock } from 'react-icons/lu';
+import { LuSparkles, LuGraduationCap, LuSearch, LuArrowRight, LuUsers, LuLock, LuMapPin } from 'react-icons/lu';
 import TiltCard from '../ui/TiltCard';
 
 interface ProposalHeroBannerProps {
@@ -105,11 +104,11 @@ const ProposalHeroBanner = ({ onSearchClick, onCreateClick }: ProposalHeroBanner
                   alt="Dilini Perera"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
-                <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-[9px] font-black uppercase bg-rose-500 text-white shadow-md">
-                  Verified Undergrad 🎓
+                <span className="absolute top-3 left-3 px-3 py-1 rounded-full text-[9px] font-black uppercase bg-rose-500 text-white shadow-md inline-flex items-center gap-1">
+                  <LuGraduationCap size={11} /> Verified Undergrad
                 </span>
-                <span className="absolute bottom-3 left-3 px-3 py-1 rounded-full text-[10px] font-bold bg-slate-950/80 backdrop-blur-md text-white border border-white/20">
-                  📍 Kandy • 23 yrs
+                <span className="absolute bottom-3 left-3 px-3 py-1 rounded-full text-[10px] font-bold bg-slate-950/80 backdrop-blur-md text-white border border-white/20 inline-flex items-center gap-1">
+                  <LuMapPin size={11} /> Kandy • 23 yrs
                 </span>
               </div>
               <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Dilini Perera</h3>

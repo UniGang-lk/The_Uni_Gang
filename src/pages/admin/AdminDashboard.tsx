@@ -3,7 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuShieldCheck, LuShoppingBag, LuCalendar,
   LuMessageSquare, LuCheck, LuX, LuTrash2, LuSearch,
-  LuExternalLink, LuUserCheck, LuMail
+  LuExternalLink, LuUserCheck, LuMail, LuHouse, LuUsers,
+  LuLifeBuoy, LuCreditCard, LuRefreshCw, LuFootprints,
+  LuMapPin, LuGraduationCap, LuBriefcase
 } from 'react-icons/lu';
 import { FiHome } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
@@ -251,9 +253,9 @@ const AdminDashboard = () => {
             </div>
             <button
               onClick={fetchAdminData}
-              className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-300 transition-colors cursor-pointer"
+              className="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-300 transition-colors cursor-pointer flex items-center gap-1.5"
             >
-              🔄 Refresh
+              <LuRefreshCw size={13} /> Refresh
             </button>
           </div>
         </div>
@@ -284,13 +286,13 @@ const AdminDashboard = () => {
         {/* Navigation Tabs */}
         <div className="flex gap-2 p-1.5 rounded-2xl bg-slate-900/60 border border-slate-800 mb-8 overflow-x-auto">
           {[
-            { id: 'annexes', label: `🏠 Annexes (${annexes.length})`, count: pendingAnnexesCount },
-            { id: 'market', label: `🎁 Marketplace (${marketItems.length})`, count: pendingMarketCount },
-            { id: 'events', label: `📅 Events (${events.length})`, count: pendingEventsCount },
-            { id: 'users', label: `👥 Users & Badges (${users.length})` },
-            { id: 'feedbacks', label: `💬 Client Feedbacks (${feedbacks.length})` },
-            { id: 'problems', label: `🛠️ Support Tickets (${problems.length})`, count: pendingProblemsCount },
-            { id: 'payments', label: `💳 Premium Payments (${payments.length})`, count: pendingPaymentsCount }
+            { id: 'annexes', label: `Annexes (${annexes.length})`, icon: LuHouse, count: pendingAnnexesCount },
+            { id: 'market', label: `Marketplace (${marketItems.length})`, icon: LuShoppingBag, count: pendingMarketCount },
+            { id: 'events', label: `Events (${events.length})`, icon: LuCalendar, count: pendingEventsCount },
+            { id: 'users', label: `Users & Badges (${users.length})`, icon: LuUsers },
+            { id: 'feedbacks', label: `Client Feedbacks (${feedbacks.length})`, icon: LuMessageSquare },
+            { id: 'problems', label: `Support Tickets (${problems.length})`, icon: LuLifeBuoy, count: pendingProblemsCount },
+            { id: 'payments', label: `Premium Payments (${payments.length})`, icon: LuCreditCard, count: pendingPaymentsCount }
           ].map(tab => (
             <button
               key={tab.id}
@@ -301,7 +303,8 @@ const AdminDashboard = () => {
                   : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
               }`}
             >
-              {tab.label}
+              <tab.icon size={15} />
+              <span>{tab.label}</span>
               {tab.count !== undefined && tab.count > 0 && (
                 <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-rose-500 text-white">
                   {tab.count}
@@ -342,7 +345,7 @@ const AdminDashboard = () => {
                         <p className="text-xs text-slate-400 mb-3 line-clamp-2">{annex.address}</p>
 
                         <div className="flex flex-wrap gap-2 text-[10px] text-slate-400 font-medium mb-4">
-                          <span>🚶 {annex.walk_time_mins || annex.walkTimeMins || 5} mins walk</span>
+                          <span className="inline-flex items-center gap-1"><LuFootprints size={12} /> {annex.walk_time_mins || annex.walkTimeMins || 5} mins walk</span>
                           <span>·</span>
                           <span>Owner: {annex.owner ? annex.owner.name : 'Unknown'} ({annex.owner ? annex.owner.phone : 'N/A'})</span>
                         </div>
@@ -459,7 +462,11 @@ const AdminDashboard = () => {
 
                         <h3 className="text-lg font-bold text-white mb-1 line-clamp-1">{event.title}</h3>
                         <p className="text-xs text-slate-400 mb-3 line-clamp-2">{event.description}</p>
-                        <p className="text-[10px] text-slate-500 font-medium">📍 {event.location} · 📅 {event.date}</p>
+                        <p className="text-[10px] text-slate-500 font-medium flex items-center gap-2">
+                          <span className="inline-flex items-center gap-1"><LuMapPin size={11} /> {event.location}</span>
+                          <span>·</span>
+                          <span className="inline-flex items-center gap-1"><LuCalendar size={11} /> {event.date}</span>
+                        </p>
                       </div>
 
                       <div className="pt-4 border-t border-slate-800/80 flex items-center justify-end gap-2">
@@ -512,18 +519,18 @@ const AdminDashboard = () => {
                           <td className="p-4">
                             <div className="flex gap-2">
                               {user.is_verified_student && (
-                                <span className="px-2.5 py-1 rounded-full text-[9px] font-black bg-blue-500/20 text-blue-400 border border-blue-500/30">
-                                  🎓 Verified University
+                                <span className="px-2.5 py-1 rounded-full text-[9px] font-black bg-blue-500/20 text-blue-400 border border-blue-500/30 inline-flex items-center gap-1">
+                                  <LuGraduationCap size={12} /> Verified University
                                 </span>
                               )}
                               {user.is_verified_landlord && (
-                                <span className="px-2.5 py-1 rounded-full text-[9px] font-black bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                                  🏠 Verified Landlord
+                                <span className="px-2.5 py-1 rounded-full text-[9px] font-black bg-amber-500/20 text-amber-400 border border-amber-500/30 inline-flex items-center gap-1">
+                                  <LuHouse size={12} /> Verified Landlord
                                 </span>
                               )}
                               {user.is_verified_professional && (
-                                <span className="px-2.5 py-1 rounded-full text-[9px] font-black bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
-                                  💼 Verified Professional
+                                <span className="px-2.5 py-1 rounded-full text-[9px] font-black bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 inline-flex items-center gap-1">
+                                  <LuBriefcase size={12} /> Verified Professional
                                 </span>
                               )}
                               {!user.is_verified_student && !user.is_verified_landlord && !user.is_verified_professional && (

@@ -1,4 +1,4 @@
-// 🔔 Web Audio API Notification Sound Synthesizer & Browser Push Helper
+// Web Audio API Notification Sound Synthesizer & Browser Push Helper
 
 let audioCtx: AudioContext | null = null;
 

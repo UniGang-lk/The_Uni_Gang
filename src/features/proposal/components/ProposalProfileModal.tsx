@@ -196,7 +196,7 @@ export default function ProposalProfileModal({ profile, onClose }: { profile: an
                   <Lock size={15} className="text-amber-500 shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold block text-amber-800 dark:text-amber-200 text-[11px]">
-                      🔒 Privacy Protection Notice
+                      Privacy Protection Notice
                     </span>
                     Full name, contact info & birthday are revealed only after mutual proposal acceptance.
                   </div>

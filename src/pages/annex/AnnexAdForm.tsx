@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuFileText, LuLayoutDashboard, LuImage, LuMapPin, LuChevronRight, LuChevronLeft, LuChevronDown,
   LuWifi, LuBath, LuSnowflake, LuCar, LuUtensils, LuZap, LuCheck,
-  LuUpload, LuX, LuGraduationCap, LuInfo as LuAlertCircle
+  LuUpload, LuX, LuGraduationCap, LuInfo, LuSearch, LuHouse, LuUsers, LuShieldCheck, LuBus, LuNavigation, LuPhone
 } from 'react-icons/lu';
 import toast from 'react-hot-toast';
 import universitiesData from '../../constants/annex/Universities.json';
@@ -39,31 +39,54 @@ const CAMPUS_COORDS: Record<string, [number, number]> = {
   "23": [6.9167, 79.8500],   // ICBT Campus
 };
 
+// ─── Distance Calculation Helper (Haversine formula) ─────────────────────────────────────────────
+const calculateDistanceKm = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
 // ─── Leaflet Clickable Map Picker ────────────────────────────────────────────────────────────────
 const LeafletAdMapPicker = ({
-  universityId, lat, lng, onCoordsChange
+  universityId, lat, lng, onCoordsChange, universities = []
 }: {
   universityId: string;
   lat: number;
   lng: number;
   onCoordsChange: (lat: number, lng: number) => void;
+  universities?: any[];
 }) => {
   const mapRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
+  const campusMarkerRef = useRef<any>(null);
   const initializedRef = useRef(false);
 
-  const getInitialCoords = (uniId: string, currentLat: number, currentLng: number): [number, number] => {
-    // If user has already placed a custom pin, respect that
-    if (currentLat && currentLng && currentLat !== 7.8731 && !CAMPUS_COORDS[uniId]?.every(
-      (v, i) => [currentLat, currentLng][i] === v
-    )) {
-      return [currentLat, currentLng];
+  const getUniCoords = (uniId: string): [number, number] => {
+    if (uniId && universities.length > 0) {
+      const match = universities.find(u => String(u.id) === String(uniId));
+      if (match?.latitude && match?.longitude) {
+        return [parseFloat(String(match.latitude)), parseFloat(String(match.longitude))];
+      }
     }
-    // Otherwise center on selected university
     if (uniId && CAMPUS_COORDS[uniId]) {
       return CAMPUS_COORDS[uniId];
     }
     return [6.9016, 79.8589]; // Default: Colombo
+  };
+
+  const getInitialCoords = (uniId: string, currentLat: number, currentLng: number): [number, number] => {
+    // If user has already placed a custom pin, respect that
+    if (currentLat && currentLng && currentLat !== 7.8731) {
+      return [currentLat, currentLng];
+    }
+    // Otherwise center on selected university
+    return getUniCoords(uniId);
   };
 
   useEffect(() => {
@@ -93,13 +116,14 @@ const LeafletAdMapPicker = ({
       }).addTo(map);
 
       // University campus marker (non-draggable, informational)
-      if (universityId && CAMPUS_COORDS[universityId] && universityId !== '0') {
+      if (universityId && universityId !== '0') {
+        const uniCoords = getUniCoords(universityId);
         const campusIcon = L.divIcon({
           className: '',
-          html: `<div style="background:#3b82f6;color:white;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.3)">🎓 Campus</div>`,
-          iconAnchor: [40, 12]
+          html: `<div style="background:#2563eb;color:white;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:800;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;box-shadow:0 4px 12px rgba(37,99,235,0.4);border:2px solid white;"><svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M22 10v6M2 10l10-5 10 5-10 5z'/><path d='M6 12v5c3 3 9 3 12 0v-5'/></svg> Campus</div>`,
+          iconAnchor: [45, 14]
         });
-        L.marker(CAMPUS_COORDS[universityId], { icon: campusIcon }).addTo(map);
+        campusMarkerRef.current = L.marker(uniCoords, { icon: campusIcon }).addTo(map);
       }
 
       // Draggable property pin marker
@@ -127,7 +151,35 @@ const LeafletAdMapPicker = ({
         initializedRef.current = false;
       }
     };
-  }, [universityId]); // Re-initialize when university changes
+  }, []); // Initialize once on mount
+
+  // Fly to university location when university changes
+  useEffect(() => {
+    if (!mapRef.current || !universityId) return;
+    const L = (window as any).L;
+    const uniCoords = getUniCoords(universityId);
+
+    // Update campus marker
+    if (campusMarkerRef.current) {
+      campusMarkerRef.current.setLatLng(uniCoords);
+    } else if (L && universityId !== '0') {
+      const campusIcon = L.divIcon({
+        className: '',
+        html: `<div style="background:#2563eb;color:white;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:800;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;box-shadow:0 4px 12px rgba(37,99,235,0.4);border:2px solid white;"><svg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M22 10v6M2 10l10-5 10 5-10 5z'/><path d='M6 12v5c3 3 9 3 12 0v-5'/></svg> Campus</div>`,
+        iconAnchor: [45, 14]
+      });
+      campusMarkerRef.current = L.marker(uniCoords, { icon: campusIcon }).addTo(mapRef.current);
+    }
+
+    // Pan smoothly to university
+    mapRef.current.flyTo(uniCoords, 14, { duration: 1.2 });
+
+    // Place annex marker near campus if not already customized
+    if (markerRef.current) {
+      markerRef.current.setLatLng(uniCoords);
+      onCoordsChange(uniCoords[0], uniCoords[1]);
+    }
+  }, [universityId]);
 
   // External position observer to allow geocoding pan/markers flyTo
   useEffect(() => {
@@ -140,7 +192,7 @@ const LeafletAdMapPicker = ({
 
       if (currentLatStr !== targetLatStr || currentLngStr !== targetLngStr) {
         markerRef.current.setLatLng([lat, lng]);
-        mapRef.current.setView([lat, lng], 16); // Center and zoom in closer on geocoded location
+        mapRef.current.setView([lat, lng], 16);
       }
     }
   }, [lat, lng]);
@@ -243,28 +295,48 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
       try {
         const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/annexes/universities`);
         if (res.ok) {
-          const data = await res.json();
-          // If DB is empty or returns no real universities, fall back to static JSON
-          const actualUnis = data.filter((u: any) => String(u.id) !== '0');
-          if (actualUnis.length === 0) {
-            setUniversities(universitiesData);
+          const json = await res.json();
+          const list: any[] = Array.isArray(json) ? json : (json.data || []);
+          const actualUnis = list.filter((u: any) => String(u.id) !== '0');
+          if (actualUnis.length > 0) {
+            // Ensure "Other" option is always available at the end
+            const hasOther = actualUnis.some((u: any) => String(u.id) === '0');
+            if (!hasOther) {
+              actualUnis.push({ id: '0', name: 'Other / Not Listed (වෙනත් ආයතනයක්)', latitude: 7.8731, longitude: 80.7718 });
+            }
+            setUniversities(actualUnis);
             return;
           }
-          // Ensure "Other" option is always available at the end
-          const hasOther = data.some((u: any) => String(u.id) === '0');
-          if (!hasOther) {
-            data.push({ id: '0', name: 'Other / Not Listed', latitude: 7.8731, longitude: 80.7718 });
-          }
-          setUniversities(data);
-        } else {
-          setUniversities(universitiesData);
         }
+        setUniversities(universitiesData);
       } catch {
         setUniversities(universitiesData);
       }
     };
     loadUniversities();
   }, []);
+
+  const handleDetectGps = () => {
+    if (!navigator.geolocation) {
+      toast.error(lang === 'si' ? 'ඔබගේ Browser එකෙහි Location පහසුකම නොමැත.' : 'Geolocation is not supported by your browser.');
+      return;
+    }
+    toast.loading(lang === 'si' ? 'ඔබ සිටින ස්ථානය හඳුනාගනිමින් පවතී...' : 'Detecting your GPS location...', { id: 'gps-detect' });
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = parseFloat(pos.coords.latitude.toFixed(6));
+        const lng = parseFloat(pos.coords.longitude.toFixed(6));
+        setValue('latitude', lat);
+        setValue('longitude', lng);
+        toast.success(lang === 'si' ? '✅ නවාතැන පිහිටි ස්ථානය සාර්ථකව ලකුණු විය!' : '✅ Property location pinned!', { id: 'gps-detect' });
+      },
+      (err) => {
+        console.warn('Geolocation error:', err);
+        toast.error(lang === 'si' ? 'ස්ථානය ලබාගැනීමට නොහැකි විය. කරුණාකර Location අවසරය ලබාදෙන්න.' : 'Unable to fetch GPS. Please allow location permissions.', { id: 'gps-detect' });
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
   const { register, handleSubmit, control, setValue, watch, formState: { errors }, trigger } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -295,6 +367,24 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
   const latVal = watch('latitude');
   const lngVal = watch('longitude');
   const isOtherSelected = selectedUni === '0';
+
+  // Compute friendly distance badge
+  const proximityInfo = React.useMemo(() => {
+    if (!selectedUni || selectedUni === '0' || !latVal || !lngVal) return null;
+    const matchedUni = universities.find(u => String(u.id) === String(selectedUni));
+    if (!matchedUni || !matchedUni.latitude || !matchedUni.longitude) return null;
+    const uniLat = parseFloat(String(matchedUni.latitude));
+    const uniLng = parseFloat(String(matchedUni.longitude));
+    const distKm = calculateDistanceKm(latVal, lngVal, uniLat, uniLng);
+    const distText = distKm < 1 ? `${Math.round(distKm * 1000)} m` : `${distKm.toFixed(1)} km`;
+    const walkMins = Math.max(1, Math.round(distKm * 12.5));
+    return {
+      uniName: matchedUni.name,
+      distKm,
+      distText,
+      walkMins: walkMins > 60 ? `${Math.floor(walkMins / 60)}h ${walkMins % 60}m` : `${walkMins} min`,
+    };
+  }, [selectedUni, latVal, lngVal, universities]);
 
   // Re-center map and update coordinates when university selection changes
   useEffect(() => {
@@ -500,10 +590,17 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
                             : 'text-slate-500 dark:text-slate-400 bg-transparent hover:text-slate-800 dark:hover:text-slate-200'
                         }`}
                       >
-                        {type === 'LANDLORD_RENT' 
-                          ? (lang === 'si' ? '🏠 සම්පූර්ණ බෝඩිම / ඇනෙක්සිය' : '🏠 Boarding Place / Annex') 
-                          : (lang === 'si' ? '👥 රූම්මේට් කෙනෙක් අවශ්‍යයි' : '👥 Roommate Finder / Share')
-                        }
+                        {type === 'LANDLORD_RENT' ? (
+                          <span className="flex items-center justify-center gap-1.5">
+                            <LuHouse size={15} />
+                            {lang === 'si' ? 'සම්පූර්ණ බෝඩිම / ඇනෙක්සිය' : 'Boarding Place / Annex'}
+                          </span>
+                        ) : (
+                          <span className="flex items-center justify-center gap-1.5">
+                            <LuUsers size={15} />
+                            {lang === 'si' ? 'රූම්මේට් කෙනෙක් අවශ්‍යයි' : 'Roommate Finder / Share'}
+                          </span>
+                        )}
                       </button>
                     ))}
                   </div>
@@ -600,10 +697,17 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
                             : 'text-slate-500 dark:text-slate-400 bg-transparent hover:text-slate-800 dark:hover:text-slate-200'
                         }`}
                       >
-                        {presence === 'INDEPENDENT' 
-                          ? (lang === 'si' ? '🏠 අයිතිකරුවන් නැත / නිදහස්' : '🏠 Independent (No Landlord on-site)') 
-                          : (lang === 'si' ? '👨‍👩‍👧 අයිතිකරුවන් එකම ඉඩමේ පදිංචිව සිටී' : '👨‍👩‍👧 Landlord Lives in Same Premise')
-                        }
+                        {presence === 'INDEPENDENT' ? (
+                          <span className="flex items-center justify-center gap-1.5">
+                            <LuHouse size={14} />
+                            {lang === 'si' ? 'අයිතිකරුවන් නැත / නිදහස්' : 'Independent (No Landlord on-site)'}
+                          </span>
+                        ) : (
+                          <span className="flex items-center justify-center gap-1.5">
+                            <LuShieldCheck size={14} />
+                            {lang === 'si' ? 'අයිතිකරුවන් එකම ඉඩමේ පදිංචිව සිටී' : 'Landlord Lives in Same Premise'}
+                          </span>
+                        )}
                       </button>
                     ))}
                   </div>
@@ -634,8 +738,9 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
-                    {lang === 'si' ? '🚌 ළඟම ඇති බස් පාර සහ ගමනාගමන පහසුව' : '🚌 Nearest Bus Route & Transit Proximity'}
+                  <label className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                    <LuBus size={14} className="text-blue-500" />
+                    <span>{lang === 'si' ? 'ළඟම ඇති බස් පාර සහ ගමනාගමන පහසුව' : 'Nearest Bus Route & Transit Proximity'}</span>
                   </label>
                   <input
                     {...register('busRoute')}
@@ -787,243 +892,254 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
 
           {/* ── STEP 4: Location Map Picker & Contact ── */}
           {currentStep === 3 && (
-            <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-              <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6">
-                Location & Contact Details
-              </h2>
+            <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+              {/* Header with warm intro */}
+              <div>
+                <h2 className="text-xl md:text-2xl font-black text-slate-800 dark:text-white flex items-center gap-2.5">
+                  <span className="w-9 h-9 rounded-2xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-sm">
+                    <LuMapPin size={20} />
+                  </span>
+                  {lang === 'si' ? 'ස්ථානය සහ ඇමතුම් තොරතුරු' : 'Location & Contact Details'}
+                </h2>
+                <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">
+                  {lang === 'si' 
+                    ? 'සිසුන්ට ඔබගේ නවාතැන පහසුවෙන් සොයාගැනීමට ළඟම ඇති විශ්වවිද්‍යාලය සහ ඔබගේ ඇමතුම් අංකය ඇතුළත් කරන්න.'
+                    : 'Select the nearest campus and provide your contact number so students can reach you easily.'
+                  }
+                </p>
+              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  {/* University Dropdown */}
+              {/* CARD 1: NEAREST UNIVERSITY / INSTITUTE */}
+              <div className="p-6 md:p-7 rounded-3xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/60 shadow-sm space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                    <LuGraduationCap className="text-blue-600 dark:text-blue-400 text-base" />
+                    {lang === 'si' ? '1. ළඟම ඇති විශ්වවිද්‍යාලය හෝ ආයතනය' : '1. Nearest University or Higher Education Institute'}
+                    <span className="text-rose-500">*</span>
+                  </label>
+                  <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-1 rounded-full border border-blue-200/40 dark:border-blue-800/40">
+                    {universities.filter(u => String(u.id) !== '0').length}+ Campuses
+                  </span>
+                </div>
+
+                <div className="relative">
+                  <LuGraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none z-10" />
+                  <select
+                    {...register('universityId')}
+                    className="w-full pl-12 pr-10 py-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-bold outline-none cursor-pointer appearance-none shadow-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-sm"
+                  >
+                    <option value="" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold py-2">
+                      {lang === 'si' ? '— විශ්වවිද්‍යාලය / ආයතනය තෝරන්න —' : '— Select University / Institution —'}
+                    </option>
+                    {universities
+                      .filter(u => String(u.id) !== '0')
+                      .map(uni => (
+                        <option key={uni.id} value={String(uni.id)} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium py-2">
+                          {uni.name}
+                        </option>
+                      ))
+                    }
+                    <option value="0" className="bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 font-bold py-2">
+                      {lang === 'si' ? '+ වෙනත් ආයතනයක් / ලැයිස්තුවේ නොමැත (Other / Not Listed)' : '+ Other / Not Listed'}
+                    </option>
+                  </select>
+                  <LuChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-lg z-10" />
+                </div>
+                {errors.universityId && <p className="text-rose-500 text-xs font-semibold mt-1">{errors.universityId.message}</p>}
+
+                {/* If Other / Not Listed is selected */}
+                <AnimatePresence>
+                  {isOtherSelected && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden pt-2"
+                    >
+                      <div className="p-4 bg-amber-50/90 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/60 rounded-2xl">
+                        <div className="flex items-center gap-2 mb-2">
+                          <LuInfo className="text-amber-600 dark:text-amber-400 shrink-0" size={18} />
+                          <h4 className="text-xs font-bold text-amber-800 dark:text-amber-300">
+                            {lang === 'si' ? 'ඔබගේ Campus / Institute එකේ නම ඇතුළත් කරන්න:' : 'Enter your Campus / Institute name:'}
+                          </h4>
+                        </div>
+                        <input
+                          {...register('customInstitution')}
+                          placeholder={lang === 'si' ? 'උදා: SLGTI කිලිනොච්චි, CIPM රාජගිරිය, ATI කුරුණෑගල...' : 'e.g. SLGTI Kilinochchi, CIPM Rajagiriya, ATI Kurunegala...'}
+                          className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 text-sm font-semibold outline-none transition-all dark:text-white"
+                        />
+                        {errors.customInstitution && <p className="text-rose-500 text-xs mt-1">{errors.customInstitution.message}</p>}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* CARD 2: PROPERTY PINPOINT MAP */}
+              <div className="p-6 md:p-7 rounded-3xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/60 shadow-sm space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
-                      {lang === 'si' ? 'ළඟම ඇති විශ්වවිද්‍යාලය හෝ ආයතනය' : 'Nearest University / Institution'}
+                    <label className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                      <LuMapPin className="text-blue-600 dark:text-blue-400 text-base" />
+                      {lang === 'si' ? '2. නවාතැන පිහිටි ස්ථානය ලකුණු කරන්න' : '2. Pinpoint Your Property Location'}
                     </label>
-                    <div className="relative">
-                      <LuGraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none z-10" />
-                      <select
-                        {...register('universityId')}
-                        className="w-full pl-12 pr-10 py-4 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-bold outline-none cursor-pointer appearance-none shadow-sm"
-                      >
-                        <option value="" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold py-2">
-                          {lang === 'si' ? '— විශ්වවිද්‍යාලය / ආයතනය තෝරන්න —' : '— Select University / Institution —'}
-                        </option>
-                        {universities
-                          .filter(u => String(u.id) !== '0')
-                          .map(uni => (
-                            <option key={uni.id} value={String(uni.id)} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold py-2">
-                              {uni.name}
-                            </option>
-                          ))
-                        }
-                        <option value="0" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold py-2">
-                          {lang === 'si' ? '🔍 වෙනත් ආයතනයක් / ලැයිස්තුවේ නොමැත' : '🔍 Other / Not Listed'}
-                        </option>
-                      </select>
-                      <LuChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-lg z-10" />
-                    </div>
-                    {errors.universityId && <p className="text-red-500 text-sm mt-1">{errors.universityId.message}</p>}
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                      {lang === 'si'
+                        ? 'සිතියම මත නිවස ඇති ස්ථානයට Pin එක තබන්න (හෝ පහත බොත්තම ඔබන්න)'
+                        : 'Drag or click on the map to pin your annex, or use the quick buttons below'
+                      }
+                    </p>
                   </div>
 
-                  {/* "Other" custom institution name field */}
+                  {/* 1-Click GPS button */}
+                  <button
+                    type="button"
+                    onClick={handleDetectGps}
+                    className="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 transition-all hover:scale-105 active:scale-95 border-none cursor-pointer flex items-center gap-1.5 shrink-0 self-start sm:self-auto"
+                  >
+                    <LuNavigation size={14} className="shrink-0" />
+                    <span>{lang === 'si' ? 'මම දැන් ඉන්නේ නවාතැනේ (GPS)' : 'Use My Current GPS'}</span>
+                  </button>
+                </div>
+
+                {/* Friendly Search Bar */}
+                <div className="relative">
+                  <div className="flex gap-2">
+                    <div className="relative flex-grow">
+                      <LuSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
+                      <input
+                        type="text"
+                        value={geocodeQuery}
+                        onChange={(e) => setGeocodeQuery(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleGeocodeSearch(geocodeQuery); } }}
+                        placeholder={lang === 'si' ? 'නගරය, හන්දිය හෝ පාර සොයන්න (උදා: කටුබැද්ද හන්දිය, විහාර මාවත)...' : 'Search junction, town or street (e.g. Katubedda Junction)...'}
+                        className="w-full pl-9 pr-3 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-xs font-semibold outline-none transition-all dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleGeocodeSearch(geocodeQuery)}
+                      disabled={geocodeLoading || !geocodeQuery.trim()}
+                      className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition-all active:scale-95 disabled:opacity-40 border-none cursor-pointer shrink-0"
+                    >
+                      {geocodeLoading ? (lang === 'si' ? 'සොයමින්...' : 'Searching...') : (lang === 'si' ? 'සොයන්න' : 'Search')}
+                    </button>
+                  </div>
+
+                  {/* Suggestions Dropdown */}
                   <AnimatePresence>
-                    {isOtherSelected && (
+                    {suggestions.length > 0 && (
                       <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="overflow-hidden"
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -5 }}
+                        className="absolute left-0 w-full mt-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl overflow-hidden z-50 max-h-[180px] overflow-y-auto"
                       >
-                        <div className="p-4 bg-amber-50/80 dark:bg-amber-950/40 border-2 border-amber-300 dark:border-amber-700/60 rounded-2xl shadow-sm">
-                          <div className="flex items-start gap-3 mb-3">
-                            <LuAlertCircle className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" size={20} />
-                            <div>
-                              <h4 className="text-xs font-black uppercase tracking-wider text-amber-800 dark:text-amber-300 mb-1">
-                                🛡️ Instant Listing Guarantee for Custom Institutes
-                              </h4>
-                              <p className="text-xs text-amber-700 dark:text-amber-400 font-semibold leading-relaxed">
-                                {lang === 'si' 
-                                  ? 'ඔබගේ Campus / Institute නම Dropdown එකෙහි නොමැතිද? ගැටලුවක් නැත! පහතින් නම සටහන් කර ඔබගේ ස්ථානය Map එකෙහි ලකුණු කරන්න. අවට සිටින සිසුන්ට ඔබගේ දැන්වීම සාර්ථකව දර්ශනය වේ.' 
-                                  : 'Is your Campus / Institute not in the dropdown? No problem! Type the name below and pin your location on the map. Nearby students will see your listing immediately.'
-                                }
-                              </p>
-                            </div>
-                          </div>
-                          <input
-                            {...register('customInstitution')}
-                            placeholder={lang === 'si' ? 'උදා: CIPM රාජගිරිය, Horizon Campus, NIBM මහනුවර, Saegis, KIU...' : 'e.g. CIPM Rajagiriya, Horizon Campus, NIBM Kandy, Saegis, KIU...'}
-                            className="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 text-sm font-bold outline-none transition-all dark:text-white"
-                          />
-                          {errors.customInstitution && <p className="text-red-500 text-sm mt-1">{errors.customInstitution.message}</p>}
-                        </div>
+                        {suggestions.map((item, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => {
+                              const lat = parseFloat(item.lat);
+                              const lon = parseFloat(item.lon);
+                              setValue('latitude', lat);
+                              setValue('longitude', lon);
+                              setSuggestions([]);
+                              setGeocodeQuery(item.name || item.display_name.split(',')[0]);
+                              toast.success('Location pinned on map!');
+                            }}
+                            className="w-full text-left px-4 py-2.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-800 border-b border-slate-100 dark:border-slate-800 last:border-b-0 transition-colors line-clamp-1 flex items-center gap-2 cursor-pointer"
+                          >
+                            <LuMapPin size={13} className="text-blue-500 shrink-0" />
+                            <span className="truncate">{item.display_name}</span>
+                          </button>
+                        ))}
                       </motion.div>
                     )}
                   </AnimatePresence>
+                </div>
 
-                  {/* Address Auto-Mapping Geocoder */}
-                  <div className="p-4 bg-blue-50/50 dark:bg-slate-800/30 border border-blue-100/50 dark:border-slate-800/80 rounded-2xl relative z-30">
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-2">
-                      📍 {lang === 'si' ? 'ශ්‍රී ලංකා සිතියම් සෙවීම (OSM Nominatim)' : 'Sri Lanka Location Autocomplete (OSM Nominatim)'}
-                    </label>
-                    <div className="flex gap-2">
-                      <div className="relative flex-grow">
-                        <LuMapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
-                        <input
-                          type="text"
-                          value={geocodeQuery}
-                          onChange={(e) => setGeocodeQuery(e.target.value)}
-                          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleGeocodeSearch(geocodeQuery); } }}
-                          placeholder={lang === 'si' ? 'උදා: කටුබැද්ද මොරටුව, පඹහින්න, සබරගමුව...' : 'e.g. Katubedda Moratuwa, Pambahinna, SUSL...'}
-                          className="w-full pl-10 pr-4 py-3.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm font-medium outline-none transition-all dark:text-white"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleGeocodeSearch(geocodeQuery)}
-                        disabled={geocodeLoading}
-                        className="px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:shadow-lg transition-all active:scale-95 disabled:opacity-50 shrink-0 border-none cursor-pointer"
-                      >
-                        {geocodeLoading ? (lang === 'si' ? 'සොයමින්...' : 'Searching...') : (lang === 'si' ? 'සොයන්න' : 'Search')}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (navigator.geolocation) {
-                            toast.loading('Detecting your GPS location...', { id: 'gps' });
-                            navigator.geolocation.getCurrentPosition(
-                              (pos) => {
-                                const lat = parseFloat(pos.coords.latitude.toFixed(6));
-                                const lng = parseFloat(pos.coords.longitude.toFixed(6));
-                                setValue('latitude', lat);
-                                setValue('longitude', lng);
-                                toast.success('Exact GPS Location pinned!', { id: 'gps' });
-                              },
-                              () => {
-                                toast.error('Unable to fetch GPS. Please enable location permissions.', { id: 'gps' });
-                              }
-                            );
-                          } else {
-                            toast.error('Geolocation is not supported by your browser.');
-                          }
-                        }}
-                        className="px-4 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:shadow-lg transition-all active:scale-95 shrink-0 border-none cursor-pointer flex items-center gap-1"
-                      >
-                        📍 GPS
-                      </button>
+                {/* Live Proximity Badge */}
+                {proximityInfo && (
+                  <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-950/40 border border-blue-200/80 dark:border-blue-800/50 shadow-sm">
+                    <div className="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center shrink-0 text-blue-600 dark:text-blue-400">
+                      <LuGraduationCap size={18} />
                     </div>
-
-                    {/* Suggestions Dropdown */}
-                    <AnimatePresence>
-                      {suggestions.length > 0 && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          className="absolute left-0 w-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl overflow-hidden z-50 max-h-[200px] overflow-y-auto"
-                        >
-                          {suggestions.map((item, idx) => (
-                            <button
-                              key={idx}
-                              type="button"
-                              onClick={() => {
-                                const lat = parseFloat(item.lat);
-                                const lon = parseFloat(item.lon);
-                                setValue('latitude', lat);
-                                setValue('longitude', lon);
-                                setValue('address', item.display_name); // Auto-populate address in form!
-                                setSuggestions([]);
-                                setGeocodeQuery(item.name || item.display_name.split(',')[0]);
-                                toast.success('Location pinned! Drag marker for precise roof adjustment.');
-                              }}
-                              className="w-full text-left px-5 py-3 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-blue-50/50 dark:hover:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800 last:border-b-0 transition-colors line-clamp-2"
-                            >
-                              📍 {item.display_name}
-                            </button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-
-                  {/* Coordinate display (read-only) */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">
-                        {lang === 'si' ? 'අක්ෂාංශ' : 'Latitude'}
-                      </label>
-                      <input
-                        type="number"
-                        step="any"
-                        readOnly
-                        {...register('latitude', { valueAsNumber: true })}
-                        className="w-full px-4 py-3 rounded-xl bg-slate-100/50 dark:bg-slate-950/20 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-500 outline-none cursor-not-allowed"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">
-                        {lang === 'si' ? 'දේශාංශ' : 'Longitude'}
-                      </label>
-                      <input
-                        type="number"
-                        step="any"
-                        readOnly
-                        {...register('longitude', { valueAsNumber: true })}
-                        className="w-full px-4 py-3 rounded-xl bg-slate-100/50 dark:bg-slate-950/20 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-500 outline-none cursor-not-allowed"
-                      />
+                    <div className="text-xs">
+                      <span className="font-bold text-slate-700 dark:text-slate-200">
+                        {proximityInfo.uniName} {lang === 'si' ? 'කැම්පස් එකට දුර:' : 'Campus distance:'}{' '}
+                      </span>
+                      <span className="font-black text-blue-600 dark:text-blue-400">
+                        {proximityInfo.distText}
+                      </span>
+                      <span className="text-slate-500 dark:text-slate-400 font-medium ml-1">
+                        (~{proximityInfo.walkMins} {lang === 'si' ? 'ක පයින් ගමනක්' : 'walk'})
+                      </span>
                     </div>
                   </div>
-                  <p className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold uppercase tracking-wider">
-                    {lang === 'si'
-                      ? '👉 ඉහතින් ඔබගේ කැම්පස් එක තෝරා, Map එක Click කර ඔබගේ නවාතැන පිහිටි නිවැරදි ස්ථානය ලකුණු කරන්න.'
-                      : '👉 Select your university above, then click on the map to pin your exact property location.'
+                )}
+
+                {/* Leaflet Map Picker Canvas */}
+                <div className="rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-inner">
+                  <LeafletAdMapPicker
+                    universityId={selectedUni}
+                    lat={latVal}
+                    lng={lngVal}
+                    onCoordsChange={(lat, lng) => {
+                      setValue('latitude', lat);
+                      setValue('longitude', lng);
+                    }}
+                    universities={universities}
+                  />
+                </div>
+
+                {/* Comforting note for non-tech landlords */}
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 font-medium">
+                  <LuInfo size={15} className="text-blue-500 shrink-0" />
+                  <span>
+                    {lang === 'si' 
+                      ? 'සිතියම මත ඔබගේ නිවස ඇති තැනට Pin එක ඇදගෙන යන්න. (ඉහතින් කැම්පස් එක තේරීම පමණක්ද ප්‍රමාණවත් වේ)'
+                      : 'Drag the pin to your exact property location on the map. (Selecting the campus above is also sufficient)'
                     }
-                  </p>
-                </div>
+                  </span>
+                </p>
 
-                {/* Leaflet Map Picker */}
-                <div className="p-1 rounded-[2rem] border border-white/40 dark:border-slate-700/50 bg-white/40 dark:bg-slate-800/40">
-                  {selectedUni ? (
-                    <LeafletAdMapPicker
-                      universityId={selectedUni}
-                      lat={latVal}
-                      lng={lngVal}
-                      onCoordsChange={(lat, lng) => {
-                        setValue('latitude', lat);
-                        setValue('longitude', lng);
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-[280px] rounded-[1.8rem] bg-slate-100 dark:bg-slate-800 flex flex-col items-center justify-center gap-3 text-slate-400">
-                      <LuMapPin size={40} className="opacity-30" />
-                      <p className="text-sm font-semibold text-center px-6">
-                        {lang === 'si' ? 'සිතියම (Map) ලබාගැනීමට ඉහතින් කැම්පස් එක තෝරන්න' : 'Select a university above to load the map'}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                {/* Hidden form inputs for lat & lng (no visible math boxes) */}
+                <input type="hidden" {...register('latitude', { valueAsNumber: true })} />
+                <input type="hidden" {...register('longitude', { valueAsNumber: true })} />
               </div>
 
-              {/* Landlord Info */}
-              <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-8">
-                <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">
-                  {lang === 'si' ? 'ඇමතුම් විස්තර' : 'Landlord Contact Info'}
-                </h3>
+              {/* CARD 3: CONTACT DETAILS */}
+              <div className="p-6 md:p-7 rounded-3xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/60 shadow-sm space-y-4">
+                <label className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                  <LuPhone size={15} className="text-blue-600 dark:text-blue-400" />
+                  {lang === 'si' ? '3. ඔබව සම්බන්ධ කරගත හැකි ඇමතුම් තොරතුරු' : '3. Landlord Contact Details'}
+                  <span className="text-rose-500">*</span>
+                </label>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">
+                      {lang === 'si' ? 'ගෙදර අයිතිකරුගේ / භාරකරුගේ නම' : 'Landlord Full Name'}
+                    </label>
                     <input
                       {...register('contactName')}
-                      placeholder={lang === 'si' ? 'ගෙදර අයිතිකරුගේ / භාරකරුගේ නම' : 'Landlord Full Name'}
-                      className="w-full px-5 py-4 rounded-2xl bg-slate-50/50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 focus:border-blue-500 font-medium outline-none transition-all dark:text-white"
+                      placeholder={lang === 'si' ? 'උදා: කේ. ඒ. පෙරේරා මහතා' : 'e.g. Mr. K. A. Perera'}
+                      className="w-full px-5 py-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 font-semibold outline-none transition-all dark:text-white text-sm"
                     />
-                    {errors.contactName && <p className="text-red-500 text-sm mt-1">{errors.contactName.message}</p>}
+                    {errors.contactName && <p className="text-rose-500 text-xs mt-1 font-semibold">{errors.contactName.message}</p>}
                   </div>
+
                   <div>
+                    <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 mb-1.5">
+                      {lang === 'si' ? 'WhatsApp හෝ දුරකථන අංකය' : 'WhatsApp / Mobile Number'}
+                    </label>
                     <input
                       {...register('contactPhone')}
-                      placeholder={lang === 'si' ? 'දුරකථන / WhatsApp අංකය' : 'WhatsApp / Phone (e.g. 0771234567)'}
-                      className="w-full px-5 py-4 rounded-2xl bg-slate-50/50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 focus:border-blue-500 font-medium outline-none transition-all dark:text-white"
+                      placeholder={lang === 'si' ? 'උදා: 077 123 4567' : 'e.g. 077 123 4567'}
+                      className="w-full px-5 py-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 font-semibold outline-none transition-all dark:text-white text-sm"
                     />
-                    {errors.contactPhone && <p className="text-red-500 text-sm mt-1">{errors.contactPhone.message}</p>}
+                    {errors.contactPhone && <p className="text-rose-500 text-xs mt-1 font-semibold">{errors.contactPhone.message}</p>}
                   </div>
                 </div>
               </div>
