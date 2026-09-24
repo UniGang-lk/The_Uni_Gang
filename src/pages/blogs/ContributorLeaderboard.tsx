@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { LuTrophy, LuHeart, LuBookOpen } from 'react-icons/lu';
+import { LuTrophy, LuCrown, LuThumbsUp, LuBookOpen, LuSparkles, LuArrowRight } from 'react-icons/lu';
+import { Link } from 'react-router-dom';
 import { Contributor } from '../../types/blog';
 
 interface ContributorLeaderboardProps {
@@ -8,56 +9,131 @@ interface ContributorLeaderboardProps {
 }
 
 const ContributorLeaderboard: React.FC<ContributorLeaderboardProps> = ({ contributors }) => {
+  const topContributors = contributors.slice(0, 5);
+
+  const getRankBadge = (rank: number) => {
+    switch (rank) {
+      case 1:
+        return (
+          <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-amber-400 to-yellow-300 text-slate-950 font-black text-xs flex items-center justify-center shadow-md shadow-yellow-500/30">
+            <LuCrown className="w-4 h-4" />
+          </div>
+        );
+      case 2:
+        return (
+          <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-slate-300 to-slate-100 text-slate-800 font-black text-xs flex items-center justify-center shadow-sm">
+            2
+          </div>
+        );
+      case 3:
+        return (
+          <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-amber-700 to-amber-500 text-white font-black text-xs flex items-center justify-center shadow-sm">
+            3
+          </div>
+        );
+      default:
+        return (
+          <div className="w-7 h-7 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 font-bold text-xs flex items-center justify-center">
+            {rank}
+          </div>
+        );
+    }
+  };
+
   return (
-    <div className="rounded-3xl border border-white/20 bg-white/70 p-6 backdrop-blur-xl dark:border-slate-700/50 dark:bg-slate-900/80">
-      <div className="mb-6 flex items-center justify-between">
-        <h3 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-          <LuTrophy className="text-yellow-500" /> Contributor Leaderboard
-        </h3>
-        <span className="text-xs font-semibold text-slate-500">Top Monthly</span>
+    <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 shadow-xl shadow-slate-100 dark:shadow-none space-y-5 transition-all">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-500 flex items-center justify-center">
+            <LuTrophy className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight">
+              Top Contributors
+            </h3>
+            <p className="text-[11px] text-slate-400 font-medium">Monthly Leaderboard</p>
+          </div>
+        </div>
+        <span className="px-2.5 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-wider">
+          Top Writers
+        </span>
       </div>
 
-      <div className="space-y-4">
-        {contributors.map((contributor, index) => (
-          <motion.div
-            key={contributor.id}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="flex items-center justify-between rounded-2xl border border-transparent p-3 transition-all hover:border-blue-500/20 hover:bg-blue-50/50 dark:hover:bg-blue-900/10"
-          >
-            <div className="flex items-center gap-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-400">
-                {index + 1}
-              </div>
-              <img
-                src={contributor.avatar}
-                alt={contributor.name}
-                className="h-10 w-10 rounded-full border-2 border-white object-cover shadow-sm"
-              />
-              <div>
-                <p className="font-bold text-slate-800 dark:text-white">{contributor.name}</p>
-                <p className="text-xs text-slate-500">{contributor.university}</p>
-              </div>
-            </div>
+      {/* List */}
+      <div className="space-y-2.5">
+        {topContributors.length > 0 ? (
+          topContributors.map((contributor, index) => {
+            const rank = index + 1;
+            return (
+              <motion.div
+                key={contributor.id || index}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="group flex items-center justify-between p-2.5 rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-all"
+              >
+                {/* Left: Rank & Avatar & Info */}
+                <div className="flex items-center gap-3 min-w-0">
+                  {getRankBadge(rank)}
+                  <div className="relative">
+                    <img
+                      src={contributor.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${contributor.name}`}
+                      alt={contributor.name}
+                      className="w-10 h-10 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shadow-sm"
+                    />
+                    {rank === 1 && (
+                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500" />
+                      </span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      {contributor.name}
+                    </h4>
+                    <p className="text-[11px] text-slate-400 truncate">
+                      {contributor.university || 'University Student'}
+                    </p>
+                  </div>
+                </div>
 
-            <div className="flex items-center gap-6">
-              <div className="text-center">
-                <p className="flex items-center gap-1 text-xs font-bold text-slate-700 dark:text-slate-300">
-                  <LuBookOpen className="w-3 h-3" /> {contributor.blogsCount}
-                </p>
-                <p className="text-[10px] text-slate-500">Posts</p>
-              </div>
-              <div className="text-center">
-                <p className="flex items-center gap-1 text-xs font-bold text-blue-600">
-                  <LuHeart className="w-3 h-3" /> {contributor.totalLikes}
-                </p>
-                <p className="text-[10px] text-slate-500">Likes</p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
+                {/* Right: Posts & Likes stats */}
+                <div className="flex items-center gap-3 shrink-0 text-right">
+                  <div className="flex items-center gap-1 text-slate-600 dark:text-slate-300 text-xs font-semibold">
+                    <LuBookOpen className="w-3.5 h-3.5 text-blue-500" />
+                    <span>{contributor.blogsCount}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-slate-600 dark:text-slate-300 text-xs font-semibold">
+                    <LuThumbsUp className="w-3.5 h-3.5 text-rose-500" />
+                    <span>{contributor.totalLikes}</span>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })
+        ) : (
+          <div className="text-center py-6 px-4 rounded-2xl bg-slate-50 dark:bg-slate-800/30 border border-slate-100 dark:border-slate-800 space-y-2">
+            <LuSparkles className="w-6 h-6 text-amber-500 mx-auto" />
+            <p className="text-xs font-bold text-slate-700 dark:text-slate-300">
+              Be the First Top Contributor!
+            </p>
+            <p className="text-[11px] text-slate-400">
+              Publish university insights and rise to the top of the campus leaderboard.
+            </p>
+          </div>
+        )}
       </div>
+
+      {/* Footer Action */}
+      <Link
+        to="/submit-blog"
+        className="flex items-center justify-between p-3 rounded-2xl bg-blue-50/60 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-100/60 dark:hover:bg-blue-900/40 transition-colors group"
+      >
+        <span>Write a Story to Rank Up</span>
+        <LuArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+      </Link>
     </div>
   );
 };
