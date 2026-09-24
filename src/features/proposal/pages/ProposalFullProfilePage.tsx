@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import { cx, PrimaryButton } from '../components/ui/ProposalPrimitives';
 import { WatermarkOverlay } from '../components/privacy/WatermarkOverlay';
-import ProposalAstroMatchModal from '../components/astro/ProposalAstroMatchModal';
 
 export default function ProposalFullProfilePage({ 
   profile, 
@@ -32,7 +31,6 @@ export default function ProposalFullProfilePage({
 }) {
   const [proposalSent, setProposalSent] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [showAstroModal, setShowAstroModal] = useState(false);
 
   const handleConnect = () => {
     setProposalSent(true);
@@ -159,8 +157,8 @@ export default function ProposalFullProfilePage({
               </div>
             </div>
 
-            {/* Dual Action Buttons: Send Proposal Request + Astro Match 🔮 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+            {/* Action Buttons: Send Proposal Request */}
+            <div className="pt-2">
               <AnimatePresence mode="wait">
                 {!proposalSent ? (
                   <PrimaryButton onClick={handleConnect} icon={MessageCircle} className="w-full py-3.5 text-xs shadow-xl shadow-rose-500/20 font-bold">
@@ -172,15 +170,6 @@ export default function ProposalFullProfilePage({
                   </div>
                 )}
               </AnimatePresence>
-
-              <button
-                type="button"
-                onClick={() => setShowAstroModal(true)}
-                className="w-full py-3.5 px-3 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-amber-500 hover:from-purple-700 hover:to-amber-600 text-white font-black text-xs shadow-lg shadow-purple-500/20 flex items-center justify-center gap-1.5 cursor-pointer border border-purple-400/30 transition-all hover:scale-[1.02]"
-              >
-                <Sparkles size={15} className="text-amber-300" />
-                <span>Astro Match (පොරොන්දම්)</span>
-              </button>
             </div>
           </div>
 
@@ -327,14 +316,6 @@ export default function ProposalFullProfilePage({
 
         </div>
       </div>
-
-      {/* Astro Porondam Match Modal */}
-      <ProposalAstroMatchModal
-        isOpen={showAstroModal}
-        onClose={() => setShowAstroModal(false)}
-        candidateName={profile.name}
-        candidateCode={profile.code}
-      />
     </motion.div>
   );
 }

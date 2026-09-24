@@ -41,7 +41,6 @@ export default function ProposalNavbar({
     { id: 'home', label: 'Home', isHighlight: false },
     { id: 'discover', label: 'Search', isHighlight: false },
     { id: 'premium', label: '👑 VIP', isHighlight: true },
-    { id: 'astro', label: '🔮 Astro Match', isHighlight: true },
   ];
 
   const handleNavClick = (id: string) => {

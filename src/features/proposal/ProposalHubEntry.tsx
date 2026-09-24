@@ -11,7 +11,6 @@ import ProposalProfilePage from './pages/ProposalProfilePage';
 import ProposalSettingsPage from './pages/ProposalSettingsPage';
 import ProposalFullProfilePage from './pages/ProposalFullProfilePage';
 import ProposalLikesPage from './pages/ProposalLikesPage';
-import ProposalAstroHubPage from './pages/ProposalAstroHubPage';
 import ErrorBoundary from './components/ErrorBoundary';
 
 export default function ProposalHubEntry() {
@@ -23,7 +22,7 @@ export default function ProposalHubEntry() {
     const hasProfile = localStorage.getItem('userHasProposalProfile') === 'true';
     return (token && hasProfile) ? 'HOME' : 'LANDING';
   });
-  const [subPage, setSubPage] = useState<'dashboard' | 'discover' | 'premium' | 'inbox' | 'profile' | 'settings' | 'view_profile' | 'likes' | 'astro'>('dashboard');
+  const [subPage, setSubPage] = useState<'dashboard' | 'discover' | 'premium' | 'inbox' | 'profile' | 'settings' | 'view_profile' | 'likes'>('dashboard');
   const [activeNavbarTab, setActiveNavbarTab] = useState(() => (localStorage.getItem('userToken') && localStorage.getItem('userHasProposalProfile') === 'true') ? 'discover' : 'home');
   const [dark] = useState(true);
   const [selectedProfile, setSelectedProfile] = useState<any | null>(null);
@@ -98,15 +97,9 @@ export default function ProposalHubEntry() {
       } else {
         setSubPage('discover');
       }
-    } else if (tabId === 'premium') {
+    } else if (tabId === 'premium' || tabId === 'pricing') {
       if (appState !== 'HOME') setAppState('HOME');
       setSubPage('premium');
-    } else if (tabId === 'astro') {
-      if (appState !== 'HOME') setAppState('HOME');
-      setSubPage('astro');
-    } else if (tabId === 'pricing') {
-      if (appState !== 'HOME') setAppState('HOME');
-      setSubPage('astro');
     }
   };
 
@@ -189,7 +182,6 @@ export default function ProposalHubEntry() {
           }}
         />
       )}
-      {subPage === 'astro' && <ProposalAstroHubPage setPage={(p) => setSubPage(p as any)} />}
       {subPage === 'dashboard' && <ProposalHomePage setPage={(p) => setSubPage(p as any)} openProfile={(p) => handleOpenProfile(p, 'dashboard')} goToLanding={handleGoToLanding} />}
       {subPage === 'likes' && <ProposalLikesPage setPage={(p) => setSubPage(p as any)} />}
       {subPage === 'view_profile' && <ProposalFullProfilePage profile={selectedProfile} goBack={() => setSubPage(previousSubPage)} />}
