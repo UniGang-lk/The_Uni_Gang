@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuSearch, LuPlus, LuShoppingBag, LuBriefcase, LuShieldCheck,
   LuStar, LuX, LuSend, LuChevronLeft, LuChevronRight, LuBadgeCheck,
-  LuTrash2, LuArrowLeft, LuUpload, LuBuilding
+  LuTrash2, LuArrowLeft, LuUpload, LuBuilding, LuSparkles, LuChevronDown,
+  LuZap, LuRefreshCw
 } from 'react-icons/lu';
 import MarketplaceCard from '../../components/market/MarketplaceCard';
 import { VerificationModal } from '../../features/proposal/components/verification/VerificationModal';
@@ -18,6 +19,7 @@ import SEO from '../../components/SEO';
 const MarketplaceHome: React.FC = () => {
   const [filter, setFilter] = useState<'All' | 'PRODUCT' | 'GIG' | 'OFFICIAL_PRODUCT'>('All');
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState<'newest' | 'price_low' | 'price_high' | 'rating'>('newest');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
@@ -382,6 +384,30 @@ const MarketplaceHome: React.FC = () => {
     (item.description ?? '').toLowerCase().includes(search.toLowerCase())
   );
 
+  const sortedItems = [...filteredItems].sort((a, b) => {
+    if (sortBy === 'price_low') {
+      return parseFloat(String(a.price || 0)) - parseFloat(String(b.price || 0));
+    }
+    if (sortBy === 'price_high') {
+      return parseFloat(String(b.price || 0)) - parseFloat(String(a.price || 0));
+    }
+    if (sortBy === 'rating') {
+      return parseFloat(String(b.rating || 0)) - parseFloat(String(a.rating || 0));
+    }
+    return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+  });
+
+  const popularKeywords = [
+    { label: 'All Items', query: '' },
+    { label: '📐 Calculators', query: 'calculator' },
+    { label: '📚 Textbooks & Notes', query: 'book' },
+    { label: '💻 Laptops & Tech', query: 'laptop' },
+    { label: '🎨 Graphic & UI Design', query: 'design' },
+    { label: '👨‍💻 Web & Coding', query: 'web' },
+    { label: '🎓 Tutoring', query: 'tutor' },
+    { label: '👕 Uni Merch', query: 'hoodie' },
+  ];
+
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-950 pt-5 pb-20 transition-colors duration-500">
       <SEO
@@ -525,54 +551,141 @@ const MarketplaceHome: React.FC = () => {
           <AdBanner placement="BANNER" />
         </div>
 
-        {/* Filters and Search */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-          <div className="flex flex-wrap bg-white dark:bg-slate-900 p-1 rounded-xl shadow-sm border border-gray-200 dark:border-white/10">
-            {['All', 'OFFICIAL_PRODUCT', 'PRODUCT', 'GIG'].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setFilter(tab as any)}
-                className={`px-5 py-2.5 rounded-lg font-bold text-sm transition-all flex items-center gap-2 ${filter === tab
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800/50'
-                  }`}
-              >
-                {tab === 'OFFICIAL_PRODUCT' && <LuBadgeCheck className="w-4 h-4 text-amber-500" />}
-                {tab === 'PRODUCT' && <LuShoppingBag className="w-4 h-4" />}
-                {tab === 'GIG' && <LuBriefcase className="w-4 h-4" />}
-                {tab === 'All'
-                  ? 'All Listings'
-                  : tab === 'OFFICIAL_PRODUCT'
-                    ? 'Official Store'
-                    : tab === 'PRODUCT'
-                      ? 'Peer Products'
-                      : 'Freelance Gigs'}
-              </button>
-            ))}
-          </div>
+        {/* Modern Interactive Command Bar (Filter Tabs + Search & Sort) */}
+        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border border-slate-200/80 dark:border-white/10 rounded-3xl p-3 sm:p-4 shadow-xl shadow-indigo-500/5 mb-4">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+            
+            {/* Category Segmented Tabs */}
+            <div className="flex items-center gap-1 p-1 sm:p-1.5 bg-slate-100/90 dark:bg-slate-950/70 rounded-2xl border border-slate-200/60 dark:border-white/5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden shrink-0">
+              {[
+                { key: 'All', label: 'All Listings', icon: LuSparkles, color: 'text-indigo-500' },
+                { key: 'OFFICIAL_PRODUCT', label: 'Official Store', icon: LuBadgeCheck, color: 'text-amber-500' },
+                { key: 'PRODUCT', label: 'Peer Products', icon: LuShoppingBag, color: 'text-emerald-500' },
+                { key: 'GIG', label: 'Freelance Gigs', icon: LuBriefcase, color: 'text-purple-500' },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = filter === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setFilter(tab.key as any)}
+                    className={`relative px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 whitespace-nowrap cursor-pointer border-none outline-none ${
+                      isActive
+                        ? 'text-white shadow-lg shadow-indigo-500/25'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60'
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeMarketplaceTab"
+                        className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-indigo-600 to-purple-600 rounded-xl"
+                        transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
+                      />
+                    )}
+                    <span className="relative z-10 flex items-center gap-2">
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-white' : tab.color}`} />
+                      {tab.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
 
-          <div className="relative w-full md:w-96">
-            <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search for calculators, laptops, tutors..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-950/50 outline-none transition-all font-medium text-gray-700 dark:text-slate-200 bg-white dark:bg-slate-900"
-            />
+            {/* Search Input & Sort Selector */}
+            <div className="flex items-center gap-3">
+              <div className="relative flex-1 lg:w-80 group">
+                <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 w-4 h-4 transition-colors" />
+                <input
+                  type="text"
+                  placeholder="Search calculators, notes, gigs..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-11 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all font-medium text-xs sm:text-sm text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900/90 placeholder:text-slate-400"
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer border-none bg-transparent"
+                    title="Clear search"
+                  >
+                    <LuX className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Sort Dropdown */}
+              <div className="relative shrink-0">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="appearance-none pl-3.5 pr-8 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 outline-none focus:border-indigo-500 cursor-pointer shadow-sm"
+                >
+                  <option value="newest">⚡ Latest</option>
+                  <option value="price_low">💰 Price: Low to High</option>
+                  <option value="price_high">💎 Price: High to Low</option>
+                  <option value="rating">⭐ Top Rated</option>
+                </select>
+                <LuChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+              </div>
+            </div>
+
           </div>
         </div>
 
-        {/* Grid */}
+        {/* Quick Suggestion Tags & Keyword Chips */}
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 mb-8">
+          <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 shrink-0 flex items-center gap-1 pl-1">
+            <LuSparkles className="w-3.5 h-3.5 text-indigo-500" /> Popular:
+          </span>
+          {popularKeywords.map((item, idx) => {
+            const isChipActive = (item.query === '' && search === '') || (item.query !== '' && search.toLowerCase().includes(item.query));
+            return (
+              <button
+                key={idx}
+                onClick={() => {
+                  if (item.query === '') {
+                    setSearch('');
+                  } else if (search.toLowerCase() === item.query) {
+                    setSearch('');
+                  } else {
+                    setSearch(item.query);
+                  }
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer border ${
+                  isChipActive
+                    ? 'bg-indigo-500/15 dark:bg-indigo-500/25 text-indigo-600 dark:text-indigo-400 border-indigo-500/40 font-bold shadow-sm'
+                    : 'bg-white/80 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border-slate-200/80 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Listings Grid or Premium Launchpad Empty State */}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="bg-white dark:bg-slate-900 rounded-2xl aspect-[3/4] animate-pulse border border-gray-100 dark:border-white/5"></div >
+            {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+              <div key={i} className="bg-white dark:bg-slate-900 rounded-3xl p-4 border border-slate-100 dark:border-white/5 shadow-sm animate-pulse flex flex-col gap-4">
+                <div className="w-full aspect-[4/3] rounded-2xl bg-slate-200 dark:bg-slate-800" />
+                <div className="space-y-2">
+                  <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded-md w-3/4" />
+                  <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded-md w-1/2" />
+                </div>
+                <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-white/5">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-slate-200 dark:bg-slate-800" />
+                    <div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded-md" />
+                  </div>
+                  <div className="h-4 w-12 bg-slate-200 dark:bg-slate-800 rounded-md" />
+                </div>
+              </div>
             ))}
           </div>
-        ) : filteredItems.length > 0 ? (
+        ) : sortedItems.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredItems.map((item, index) => (
+            {sortedItems.map((item, index) => (
               <React.Fragment key={item.id}>
                 <MarketplaceCard
                   item={item}
@@ -591,12 +704,164 @@ const MarketplaceHome: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-white/10 shadow-sm mt-8">
-            <div className="w-20 h-20 bg-gray-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-              <LuSearch className="w-8 h-8 text-gray-400" />
+          /* High-Converting "Hustle Launchpad" Empty State */
+          <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-b from-white via-slate-50/80 to-indigo-50/30 dark:from-slate-900 dark:via-slate-900/90 dark:to-indigo-950/20 border border-slate-200/80 dark:border-white/10 shadow-2xl p-8 sm:p-12 md:p-16 text-center">
+            {/* Ambient glowing radial orbs */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[280px] bg-gradient-to-r from-purple-500/15 via-indigo-500/15 to-pink-500/15 blur-[100px] rounded-full pointer-events-none" />
+            <div className="absolute -bottom-20 right-10 w-72 h-72 bg-blue-500/10 blur-[90px] rounded-full pointer-events-none" />
+
+            <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center">
+              
+              {/* Floating 3D Badge Cluster */}
+              <div className="relative mb-8 flex items-center justify-center">
+                <motion.div
+                  animate={{ y: [-5, 5, -5] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 p-1 shadow-2xl shadow-purple-500/30 flex items-center justify-center"
+                >
+                  <div className="w-full h-full bg-white dark:bg-slate-900 rounded-[22px] flex items-center justify-center backdrop-blur-xl">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-purple-500/25">
+                      <LuShoppingBag className="w-7 h-7 sm:w-8 sm:h-8" />
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Floating Micro Badge 1 (Left) */}
+                <motion.div
+                  animate={{ y: [6, -6, 6], x: [-3, 3, -3] }}
+                  transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
+                  className="hidden sm:flex absolute -left-28 md:-left-36 top-2 items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-200/80 dark:border-white/10 shadow-lg text-xs font-bold text-slate-700 dark:text-slate-200"
+                >
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                  <LuShieldCheck className="w-4 h-4 text-emerald-500" />
+                  <span>100% Student Verified</span>
+                </motion.div>
+
+                {/* Floating Micro Badge 2 (Right) */}
+                <motion.div
+                  animate={{ y: [-6, 6, -6], x: [3, -3, 3] }}
+                  transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+                  className="hidden sm:flex absolute -right-28 md:-right-36 bottom-2 items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border border-slate-200/80 dark:border-white/10 shadow-lg text-xs font-bold text-slate-700 dark:text-slate-200"
+                >
+                  <LuZap className="w-4 h-4 text-amber-500" />
+                  <span>Direct Campus Chat</span>
+                </motion.div>
+              </div>
+
+              {/* Dynamic Header & Subtitle */}
+              {search ? (
+                <>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 mb-3">
+                    <LuSearch className="w-3.5 h-3.5" /> No Direct Match
+                  </span>
+                  <h3 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-3">
+                    No listings found for "<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">{search}</span>"
+                  </h3>
+                  <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 max-w-xl mb-8 leading-relaxed">
+                    Looks like no one has posted this item yet. You can clear your search query or be the first person to offer it to fellow students!
+                  </p>
+                </>
+              ) : (
+                <>
+                  <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-black uppercase tracking-wider bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 mb-3">
+                    <LuSparkles className="w-3.5 h-3.5 text-purple-500" /> Prime Spotlight Spot Available
+                  </span>
+                  <h3 className="text-2xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-3">
+                    {filter === 'OFFICIAL_PRODUCT'
+                      ? 'The Official Store is Getting Restocked'
+                      : filter === 'GIG'
+                      ? 'Be the First Campus Freelancer Here!'
+                      : filter === 'PRODUCT'
+                      ? 'Turn Your Old Gear into Quick Cash!'
+                      : 'Be the First to Spark the Campus Hustle!'}
+                  </h3>
+                  <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400 max-w-xl mb-8 leading-relaxed">
+                    {filter === 'OFFICIAL_PRODUCT'
+                      ? 'Uni Gang official merch and exclusive student bundles are on the way. Check back shortly or explore peer student products!'
+                      : 'Thousands of university students visit The Uni Gang every week. Post your old textbooks, calculators, tech gear, or freelance services and close deals directly.'}
+                  </p>
+                </>
+              )}
+
+              {/* 3 Value Pillars */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mb-10 text-left">
+                <div className="p-4 sm:p-5 rounded-2xl bg-white/70 dark:bg-slate-800/50 border border-slate-200/70 dark:border-white/5 backdrop-blur-sm shadow-sm hover:border-purple-500/30 transition-all">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold mb-3">
+                    <LuSparkles className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Post in Under 60s</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Snap pictures, set your student rate, and publish instantly.</p>
+                </div>
+
+                <div className="p-4 sm:p-5 rounded-2xl bg-white/70 dark:bg-slate-800/50 border border-slate-200/70 dark:border-white/5 backdrop-blur-sm shadow-sm hover:border-indigo-500/30 transition-all">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold mb-3">
+                    <LuShieldCheck className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Zero Middleman Cuts</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Keep 100% of your earnings. Direct payments, no fees.</p>
+                </div>
+
+                <div className="p-4 sm:p-5 rounded-2xl bg-white/70 dark:bg-slate-800/50 border border-slate-200/70 dark:border-white/5 backdrop-blur-sm shadow-sm hover:border-amber-500/30 transition-all">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold mb-3">
+                    <LuZap className="w-5 h-5" />
+                  </div>
+                  <h4 className="font-bold text-sm text-slate-900 dark:text-white mb-1">Direct Campus Chat</h4>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">Chat in-app or connect on WhatsApp for safe on-campus meetups.</p>
+                </div>
+              </div>
+
+              {/* High Impact Call to Action Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+                {search ? (
+                  <button
+                    onClick={() => setSearch('')}
+                    className="w-full sm:w-auto px-7 py-3.5 rounded-2xl font-bold text-sm bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:opacity-90 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border-none"
+                  >
+                    <LuRefreshCw className="w-4 h-4" /> Clear Search
+                  </button>
+                ) : null}
+
+                <button
+                  onClick={handlePostAdClick}
+                  className="w-full sm:w-auto group relative inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-black text-sm text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 shadow-xl shadow-purple-500/25 transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer border-none overflow-hidden"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    <LuPlus className="w-5 h-5 transition-transform group-hover:rotate-90 duration-300" />
+                    {filter === 'GIG' ? 'Post a Freelance Gig' : 'Post Your Listing / Ad Now'}
+                  </span>
+                  <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+
+                {filter !== 'All' && (
+                  <button
+                    onClick={() => {
+                      setFilter('All');
+                      setSearch('');
+                    }}
+                    className="w-full sm:w-auto px-6 py-4 rounded-2xl font-bold text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-2 cursor-pointer border border-slate-200 dark:border-white/10"
+                  >
+                    View All Categories
+                  </button>
+                )}
+              </div>
+
+              {/* Frequently Requested Ideas Ticker */}
+              <div className="mt-10 pt-6 border-t border-slate-200/60 dark:border-white/5 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-400 dark:text-slate-500">
+                <span className="font-bold flex items-center gap-1 text-slate-600 dark:text-slate-300">
+                  🔥 Frequently Requested:
+                </span>
+                {['Casio fx-991EX', 'Engineering Drawing Board', 'Past Papers & Notes', 'React/Python Tutor', 'Used iPad / Tablet'].map((req, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSearch(req)}
+                    className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-all cursor-pointer border-none text-[11px] font-medium"
+                  >
+                    {req}
+                  </button>
+                ))}
+              </div>
+
             </div>
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">No listings found</h3>
-            <p className="text-gray-500 dark:text-slate-400">Be the first to post something in this category!</p>
           </div>
         )}
 
