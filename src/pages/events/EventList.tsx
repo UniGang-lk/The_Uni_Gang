@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
     LuArrowLeft, LuSearch, LuCalendar, LuMapPin, LuGraduationCap,
-    LuClock, LuMessageCircle, LuInfo, LuArrowRight, LuSparkles
+    LuClock, LuMessageCircle, LuInfo, LuArrowRight, LuSparkles,
+    LuTicket, LuX, LuChevronDown, LuUsers
 } from "react-icons/lu";
 import { motion, AnimatePresence } from "framer-motion";
 import TiltCard from '../../components/ui/TiltCard';
@@ -107,11 +108,22 @@ const DUMMY_EVENTS = [
     }
 ];
 
+const CATEGORIES = [
+    { key: "All", label: "All Events" },
+    { key: "Tech", label: "Tech & Code" },
+    { key: "Culture", label: "Culture & Music" },
+    { key: "Sports", label: "Sports Derbies" },
+    { key: "Business", label: "Business & Pitch" },
+    { key: "Lifestyle", label: "Campus Lifestyle" },
+];
+
+const UNIVERSITIES = ["All", "UOM", "UOC", "SLIIT", "NSBM", "IIT"];
+
 const FloatingIcon = ({ icon: Icon, index }: { icon: React.ComponentType, index: number }) => (
     <motion.div
         initial={{ opacity: 0, scale: 0 }}
         animate={{
-            opacity: [0.2, 0.5, 0.2],
+            opacity: [0.15, 0.4, 0.15],
             scale: [1, 1.2, 1],
             y: [0, -20, 0],
             rotate: [0, 10, -10, 0]
@@ -133,11 +145,11 @@ const FloatingIcon = ({ icon: Icon, index }: { icon: React.ComponentType, index:
     </motion.div>
 );
 
-
-
-const EventList = () => {
+const EventList: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("All");
+    const [selectedUni, setSelectedUni] = useState("All");
+    const [sortBy, setSortBy] = useState<"soonest" | "az">("soonest");
     const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
     const [, setIsScrolled] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -148,7 +160,7 @@ const EventList = () => {
             try {
                 setLoading(true);
                 const data = await api.getApprovedEvents();
-                setEvents(data);
+                setEvents(Array.isArray(data) ? data : []);
             } catch (err) {
                 console.error("Failed to load approved events:", err);
             } finally {
@@ -164,15 +176,27 @@ const EventList = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    const displayEvents = events.length > 0 ? events : DUMMY_EVENTS;
+    const featuredEvent = displayEvents[0] || DUMMY_EVENTS[0];
+
     const filteredEvents = (() => {
-        const displayEvents = events.length > 0 ? events : DUMMY_EVENTS;
-        return displayEvents.filter(event => {
-            const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                event.uni.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        const list = displayEvents.filter(event => {
+            const matchesSearch =
+                (event.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (event.uni || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (event.location || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (event.faculty && event.faculty.toLowerCase().includes(searchTerm.toLowerCase()));
             const matchesCategory = selectedCategory === "All" || event.category === selectedCategory;
-            return matchesSearch && matchesCategory;
+            const matchesUni = selectedUni === "All" || (event.uni || '').toUpperCase() === selectedUni.toUpperCase();
+            return matchesSearch && matchesCategory && matchesUni;
         });
+
+        if (sortBy === "az") {
+            list.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+        } else {
+            list.sort((a, b) => new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime());
+        }
+        return list;
     })();
 
     const handleStartChat = async (eventId: string) => {
@@ -192,7 +216,10 @@ const EventList = () => {
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500 pb-20">
-            <SEO title="University Events & Tech Meetups - The Uni Gang" description="Discover the latest university events, tech summits, hackathons, and cultural nights across Sri Lanka." />
+            <SEO
+                title="University Events & Tech Meetups - The Uni Gang"
+                description="Discover the latest university events, tech summits, hackathons, and cultural nights across Sri Lanka."
+            />
             <PremiumPageLoader isLoading={loading} message="Syncing with the campus heartbeat..." />
 
             <AnimatePresence>
@@ -202,127 +229,263 @@ const EventList = () => {
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5 }}
                     >
-                        {/* Background Decorative Globs */}
+                        {/* Background Ambient Glows */}
                         <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-                            <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px]" />
-                            <div className="absolute bottom-[20%] left-[-10%] w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px]" />
+                            <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-blue-500/10 dark:bg-blue-600/10 rounded-full blur-[140px]" />
+                            <div className="absolute bottom-[20%] left-[-10%] w-[500px] h-[500px] bg-cyan-500/10 dark:bg-cyan-600/10 rounded-full blur-[120px]" />
                         </div>
 
-                        {/* Hero Section */}
-                        <section className="relative pt-5 pb-16 px-4 md:px-8 max-w-7xl mx-auto z-10">
-                            <div className="grid lg:grid-cols-2 gap-12 items-center">
+                        {/* Top Hero Section */}
+                        <section className="relative pt-6 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto z-10">
+                            <div className="grid lg:grid-cols-12 gap-10 items-center">
+                                
+                                {/* Left Column: Headline and Proof */}
                                 <motion.div
                                     initial={{ opacity: 0, y: 30 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.8 }}
-                                    className="space-y-8"
+                                    className="lg:col-span-7 space-y-6 text-center lg:text-left"
                                 >
-                                    {/* Breadcrumb navigation */}
-                                    {/* <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-2 animate-in fade-in slide-in-from-left-2 duration-300">
-                                        <button
-                                            onClick={() => navigate('/')}
-                                            className="hover:text-blue-600 dark:hover:text-cyan-400 transition-colors flex items-center gap-1.5 bg-transparent border-none p-0 cursor-pointer font-black text-slate-400 dark:text-slate-500"
-                                        >
-                                            <LuArrowLeft className="w-3.5 h-3.5" /> Hub
-                                        </button>
-                                        <span className="text-slate-300 dark:text-slate-800">/</span>
-                                        <span className="text-slate-605 dark:text-slate-405">Events</span>
-                                    </div> */}
+                                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200/60 dark:border-blue-800/60 text-blue-600 dark:text-cyan-400 font-black text-xs uppercase tracking-wider shadow-sm">
+                                        <LuSparkles className="w-3.5 h-3.5 animate-pulse" /> Sri Lanka's Campus Heartbeat
+                                    </div>
 
-                                    {/* <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100/50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-black uppercase tracking-widest border border-blue-200/50 dark:border-blue-800/50">
-                                        <LuSparkles className="animate-pulse" /> Live the Experience
-                                    </div> */}
-                                    <h1 className="text-6xl md:text-8xl font-black text-slate-900 dark:text-white leading-[0.9] tracking-tighter">
+                                    <h1 className="text-5xl sm:text-7xl font-black text-slate-900 dark:text-white leading-[0.95] tracking-tight">
                                         University <br />
-                                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Pulse.</span>
+                                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500">Pulse.</span>
                                     </h1>
-                                    <p className="text-xl text-slate-500 dark:text-slate-400 max-w-lg leading-relaxed font-medium">
-                                        The ultimate destination for all Sri Lankan university events. Stay updated, get registered, and never miss a landmark moment.
+
+                                    <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl mx-auto lg:mx-0 leading-relaxed font-normal">
+                                        The unified stage for hackathons, cultural festivals, tech summits, and sports derbies across Sri Lankan universities. Never miss a landmark campus moment.
                                     </p>
 
-                                    <div className="flex flex-wrap gap-4 pt-4">
-                                        <div className="flex -space-x-3">
-                                            {[1, 2, 3, 4].map(i => (
-                                                <img key={i} src={`https://i.pravatar.cc/100?u=${i + 10}`} className="w-12 h-12 rounded-full border-4 border-white dark:border-slate-900 object-cover" alt="avatar" />
-                                            ))}
-                                            <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center border-4 border-white dark:border-slate-900 text-white text-xs font-black">
-                                                +2K
+                                    {/* Stats & Trust Row */}
+                                    <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-6">
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex -space-x-3">
+                                                {[1, 2, 3, 4].map(i => (
+                                                    <img
+                                                        key={i}
+                                                        src={`https://i.pravatar.cc/100?u=${i + 15}`}
+                                                        className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 object-cover shadow-sm"
+                                                        alt="student"
+                                                    />
+                                                ))}
+                                                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center border-2 border-white dark:border-slate-900 text-white text-[11px] font-black shadow-sm">
+                                                    +3K
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col text-left">
+                                                <span className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-tight">3,000+ Students</span>
+                                                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">Active Campus Community</span>
                                             </div>
                                         </div>
-                                        <div className="flex flex-col justify-center">
-                                            <span className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">Joined the gang</span>
-                                            <span className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">Active Students</span>
+
+                                        <div className="h-8 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
+
+                                        <div className="flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300">
+                                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                                            <span>{displayEvents.length} Active University Events Live</span>
                                         </div>
                                     </div>
                                 </motion.div>
 
-                                {/* 3D-Like Animated Visual Component */}
+                                {/* Right Column: Dynamic Featured Event Spotlight */}
                                 <motion.div
-                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ duration: 1 }}
-                                    className="relative mt-12 lg:mt-0"
+                                    transition={{ duration: 0.8, delay: 0.1 }}
+                                    className="lg:col-span-5 relative"
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-[3rem] blur-3xl animate-pulse" />
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-blue-600/20 via-indigo-600/20 to-cyan-500/20 rounded-[2.5rem] blur-2xl pointer-events-none" />
 
-                                    {/* Floating Dynamic Icons */}
                                     <FloatingIcon icon={LuCalendar} index={0} />
                                     <FloatingIcon icon={LuSparkles} index={1} />
                                     <FloatingIcon icon={LuGraduationCap} index={2} />
-                                    <FloatingIcon icon={LuClock} index={3} />
 
                                     <TiltCard>
-                                        <div className="relative rounded-[3rem] overflow-hidden border border-white/30 dark:border-white/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.3)] bg-white/10 backdrop-blur-sm p-6">
-                                            <motion.div
-                                                className="relative h-[500px] rounded-[2.5rem] overflow-hidden"
-                                                whileHover={{ scale: 1.02 }}
-                                                transition={{ duration: 0.5 }}
-                                            >
+                                        <div
+                                            onClick={() => setSelectedEvent(featuredEvent)}
+                                            className="group cursor-pointer relative rounded-[2rem] overflow-hidden border border-white/60 dark:border-white/10 shadow-2xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl p-4 sm:p-5 transition-all duration-300 hover:border-blue-500/50"
+                                        >
+                                            <div className="relative h-64 sm:h-72 rounded-2xl overflow-hidden mb-4">
                                                 <img
-                                                    src="https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=1200"
-                                                    className="w-full h-full object-cover"
-                                                    alt="University Event"
+                                                    src={featuredEvent.image || "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=1200"}
+                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                                    alt={featuredEvent.title}
                                                 />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
 
-                                                <div className="absolute bottom-10 left-10 right-10 space-y-4">
-                                                    <div className="bg-white/20 backdrop-blur-md px-4 py-2 rounded-full w-fit border border-white/30">
-                                                        <span className="text-xs font-black text-white uppercase tracking-widest">Featured Event</span>
-                                                    </div>
-                                                    <h3 className="text-4xl font-black text-white uppercase tracking-tighter">Innovate Your Future</h3>
-                                                    <div className="flex items-center gap-6 text-white/80 font-bold">
-                                                        <div className="flex items-center gap-2">
-                                                            <LuCalendar className="text-blue-400" /> Oct 15
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                            <LuMapPin className="text-blue-400" /> Colombo
-                                                        </div>
-                                                    </div>
+                                                <div className="absolute top-3.5 left-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5">
+                                                    <LuSparkles className="w-3 h-3" /> Spotlight Event
                                                 </div>
-                                            </motion.div>
+
+                                                <div className="absolute top-3.5 right-3.5 bg-black/50 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
+                                                    {featuredEvent.category}
+                                                </div>
+
+                                                <div className="absolute bottom-4 left-4 right-4">
+                                                    <div className="flex items-center gap-2 text-cyan-300 text-xs font-bold uppercase tracking-wider mb-1">
+                                                        <LuGraduationCap className="text-sm" /> {featuredEvent.uni}{featuredEvent.faculty ? ` - ${featuredEvent.faculty}` : ''}
+                                                    </div>
+                                                    <h3 className="text-2xl font-black text-white tracking-tight leading-tight group-hover:text-cyan-300 transition-colors">
+                                                        {featuredEvent.title}
+                                                    </h3>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center justify-between pt-1 px-1">
+                                                <div className="flex items-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                                    <span className="flex items-center gap-1 text-slate-700 dark:text-slate-200">
+                                                        <LuCalendar className="text-blue-500" /> {featuredEvent.date}
+                                                    </span>
+                                                    <span>•</span>
+                                                    <span className="flex items-center gap-1">
+                                                        <LuMapPin className="text-blue-500" /> {featuredEvent.location}
+                                                    </span>
+                                                </div>
+                                                <span className="text-xs font-black text-blue-600 dark:text-cyan-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                                    View RSVP <LuArrowRight className="w-3.5 h-3.5" />
+                                                </span>
+                                            </div>
                                         </div>
                                     </TiltCard>
                                 </motion.div>
+
                             </div>
                         </section>
 
-                        {/* Events Grid */}
-                        <section className="max-w-7xl mx-auto px-4 md:px-8 pt-10 relative z-10">
+                        {/* Events Main Hub */}
+                        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 relative z-10">
 
-                            {/* Ad Banner Placement */}
-                            <AdBanner placement="BANNER" />
+                            {/* Ad Banner */}
+                            <div className="mb-8">
+                                <AdBanner placement="BANNER" />
+                            </div>
 
-                            <div className="flex items-center justify-between mb-12">
-                                <div>
-                                    <h2 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Upcoming Vibes</h2>
-                                    <p className="text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-xs mt-2">Found {filteredEvents.length} active events</p>
+                            {/* Interactive Command & Discovery Toolbar */}
+                            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border border-slate-200/80 dark:border-white/10 rounded-3xl p-3 sm:p-4 shadow-xl shadow-blue-500/5 mb-6">
+                                <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+                                    
+                                    {/* Category Segmented Tabs */}
+                                    <div className="flex items-center gap-1 p-1 bg-slate-100/90 dark:bg-slate-950/70 rounded-2xl border border-slate-200/60 dark:border-white/5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden shrink-0">
+                                        {CATEGORIES.map((cat) => {
+                                            const isActive = selectedCategory === cat.key;
+                                            return (
+                                                <button
+                                                    key={cat.key}
+                                                    onClick={() => setSelectedCategory(cat.key)}
+                                                    className={`relative px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 whitespace-nowrap cursor-pointer border-none outline-none ${
+                                                        isActive
+                                                            ? 'text-white shadow-lg shadow-blue-500/25'
+                                                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60'
+                                                    }`}
+                                                >
+                                                    {isActive && (
+                                                        <motion.div
+                                                            layoutId="activeEventCategoryPill"
+                                                            className="absolute inset-0 bg-gradient-to-r from-blue-600 via-blue-600 to-indigo-600 rounded-xl"
+                                                            transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
+                                                        />
+                                                    )}
+                                                    <span className="relative z-10">{cat.label}</span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+
+                                    {/* Search Input & Sort Selector */}
+                                    <div className="flex items-center gap-3">
+                                        <div className="relative flex-1 lg:w-80 group">
+                                            <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 w-4 h-4 transition-colors" />
+                                            <input
+                                                type="text"
+                                                placeholder="Search event, uni (UOM...), venue..."
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                className="w-full pl-11 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-xs sm:text-sm text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900/90 placeholder:text-slate-400"
+                                            />
+                                            {searchTerm && (
+                                                <button
+                                                    onClick={() => setSearchTerm('')}
+                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer border-none bg-transparent"
+                                                    title="Clear search"
+                                                >
+                                                    <LuX className="w-3.5 h-3.5" />
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {/* Sort Dropdown */}
+                                        <div className="relative shrink-0">
+                                            <select
+                                                value={sortBy}
+                                                onChange={(e) => setSortBy(e.target.value as any)}
+                                                className="appearance-none pl-3.5 pr-8 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 outline-none focus:border-blue-500 cursor-pointer shadow-sm"
+                                            >
+                                                <option value="soonest">📅 Soonest First</option>
+                                                <option value="az">🔤 Title (A - Z)</option>
+                                            </select>
+                                            <LuChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
 
+                            {/* University Quick Chips */}
+                            <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 mb-8">
+                                <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 shrink-0 flex items-center gap-1 pl-1">
+                                    <LuGraduationCap className="w-3.5 h-3.5 text-blue-500" /> Filter by Campus:
+                                </span>
+                                {UNIVERSITIES.map((uni) => {
+                                    const isUniActive = selectedUni === uni;
+                                    return (
+                                        <button
+                                            key={uni}
+                                            onClick={() => setSelectedUni(uni)}
+                                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer border ${
+                                                isUniActive
+                                                    ? 'bg-blue-500/15 dark:bg-blue-500/25 text-blue-600 dark:text-cyan-400 border-blue-500/40 font-bold shadow-sm'
+                                                    : 'bg-white/80 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border-slate-200/80 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 hover:text-slate-900 dark:hover:text-white'
+                                            }`}
+                                        >
+                                            {uni === 'All' ? 'All Campuses' : uni}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Section Header */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
+                                <div>
+                                    <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                                        Upcoming University Events
+                                    </h2>
+                                    <p className="text-slate-500 dark:text-slate-400 font-semibold text-xs mt-1">
+                                        Showing {filteredEvents.length} active campus events
+                                    </p>
+                                </div>
+
+                                {(searchTerm || selectedCategory !== 'All' || selectedUni !== 'All') && (
+                                    <button
+                                        onClick={() => {
+                                            setSearchTerm('');
+                                            setSelectedCategory('All');
+                                            setSelectedUni('All');
+                                        }}
+                                        className="text-xs font-bold text-blue-600 dark:text-cyan-400 hover:underline flex items-center gap-1 self-start sm:self-auto cursor-pointer border-none bg-transparent"
+                                    >
+                                        <LuX className="w-3 h-3" /> Reset all filters
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Events Grid */}
                             <AnimatePresence mode="popLayout">
                                 <motion.div
                                     layout
-                                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10"
+                                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
                                 >
                                     {filteredEvents.map((event, index) => {
                                         const imageUrl = event.image
@@ -337,106 +500,112 @@ const EventList = () => {
                                             <React.Fragment key={event.id}>
                                                 <motion.div
                                                     layout
-                                                    initial={{ opacity: 0, y: 30 }}
+                                                    initial={{ opacity: 0, y: 25 }}
                                                     animate={{ opacity: 1, y: 0 }}
-                                                    exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-                                                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                                                    exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                                                    transition={{ duration: 0.4, delay: index * 0.05 }}
                                                 >
-                                                    {/* <TiltCard className="h-full"> */}
                                                     <div className="h-full">
-                                                        <div className="group h-full bg-white/60 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/50 dark:border-slate-700/30 rounded-[2rem] p-5 shadow-xl hover:-translate-y-2 hover:shadow-[0_40px_80px_-20px_rgba(0,63,221,0.15)] transition-all duration-500 flex flex-col">
-                                                            {/* Image Container */}
-                                                            <div className="relative h-72 rounded-[2rem] overflow-hidden mb-6">
+                                                        <div className="group h-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 rounded-3xl p-5 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col relative overflow-hidden">
+                                                            
+                                                            {/* Image Capsule */}
+                                                            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                                                                 <img
                                                                     src={imageUrl}
                                                                     alt={event.title}
-                                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                                                 />
-                                                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
 
-                                                                {/* Date Badge - Premium Calendar Leaf */}
-                                                                <div className="absolute top-4 left-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl overflow-hidden flex flex-col items-center border border-white/40 dark:border-slate-700/50 shadow-xl shadow-black/10 min-w-[3rem]">
-                                                                    <div className="bg-blue-600 w-full py-1 text-center">
-                                                                        <span className="text-[8px] font-black uppercase tracking-widest text-white leading-none">{monthStr}</span>
+                                                                {/* Date Badge - Ultra Crisp Calendar Pill */}
+                                                                <div className="absolute top-3.5 left-3.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl overflow-hidden flex flex-col items-center border border-white/60 dark:border-slate-700/60 shadow-xl min-w-[3.2rem]">
+                                                                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 w-full py-1 text-center">
+                                                                        <span className="text-[9px] font-black uppercase tracking-wider text-white leading-none block">{monthStr}</span>
                                                                     </div>
-                                                                    <div className="px-3 py-1.5 flex items-center justify-center">
-                                                                        <span className="text-xl font-black text-slate-900 dark:text-white leading-none tracking-tighter">{dayStr}</span>
+                                                                    <div className="px-2.5 py-1 flex items-center justify-center">
+                                                                        <span className="text-xl font-black text-slate-900 dark:text-white leading-none tracking-tight">{dayStr}</span>
                                                                     </div>
                                                                 </div>
 
                                                                 {/* Category Tag */}
-                                                                <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg">
+                                                                <div className="absolute top-3.5 right-3.5 bg-slate-900/80 dark:bg-white/15 backdrop-blur-md text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20 shadow-md">
                                                                     {event.category || 'Event'}
+                                                                </div>
+
+                                                                {/* University & Faculty Badge on Image Bottom */}
+                                                                <div className="absolute bottom-3 left-3 right-3 flex items-center gap-1.5 text-white/95 text-xs font-bold truncate">
+                                                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-black/50 backdrop-blur-md border border-white/15 text-[11px]">
+                                                                        <LuGraduationCap className="text-cyan-400 shrink-0" />
+                                                                        <span className="truncate">{event.uni}{event.faculty ? ` • ${event.faculty}` : ''}</span>
+                                                                    </span>
                                                                 </div>
                                                             </div>
 
                                                             {/* Content */}
-                                                            <div className="px-3 flex-grow space-y-4">
-                                                                <div className="space-y-1">
-                                                                    <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-[0.2em]">
-                                                                        <LuGraduationCap /> {event.uni}{event.faculty ? ` - ${event.faculty}` : ''}
+                                                            <div className="flex flex-col flex-grow">
+                                                                <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-snug group-hover:text-blue-600 dark:group-hover:text-cyan-400 transition-colors line-clamp-1 mb-2">
+                                                                    {event.title}
+                                                                </h3>
+
+                                                                {/* Time & Location */}
+                                                                <div className="flex flex-wrap items-center gap-3 text-slate-500 dark:text-slate-400 text-xs font-semibold mb-3">
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        <LuMapPin className="text-blue-500 shrink-0" />
+                                                                        <span className="truncate">{event.location}</span>
                                                                     </div>
-                                                                    <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none group-hover:text-blue-600 transition-colors duration-300 mt-1">
-                                                                        {event.title}
-                                                                    </h3>
+                                                                    <span className="text-slate-300 dark:text-slate-700">•</span>
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        <LuClock className="text-blue-500 shrink-0" />
+                                                                        <span>{event.time || '09:00 AM'}</span>
+                                                                    </div>
                                                                 </div>
 
-                                                                <div className="flex flex-wrap gap-4 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">
-                                                                    <div className="flex items-center gap-1.5">
-                                                                        <LuMapPin className="text-blue-500" /> {event.location}
-                                                                    </div>
-                                                                    <div className="flex items-center gap-1.5">
-                                                                        <LuClock className="text-blue-500" /> {event.time || '09:00 AM'}
-                                                                    </div>
-                                                                </div>
-
-                                                                <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed font-medium line-clamp-2">
+                                                                <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm leading-relaxed font-normal line-clamp-2 mb-4 flex-grow">
                                                                     {event.description}
                                                                 </p>
 
-                                                                {/* Expandable Details Peek & Capacity */}
-                                                                <div className="pt-4 flex flex-col gap-4 border-t border-slate-200/50 dark:border-slate-700/50">
-                                                                    {event.capacity && (
-                                                                        <div className="flex flex-col gap-1.5">
-                                                                            <div className="flex items-center justify-between text-[8px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                                                                                <span>Capacity</span>
-                                                                                <span className="text-blue-600 dark:text-blue-400">{event.attendees?.length || 0} / {event.capacity}</span>
-                                                                            </div>
-                                                                            <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                                                                                <div
-                                                                                    className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full"
-                                                                                    style={{ width: `${Math.min(((event.attendees?.length || 0) / event.capacity) * 100, 100)}%` }}
-                                                                                />
-                                                                            </div>
+                                                                {/* Capacity Progress Bar (if exists) */}
+                                                                {event.capacity && (
+                                                                    <div className="mb-4 pt-3 border-t border-slate-100 dark:border-white/5 flex flex-col gap-1.5">
+                                                                        <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                                            <span>RSVP Capacity</span>
+                                                                            <span className="text-blue-600 dark:text-cyan-400">{event.attendees?.length || 0} / {event.capacity} Spots</span>
                                                                         </div>
-                                                                    )}
-
-                                                                    {/* Interaction Buttons */}
-                                                                    <div className="grid grid-cols-[1fr_auto] gap-3">
-                                                                        <button
-                                                                            onClick={() => setSelectedEvent(event)}
-                                                                            className="flex items-center justify-center gap-2 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest text-[10px] transition-all shadow-lg shadow-blue-600/30 active:scale-95 border border-transparent"
-                                                                        >
-                                                                            <LuInfo size={14} /> View & RSVP
-                                                                        </button>
-                                                                        <button
-                                                                            onClick={() => handleStartChat(event.id.toString())}
-                                                                            className="flex items-center justify-center p-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-500 dark:text-slate-400 transition-all active:scale-95 shadow-sm"
-                                                                            title="Chat with Organizer"
-                                                                        >
-                                                                            <LuMessageCircle size={18} />
-                                                                        </button>
+                                                                        <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                                                            <div
+                                                                                className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full"
+                                                                                style={{ width: `${Math.min(((event.attendees?.length || 0) / event.capacity) * 100, 100)}%` }}
+                                                                            />
+                                                                        </div>
                                                                     </div>
+                                                                )}
+
+                                                                {/* Interaction Buttons */}
+                                                                <div className="pt-3 border-t border-slate-100 dark:border-white/5 grid grid-cols-[1fr_auto] gap-2.5 mt-auto">
+                                                                    <button
+                                                                        onClick={() => setSelectedEvent(event)}
+                                                                        className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-500/20 active:scale-95 cursor-pointer border-none"
+                                                                    >
+                                                                        <LuTicket className="w-3.5 h-3.5" /> View & RSVP
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleStartChat(event.id.toString())}
+                                                                        className="flex items-center justify-center p-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-all active:scale-95 cursor-pointer border-none"
+                                                                        title="Chat with Event Organizer"
+                                                                    >
+                                                                        <LuMessageCircle className="w-4 h-4" />
+                                                                    </button>
                                                                 </div>
+
                                                             </div>
+
                                                         </div>
                                                     </div>
-                                                    {/* </TiltCard> */}
                                                 </motion.div>
 
-                                                {(index + 1) % 4 === 0 && (
+                                                {(index + 1) % 6 === 0 && (
                                                     <div key={`ad-${index}`} className="col-span-1 md:col-span-2 lg:col-span-3">
-                                                        <AdNativeFeed adIndex={Math.floor((index + 1) / 4) - 1} />
+                                                        <AdNativeFeed adIndex={Math.floor((index + 1) / 6) - 1} />
                                                     </div>
                                                 )}
                                             </React.Fragment>
@@ -445,52 +614,43 @@ const EventList = () => {
                                 </motion.div>
                             </AnimatePresence>
 
-                            {/* Premium Event Details Component */}
+                            {/* Empty State */}
+                            {filteredEvents.length === 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-b from-white via-slate-50/80 to-blue-50/30 dark:from-slate-900 dark:via-slate-900/90 dark:to-blue-950/20 border border-slate-200/80 dark:border-white/10 shadow-2xl p-8 sm:p-12 text-center my-8"
+                                >
+                                    <div className="w-20 h-20 rounded-3xl bg-blue-500/10 text-blue-600 dark:text-cyan-400 flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
+                                        <LuSearch className="w-9 h-9" />
+                                    </div>
+                                    <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
+                                        No Events Found
+                                    </h3>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-6">
+                                        We couldn't find any events matching your selected category or search query.
+                                    </p>
+                                    <button
+                                        onClick={() => {
+                                            setSearchTerm("");
+                                            setSelectedCategory("All");
+                                            setSelectedUni("All");
+                                        }}
+                                        className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer border-none"
+                                    >
+                                        Reset All Filters
+                                    </button>
+                                </motion.div>
+                            )}
+
+                            {/* Event Details Modal Popup */}
                             <EventDetails
                                 event={selectedEvent}
                                 isOpen={!!selectedEvent}
                                 onClose={() => setSelectedEvent(null)}
                             />
 
-                            {filteredEvents.length === 0 && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="flex flex-col items-center justify-center py-32 text-center space-y-6"
-                                >
-                                    <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-800">
-                                        <LuSearch className="text-4xl text-slate-300" />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">No Events Found</h3>
-                                        <p className="text-slate-500 dark:text-slate-400 font-medium">Try adjusting your search or filters to find what you're looking for.</p>
-                                    </div>
-                                    <button
-                                        onClick={() => { setSearchTerm(""); setSelectedCategory("All"); }}
-                                        className="text-blue-600 dark:text-blue-400 font-black uppercase tracking-widest text-xs hover:underline decoration-2 underline-offset-8"
-                                    >
-                                        Reset All Filters
-                                    </button>
-                                </motion.div>
-                            )}
                         </section>
-
-                        {/* Pagination System */}
-                        {filteredEvents.length > 0 && (
-                            <div className="mt-20 flex justify-center w-full px-4">
-                                <div className="flex items-center gap-2 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl p-2 rounded-full border border-white/40 dark:border-slate-800 shadow-2xl">
-                                    <button className="w-12 h-12 flex items-center justify-center rounded-full text-slate-400 dark:text-slate-600 cursor-not-allowed">
-                                        <LuArrowLeft />
-                                    </button>
-                                    <div className="px-4 py-2 bg-blue-600 text-white font-black rounded-full text-sm shadow-lg shadow-blue-500/30">
-                                        1
-                                    </div>
-                                    <button className="w-12 h-12 flex items-center justify-center rounded-full text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 transition-all">
-                                        <LuArrowRight />
-                                    </button>
-                                </div>
-                            </div>
-                        )}
                     </motion.div>
                 )}
             </AnimatePresence>
