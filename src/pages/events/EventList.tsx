@@ -108,16 +108,7 @@ const DUMMY_EVENTS = [
     }
 ];
 
-const CATEGORIES = [
-    { key: "All", label: "All Events" },
-    { key: "Tech", label: "Tech & Code" },
-    { key: "Culture", label: "Culture & Music" },
-    { key: "Sports", label: "Sports Derbies" },
-    { key: "Business", label: "Business & Pitch" },
-    { key: "Lifestyle", label: "Campus Lifestyle" },
-];
 
-const UNIVERSITIES = ["All", "UOM", "UOC", "SLIIT", "NSBM", "IIT"];
 
 const FloatingIcon = ({ icon: Icon, index }: { icon: React.ComponentType, index: number }) => (
     <motion.div
@@ -146,10 +137,6 @@ const FloatingIcon = ({ icon: Icon, index }: { icon: React.ComponentType, index:
 );
 
 const EventList: React.FC = () => {
-    const [searchTerm, setSearchTerm] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState("All");
-    const [selectedUni, setSelectedUni] = useState("All");
-    const [sortBy, setSortBy] = useState<"soonest" | "az">("soonest");
     const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
     const [, setIsScrolled] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -178,26 +165,6 @@ const EventList: React.FC = () => {
 
     const displayEvents = events.length > 0 ? events : DUMMY_EVENTS;
     const featuredEvent = displayEvents[0] || DUMMY_EVENTS[0];
-
-    const filteredEvents = (() => {
-        const list = displayEvents.filter(event => {
-            const matchesSearch =
-                (event.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (event.uni || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (event.location || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (event.faculty && event.faculty.toLowerCase().includes(searchTerm.toLowerCase()));
-            const matchesCategory = selectedCategory === "All" || event.category === selectedCategory;
-            const matchesUni = selectedUni === "All" || (event.uni || '').toUpperCase() === selectedUni.toUpperCase();
-            return matchesSearch && matchesCategory && matchesUni;
-        });
-
-        if (sortBy === "az") {
-            list.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
-        } else {
-            list.sort((a, b) => new Date(a.date || 0).getTime() - new Date(b.date || 0).getTime());
-        }
-        return list;
-    })();
 
     const handleStartChat = async (eventId: string) => {
         const token = localStorage.getItem('userToken');
@@ -363,122 +330,16 @@ const EventList: React.FC = () => {
                                 <AdBanner placement="BANNER" />
                             </div>
 
-                            {/* Interactive Command & Discovery Toolbar */}
-                            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl border border-slate-200/80 dark:border-white/10 rounded-3xl p-3 sm:p-4 shadow-xl shadow-blue-500/5 mb-6">
-                                <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
-                                    
-                                    {/* Category Segmented Tabs */}
-                                    <div className="flex items-center gap-1 p-1 bg-slate-100/90 dark:bg-slate-950/70 rounded-2xl border border-slate-200/60 dark:border-white/5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden shrink-0">
-                                        {CATEGORIES.map((cat) => {
-                                            const isActive = selectedCategory === cat.key;
-                                            return (
-                                                <button
-                                                    key={cat.key}
-                                                    onClick={() => setSelectedCategory(cat.key)}
-                                                    className={`relative px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 whitespace-nowrap cursor-pointer border-none outline-none ${
-                                                        isActive
-                                                            ? 'text-white shadow-lg shadow-blue-500/25'
-                                                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800/60'
-                                                    }`}
-                                                >
-                                                    {isActive && (
-                                                        <motion.div
-                                                            layoutId="activeEventCategoryPill"
-                                                            className="absolute inset-0 bg-gradient-to-r from-blue-600 via-blue-600 to-indigo-600 rounded-xl"
-                                                            transition={{ type: 'spring', bounce: 0.2, duration: 0.5 }}
-                                                        />
-                                                    )}
-                                                    <span className="relative z-10">{cat.label}</span>
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-
-                                    {/* Search Input & Sort Selector */}
-                                    <div className="flex items-center gap-3">
-                                        <div className="relative flex-1 lg:w-80 group">
-                                            <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 w-4 h-4 transition-colors" />
-                                            <input
-                                                type="text"
-                                                placeholder="Search event, uni (UOM...), venue..."
-                                                value={searchTerm}
-                                                onChange={(e) => setSearchTerm(e.target.value)}
-                                                className="w-full pl-11 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-medium text-xs sm:text-sm text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900/90 placeholder:text-slate-400"
-                                            />
-                                            {searchTerm && (
-                                                <button
-                                                    onClick={() => setSearchTerm('')}
-                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 cursor-pointer border-none bg-transparent"
-                                                    title="Clear search"
-                                                >
-                                                    <LuX className="w-3.5 h-3.5" />
-                                                </button>
-                                            )}
-                                        </div>
-
-                                        {/* Sort Dropdown */}
-                                        <div className="relative shrink-0">
-                                            <select
-                                                value={sortBy}
-                                                onChange={(e) => setSortBy(e.target.value as any)}
-                                                className="appearance-none pl-3.5 pr-8 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 outline-none focus:border-blue-500 cursor-pointer shadow-sm"
-                                            >
-                                                <option value="soonest">📅 Soonest First</option>
-                                                <option value="az">🔤 Title (A - Z)</option>
-                                            </select>
-                                            <LuChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            {/* University Quick Chips */}
-                            <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1 mb-8">
-                                <span className="text-[11px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 shrink-0 flex items-center gap-1 pl-1">
-                                    <LuGraduationCap className="w-3.5 h-3.5 text-blue-500" /> Filter by Campus:
-                                </span>
-                                {UNIVERSITIES.map((uni) => {
-                                    const isUniActive = selectedUni === uni;
-                                    return (
-                                        <button
-                                            key={uni}
-                                            onClick={() => setSelectedUni(uni)}
-                                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-all cursor-pointer border ${
-                                                isUniActive
-                                                    ? 'bg-blue-500/15 dark:bg-blue-500/25 text-blue-600 dark:text-cyan-400 border-blue-500/40 font-bold shadow-sm'
-                                                    : 'bg-white/80 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 border-slate-200/80 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 hover:text-slate-900 dark:hover:text-white'
-                                            }`}
-                                        >
-                                            {uni === 'All' ? 'All Campuses' : uni}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-
                             {/* Section Header */}
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8">
+                            <div className="flex items-center justify-between mb-8">
                                 <div>
                                     <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                                         Upcoming University Events
                                     </h2>
                                     <p className="text-slate-500 dark:text-slate-400 font-semibold text-xs mt-1">
-                                        Showing {filteredEvents.length} active campus events
+                                        Showing {displayEvents.length} active campus events
                                     </p>
                                 </div>
-
-                                {(searchTerm || selectedCategory !== 'All' || selectedUni !== 'All') && (
-                                    <button
-                                        onClick={() => {
-                                            setSearchTerm('');
-                                            setSelectedCategory('All');
-                                            setSelectedUni('All');
-                                        }}
-                                        className="text-xs font-bold text-blue-600 dark:text-cyan-400 hover:underline flex items-center gap-1 self-start sm:self-auto cursor-pointer border-none bg-transparent"
-                                    >
-                                        <LuX className="w-3 h-3" /> Reset all filters
-                                    </button>
-                                )}
                             </div>
 
                             {/* Events Grid */}
@@ -487,7 +348,7 @@ const EventList: React.FC = () => {
                                     layout
                                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
                                 >
-                                    {filteredEvents.map((event, index) => {
+                                    {displayEvents.map((event, index) => {
                                         const imageUrl = event.image
                                             ? (event.image.startsWith('http') ? event.image : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${event.image}`)
                                             : 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800';
@@ -615,31 +476,21 @@ const EventList: React.FC = () => {
                             </AnimatePresence>
 
                             {/* Empty State */}
-                            {filteredEvents.length === 0 && (
+                            {displayEvents.length === 0 && (
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-b from-white via-slate-50/80 to-blue-50/30 dark:from-slate-900 dark:via-slate-900/90 dark:to-blue-950/20 border border-slate-200/80 dark:border-white/10 shadow-2xl p-8 sm:p-12 text-center my-8"
                                 >
                                     <div className="w-20 h-20 rounded-3xl bg-blue-500/10 text-blue-600 dark:text-cyan-400 flex items-center justify-center mx-auto mb-4 border border-blue-500/20">
-                                        <LuSearch className="w-9 h-9" />
+                                        <LuCalendar className="w-9 h-9" />
                                     </div>
                                     <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
-                                        No Events Found
+                                        No Events Scheduled
                                     </h3>
                                     <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-6">
-                                        We couldn't find any events matching your selected category or search query.
+                                        There are currently no active campus events. Check back soon!
                                     </p>
-                                    <button
-                                        onClick={() => {
-                                            setSearchTerm("");
-                                            setSelectedCategory("All");
-                                            setSelectedUni("All");
-                                        }}
-                                        className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer border-none"
-                                    >
-                                        Reset All Filters
-                                    </button>
                                 </motion.div>
                             )}
 
