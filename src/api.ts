@@ -36,21 +36,28 @@ export const api = {
       headers
     });
     if (!response.ok) throw new Error('Failed to fetch blog post');
-    const blog = await response.json();
+    const data = await response.json();
+    const blog = data.blog || data;
+    const author = blog.author || {};
     return {
       ...blog,
-      tags: blog.tags ? blog.tags.split(',').map((t: string) => t.trim()) : [],
+      hasLiked: data.isLiked ?? blog.hasLiked ?? false,
+      tags: typeof blog.tags === 'string'
+        ? (blog.tags ? blog.tags.split(',').map((t: string) => t.trim()).filter(Boolean) : [])
+        : (Array.isArray(blog.tags) ? blog.tags : []),
       author: {
-        ...blog.author,
-        avatar: blog.author.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${blog.author.name}`,
-        university: 'University of Colombo'
+        ...author,
+        name: author.name || 'Anonymous',
+        avatar: author.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${author.name || 'Author'}`,
+        university: author.university || 'University of Colombo'
       },
       featuredImage: blog.featuredImage ? (blog.featuredImage.startsWith('http') ? blog.featuredImage : `${BASE_URL}${blog.featuredImage}`) : '',
-      comments: blog.comments ? blog.comments.map((comment: any) => ({
+      comments: Array.isArray(blog.comments) ? blog.comments.map((comment: any) => ({
         ...comment,
         user: {
           ...comment.user,
-          avatar: comment.user.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.user.name}`
+          name: comment.user?.name || 'Anonymous',
+          avatar: comment.user?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.user?.name || 'User'}`
         }
       })) : []
     };
