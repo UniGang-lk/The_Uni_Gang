@@ -14,29 +14,16 @@ import {
   LuSend,
   LuTrendingUp,
   LuSparkles,
-  LuFolder,
   LuPenLine
 } from 'react-icons/lu';
 import { FaWhatsapp, FaFacebookF, FaTwitter } from 'react-icons/fa6';
 import { api } from '../../api';
-import { Blog, BlogCategory } from '../../types/blog';
+import { Blog } from '../../types/blog';
 import SEO from '../../components/SEO';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 import DOMPurify from 'dompurify';
-
-const ALL_CATEGORIES: BlogCategory[] = [
-  'Campus Life',
-  'Career Advice',
-  'Exam Tips',
-  'Technology',
-  'Student Accommodation',
-  'Sports & Fitness',
-  'Clubs & Societies',
-  'Events & Festivities',
-  'General Discussion'
-];
 
 const DEFAULT_FALLBACK_STORIES: Blog[] = [
   {
@@ -131,7 +118,6 @@ const BlogDetail: React.FC = () => {
   const [blog, setBlog] = useState<Blog | null>(null);
   const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
   const [trendingBlogs, setTrendingBlogs] = useState<Blog[]>([]);
-  const [categoryCounts, setCategoryCounts] = useState<{ [category: string]: number }>({});
   const [loading, setLoading] = useState(true);
 
   // Comments state
@@ -187,26 +173,6 @@ const BlogDetail: React.FC = () => {
               .sort((a, b) => (b.views || 0) - (a.views || 0))
               .slice(0, 4);
             setTrendingBlogs(sortedTrending);
-
-            // Category counts
-            const counts: { [category: string]: number } = {};
-            all.forEach(b => {
-              if (b.category) {
-                counts[b.category] = (counts[b.category] || 0) + 1;
-              }
-            });
-            if (all.length <= 1) {
-              counts['Campus Life'] = Math.max(counts['Campus Life'] || 0, 7);
-              counts['Career Advice'] = 4;
-              counts['Exam Tips'] = 5;
-              counts['Technology'] = 8;
-              counts['Student Accommodation'] = 3;
-              counts['General Discussion'] = 6;
-              counts['Sports & Fitness'] = 2;
-              counts['Clubs & Societies'] = 5;
-              counts['Events & Festivities'] = 9;
-            }
-            setCategoryCounts(counts);
           } catch (err) {
             console.error('Failed to fetch sidebar suggestions:', err);
           }
@@ -888,38 +854,6 @@ const BlogDetail: React.FC = () => {
                           </div>
                         </Link>
                       ))}
-                    </div>
-                  </div>
-
-                  {/* Categories Widget with Gold/Amber Badges (Matching Screenshot 1) */}
-                  <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-5 shadow-sm">
-                    <div className="flex items-center gap-2 pb-3 mb-3 border-b border-slate-100 dark:border-slate-800">
-                      <div className="p-1 rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
-                        <LuFolder className="w-4 h-4" />
-                      </div>
-                      <h3 className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wider">
-                        Categories
-                      </h3>
-                    </div>
-
-                    <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
-                      {ALL_CATEGORIES.map((cat) => {
-                        const count = categoryCounts[cat] || 0;
-                        return (
-                          <Link
-                            key={cat}
-                            to={`/blogs?category=${encodeURIComponent(cat)}`}
-                            className="flex items-center justify-between py-2 px-1 hover:text-blue-600 transition-colors group"
-                          >
-                            <span className="text-xs font-medium text-slate-700 dark:text-slate-300 group-hover:text-blue-600 transition-colors">
-                              {cat}
-                            </span>
-                            <span className="px-2 py-0.5 rounded text-[10px] font-black bg-amber-400 text-slate-900 shadow-sm">
-                              {count}
-                            </span>
-                          </Link>
-                        );
-                      })}
                     </div>
                   </div>
 
