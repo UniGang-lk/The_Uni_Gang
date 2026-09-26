@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuSearch, LuPlus, LuShoppingBag, LuBriefcase, LuShieldCheck,
@@ -17,6 +18,7 @@ import AdNativeFeed from '../../components/advertise/AdNativeFeed';
 import SEO from '../../components/SEO';
 
 const MarketplaceHome: React.FC = () => {
+  const navigate = useNavigate();
   const [filter, setFilter] = useState<'All' | 'PRODUCT' | 'GIG' | 'OFFICIAL_PRODUCT'>('All');
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'price_low' | 'price_high' | 'rating'>('newest');
@@ -690,8 +692,7 @@ const MarketplaceHome: React.FC = () => {
                 <MarketplaceCard
                   item={item}
                   onClick={() => {
-                    setSelectedItem(item);
-                    setActiveImgIndex(0);
+                    navigate(`/market/${item.id}`);
                   }}
                   onAddToCart={(item) => addToCart(item, 1, false)}
                 />

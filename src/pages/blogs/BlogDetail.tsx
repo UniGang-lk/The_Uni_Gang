@@ -96,7 +96,7 @@ const getLoggedInUserEmail = (): string | null => {
   const token = localStorage.getItem('userToken');
   if (token) {
     if (import.meta.env.DEV) {
-      if (token === 'dummy_token') return 'john@example.com';
+      if (token === 'dummy_token' || token.startsWith('demo_')) return localStorage.getItem('userEmail') || 'kasun.demo@unigang.lk';
       if (token.startsWith('mock_token:')) return token.split(':')[1] || null;
     }
     try {
@@ -147,8 +147,8 @@ const BlogDetail: React.FC = () => {
             if (email) {
               try {
                 const network = await api.getUserNetwork(data.author.id, token);
-                const amIFollowing = network.followers.some((f: any) => f.email === email || f.id === localStorage.getItem('userId'));
-                setIsFollowing(amIFollowing);
+                const amIFollowing = network?.followers?.some((f: any) => f.email === email || f.id === localStorage.getItem('userId'));
+                setIsFollowing(Boolean(amIFollowing));
               } catch {
                 /* ignore follow check failure */
               }
@@ -161,11 +161,14 @@ const BlogDetail: React.FC = () => {
             
             // Related & trending pool
             const pool = all.filter((b: Blog) => b.id !== data.id && b.slug !== slug);
-            const combinedPool = pool.length >= 2 ? pool : [...pool, ...DEFAULT_FALLBACK_STORIES.filter(f => f.slug !== slug)];
+            const combinedPool = pool.length >= 3 
+              ? pool 
+              : [...pool, ...DEFAULT_FALLBACK_STORIES.filter(f => f.slug !== slug && !pool.some(p => p.id === f.id || p.slug === f.slug))];
 
-            // Related blogs
+            // Related blogs: prioritize same category first, then top up with other stories to always have 3 cards
             const sameCat = combinedPool.filter((b: Blog) => b.category === data.category);
-            const finalRelated = (sameCat.length >= 2 ? sameCat : combinedPool).slice(0, 4);
+            const otherCat = combinedPool.filter((b: Blog) => b.category !== data.category);
+            const finalRelated = [...sameCat, ...otherCat].slice(0, 3);
             setRelatedBlogs(finalRelated);
 
             // Trending blogs for sidebar (most views/likes)
@@ -294,11 +297,29 @@ const BlogDetail: React.FC = () => {
     });
   };
 
+  const userEmail = getLoggedInUserEmail();
+  const currentUserId = localStorage.getItem('userId');
+  const currentUserName = localStorage.getItem('userName');
+  const isAuthor = Boolean(
+    blog?.author && (
+      (currentUserId && blog.author.id === currentUserId) ||
+      (userEmail && (blog.author as any)?.email && (blog.author as any).email.toLowerCase() === userEmail.toLowerCase()) ||
+      (currentUserName && blog.author.name && blog.author.name.toLowerCase() === currentUserName.toLowerCase())
+    )
+  );
+
   const handleFollow = async () => {
     if (!blog || !blog.author?.id) return;
     const token = localStorage.getItem('userToken');
     if (!token) {
       toast.error('Please login to follow authors.', {
+        style: { borderRadius: '16px', background: '#1e293b', color: '#fff' }
+      });
+      return;
+    }
+
+    if (isAuthor) {
+      toast.error('You cannot follow yourself.', {
         style: { borderRadius: '16px', background: '#1e293b', color: '#fff' }
       });
       return;
@@ -310,6 +331,10 @@ const BlogDetail: React.FC = () => {
       setIsFollowing(result.isFollowing);
       if (result.isFollowing) {
         toast.success(`You are now following ${blog.author.name}!`, {
+          style: { borderRadius: '16px', background: '#1e293b', color: '#fff' }
+        });
+      } else {
+        toast.success(`Unfollowed ${blog.author.name}`, {
           style: { borderRadius: '16px', background: '#1e293b', color: '#fff' }
         });
       }
@@ -335,7 +360,6 @@ const BlogDetail: React.FC = () => {
     );
   }
 
-  const userEmail = getLoggedInUserEmail();
   const shareUrl = window.location.href;
   const shareTitle = blog?.title || '';
 
@@ -593,16 +617,22 @@ const BlogDetail: React.FC = () => {
                           <h4 className="text-base font-bold text-slate-900 dark:text-white">{blog.author?.name}</h4>
                         </div>
                         {blog.author?.id && (
-                          <button
-                            onClick={handleFollow}
-                            disabled={togglingFollow}
-                            className={`text-xs font-bold px-4 py-1.5 rounded-full transition-all w-fit mx-auto sm:mx-0 ${isFollowing
-                              ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30'
-                              : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm shadow-blue-500/20'
-                              }`}
-                          >
-                            {togglingFollow ? '...' : (isFollowing ? 'Following' : 'Follow')}
-                          </button>
+                          isAuthor ? (
+                            <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 w-fit mx-auto sm:mx-0 border border-blue-200/60 dark:border-blue-800/60">
+                              You (Author)
+                            </span>
+                          ) : (
+                            <button
+                              onClick={handleFollow}
+                              disabled={togglingFollow}
+                              className={`text-xs font-bold px-4 py-1.5 rounded-full transition-all w-fit mx-auto sm:mx-0 ${isFollowing
+                                ? 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30'
+                                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm shadow-blue-500/20'
+                                }`}
+                            >
+                              {togglingFollow ? '...' : (isFollowing ? 'Following' : 'Follow')}
+                            </button>
+                          )
                         )}
                       </div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-1">
@@ -727,82 +757,6 @@ const BlogDetail: React.FC = () => {
                     </div>
                   </section>
 
-                  {/* Related Posts Grid (Matching Screenshot 3) */}
-                  {relatedBlogs.length > 0 && (
-                    <section className="mt-14 pt-8 border-t border-slate-200/80 dark:border-slate-800">
-                      <div className="flex items-center justify-between mb-6">
-                        <div>
-                          <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">
-                            Related Posts
-                          </h3>
-                          <p className="text-xs text-slate-500 mt-0.5">Explore more articles from campus contributors</p>
-                        </div>
-                        <Link
-                          to="/blogs"
-                          className="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline inline-flex items-center gap-1"
-                        >
-                          View All <LuChevronRight className="w-3.5 h-3.5" />
-                        </Link>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        {relatedBlogs.map((item) => (
-                          <motion.div
-                            key={item.id}
-                            whileHover={{ y: -4 }}
-                            className="group rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-sm hover:shadow-md transition-all flex flex-col"
-                          >
-                            <Link
-                              to={`/blogs/${item.slug}`}
-                              className="block relative aspect-video overflow-hidden bg-slate-100 dark:bg-slate-800"
-                            >
-                              {item.featuredImage ? (
-                                <img
-                                  src={item.featuredImage}
-                                  alt={item.title}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500/10 to-indigo-500/10 text-slate-400">
-                                  <LuSparkles className="w-8 h-8 opacity-40" />
-                                </div>
-                              )}
-                              <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-400 text-slate-900 shadow-md">
-                                {item.category}
-                              </span>
-                            </Link>
-
-                            <div className="p-4 flex flex-col flex-1">
-                              <Link to={`/blogs/${item.slug}`}>
-                                <h4 className="text-sm md:text-base font-bold text-slate-900 dark:text-white line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
-                                  {item.title}
-                                </h4>
-                              </Link>
-                              <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-2 leading-relaxed">
-                                {item.excerpt}
-                              </p>
-                              <div className="mt-auto pt-3 flex items-center justify-between text-xs text-slate-500 border-t border-slate-100 dark:border-slate-800/60">
-                                <div className="flex items-center gap-1.5 truncate max-w-[140px]">
-                                  <img
-                                    src={item.author?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${item.author?.name || 'Author'}`}
-                                    alt={item.author?.name}
-                                    className="w-4 h-4 rounded-full object-cover"
-                                  />
-                                  <span className="font-medium text-slate-700 dark:text-slate-300 truncate text-[11px]">
-                                    {item.author?.name}
-                                  </span>
-                                </div>
-                                <span className="text-[11px] text-slate-400">
-                                  {new Date(item.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                                </span>
-                              </div>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </section>
-                  )}
-
                 </main>
 
                 {/* Right Sidebar: Trending Stories + Categories (Matching Screenshot 1) */}
@@ -879,6 +833,82 @@ const BlogDetail: React.FC = () => {
                 </aside>
 
               </div>
+
+              {/* Related Posts Section — Full Width Below Article & Sidebar */}
+              {relatedBlogs.length > 0 && (
+                <section className="mt-16 pt-10 border-t border-slate-200/80 dark:border-slate-800">
+                  <div className="flex items-center justify-between mb-8">
+                    <div>
+                      <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">
+                        Related Posts
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1">Explore more articles from campus contributors</p>
+                    </div>
+                    <Link
+                      to="/blogs"
+                      className="text-xs font-bold text-blue-600 hover:text-blue-700 hover:underline inline-flex items-center gap-1"
+                    >
+                      View All <LuChevronRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {relatedBlogs.map((item) => (
+                      <motion.div
+                        key={item.id}
+                        whileHover={{ y: -4 }}
+                        className="group rounded-2xl overflow-hidden border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-sm hover:shadow-md transition-all flex flex-col"
+                      >
+                        <Link
+                          to={`/blogs/${item.slug}`}
+                          className="block relative aspect-video overflow-hidden bg-slate-100 dark:bg-slate-800"
+                        >
+                          {item.featuredImage ? (
+                            <img
+                              src={item.featuredImage}
+                              alt={item.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500/10 to-indigo-500/10 text-slate-400">
+                              <LuSparkles className="w-8 h-8 opacity-40" />
+                            </div>
+                          )}
+                          <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-amber-400 text-slate-900 shadow-md">
+                            {item.category}
+                          </span>
+                        </Link>
+
+                        <div className="p-4 flex flex-col flex-1">
+                          <Link to={`/blogs/${item.slug}`}>
+                            <h4 className="text-sm md:text-base font-bold text-slate-900 dark:text-white line-clamp-2 group-hover:text-blue-600 transition-colors leading-snug">
+                              {item.title}
+                            </h4>
+                          </Link>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-2 leading-relaxed">
+                            {item.excerpt}
+                          </p>
+                          <div className="mt-auto pt-3 flex items-center justify-between text-xs text-slate-500 border-t border-slate-100 dark:border-slate-800/60">
+                            <div className="flex items-center gap-1.5 truncate max-w-[140px]">
+                              <img
+                                src={item.author?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${item.author?.name || 'Author'}`}
+                                alt={item.author?.name}
+                                className="w-4 h-4 rounded-full object-cover"
+                              />
+                              <span className="font-medium text-slate-700 dark:text-slate-300 truncate text-[11px]">
+                                {item.author?.name}
+                              </span>
+                            </div>
+                            <span className="text-[11px] text-slate-400">
+                              {new Date(item.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
             </div>
 

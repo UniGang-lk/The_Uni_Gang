@@ -43,6 +43,7 @@ const SubmitBlog = lazy(() => import('./pages/blogs/SubmitBlog'));
 const AdvertiseLanding = lazy(() => import('./pages/advertise/AdvertiseLanding'));
 const AdSubmissionForm = lazy(() => import('./pages/advertise/AdSubmissionForm'));
 const MarketplaceHome = lazy(() => import('./pages/market/MarketplaceHome'));
+const MarketItemDetailPage = lazy(() => import('./pages/market/MarketItemDetailPage'));
 const ServicesPage = lazy(() => import('./pages/services/ServicesPage'));
 const ProposalHubEntry = lazy(() => import('./features/proposal/ProposalHubEntry'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
@@ -127,6 +128,7 @@ function App() {
 
           {/* Marketplace Route */}
           <Route path="/market" element={<SubLayout><MarketplaceHome /></SubLayout>} />
+          <Route path="/market/:id" element={<SubLayout><MarketItemDetailPage /></SubLayout>} />
 
           {/* Services Dedicated Route */}
           <Route path="/services" element={<SubLayout><ServicesPage /></SubLayout>} />

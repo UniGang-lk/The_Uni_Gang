@@ -132,14 +132,27 @@ export const api = {
       },
       body: JSON.stringify({ content })
     });
-    if (!response.ok) throw new Error('Failed to submit comment');
+    if (!response.ok) {
+      try {
+        const err = await response.json();
+        throw new Error(err.message || 'Failed to submit comment');
+      } catch (e: any) {
+        throw new Error(e.message || 'Failed to submit comment');
+      }
+    }
     const result = await response.json();
-    const comment = result.comment;
+    const comment = result.comment || result;
+    const commentUser = comment?.user || {
+      name: localStorage.getItem('userName') || 'User',
+      profile_pic: localStorage.getItem('userProfilePicture') || '',
+      email: localStorage.getItem('userEmail') || ''
+    };
     return {
       ...comment,
       user: {
-        ...comment.user,
-        avatar: comment.user.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${comment.user.name}`
+        ...commentUser,
+        name: commentUser.name || localStorage.getItem('userName') || 'User',
+        avatar: commentUser.avatar || commentUser.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${commentUser.name || 'User'}`
       }
     };
   },
@@ -464,18 +477,29 @@ export const api = {
         Authorization: `Bearer ${token}`
       }
     });
-    if (!response.ok) throw new Error('Failed to toggle follow');
+    if (!response.ok) {
+      try {
+        const err = await response.json();
+        throw new Error(err.message || 'Failed to toggle follow');
+      } catch (e: any) {
+        throw new Error(e.message || 'Failed to toggle follow');
+      }
+    }
     return response.json();
   },
 
   getUserNetwork: async (userId: string, token: string): Promise<any> => {
-    const response = await fetch(`${BASE_URL}/api/users/${userId}/network`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    if (!response.ok) throw new Error('Failed to fetch network');
-    return response.json();
+    try {
+      const response = await fetch(`${BASE_URL}/api/users/${userId}/network`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (!response.ok) return { followers: [], following: [], followersCount: 0, followingCount: 0 };
+      return await response.json();
+    } catch {
+      return { followers: [], following: [], followersCount: 0, followingCount: 0 };
+    }
   },
 
   // ─── ADVERTISEMENTS API ────────────────────────────────────────
@@ -525,6 +549,32 @@ export const api = {
   },
 
   // Marketplace
+  getMarketItem: async (id: string): Promise<any> => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/market/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data && (data.id || data.title)) return data;
+      }
+    } catch {
+      /* ignore and fallback */
+    }
+    // Fallback: fetch all items and find by ID
+    const res = await fetch(`${BASE_URL}/api/market`);
+    if (!res.ok) throw new Error('Failed to fetch item details');
+    const items = await res.json();
+    const item = Array.isArray(items) ? items.find((i: any) => String(i.id) === String(id)) : null;
+    if (!item) throw new Error('Item not found');
+    return item;
+  },
+
+  getMarketItems: async (type?: string): Promise<any[]> => {
+    const url = type && type !== 'All' ? `${BASE_URL}/api/market?type=${type}` : `${BASE_URL}/api/market`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Failed to fetch marketplace items');
+    return response.json();
+  },
+
   getMyListings: async (): Promise<any[]> => {
     const token = localStorage.getItem('userToken');
     const response = await fetch(`${BASE_URL}/api/market/my`, {
