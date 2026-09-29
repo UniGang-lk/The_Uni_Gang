@@ -3,7 +3,7 @@ import {
   LuStar, LuBadgeCheck, LuWifi, LuBath, LuSnowflake, LuCar, LuUtensils,
   LuZap, LuMessageCircle, LuX, LuCircleCheckBig, LuCheck,
   LuShieldCheck, LuHouse, LuClock, LuUsers, LuBus, LuFootprints,
-  LuDroplets, LuLock, LuLightbulb, LuBanknote, LuShare2, LuCalculator, LuMapPin
+  LuDroplets, LuLock, LuLightbulb, LuBanknote, LuShare2, LuCalculator
 } from 'react-icons/lu';
 import SEO from '../../components/SEO';
 import VerifiedBadge from '../../components/ui/VerifiedBadge';

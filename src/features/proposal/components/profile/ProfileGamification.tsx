@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Target, CheckCircle2, Trophy, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Target, CheckCircle2, ArrowRight, ShieldCheck } from 'lucide-react';
 import { Card } from '../ui/ProposalPrimitives';
 import { celebrate } from '../../../../utils/celebrate';
 

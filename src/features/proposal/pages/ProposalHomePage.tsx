@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Compass, Send, Heart, Eye, CheckCircle2, Crown, ArrowRight, ShieldCheck, Lock, MessageCircle, Settings, GraduationCap, User2, Sparkles, Inbox, Check, X, Clock, Award } from 'lucide-react';
+import { Compass, Send, Heart, Eye, CheckCircle2, Crown, ArrowRight, ShieldCheck, Lock, MessageCircle, Settings, GraduationCap, User2, Inbox, Check, X, Clock } from 'lucide-react';
 import { cx } from '../components/ui/ProposalPrimitives';
 import { proposalApi } from '../api/proposalApi';
-import { useTheme } from '../../../context/ThemeContext';
 
 export default function ProposalHomePage({
   setPage,
@@ -14,8 +12,6 @@ export default function ProposalHomePage({
   openProfile: (p: any) => void;
   goToLanding?: () => void;
 }) {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
   const [discoverProfiles, setDiscoverProfiles] = useState<any[]>([]);
   const [currentUser, setCurrentUser] = useState<any>({ 
     name: 'User', 

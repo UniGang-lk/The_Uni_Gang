@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-    LuArrowLeft, LuSearch, LuCalendar, LuMapPin, LuGraduationCap,
-    LuClock, LuMessageCircle, LuInfo, LuArrowRight, LuSparkles,
-    LuTicket, LuX, LuChevronDown, LuUsers
+    LuCalendar, LuMapPin, LuGraduationCap,
+    LuClock, LuMessageCircle, LuArrowRight, LuSparkles,
+    LuTicket
 } from "react-icons/lu";
 import { motion, AnimatePresence } from "framer-motion";
 import TiltCard from '../../components/ui/TiltCard';

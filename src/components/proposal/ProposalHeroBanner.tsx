@@ -1,4 +1,5 @@
 import { LuSparkles, LuGraduationCap, LuSearch, LuArrowRight, LuUsers, LuLock, LuMapPin } from 'react-icons/lu';
+import { motion } from 'framer-motion';
 import TiltCard from '../ui/TiltCard';
 
 interface ProposalHeroBannerProps {

@@ -1,5 +1,4 @@
-import { motion } from 'framer-motion';
-import { ShieldCheck, Heart, Crown, Lock, Video, CheckCircle2, Star, UserCheck, Sparkles, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Heart, Crown, Lock, Video, CheckCircle2, Star, UserCheck } from 'lucide-react';
 import { PrimaryButton, Card } from '../components/ui/ProposalPrimitives';
 import { SUCCESS_STORIES } from '../data/mockProposalData';
 import ProposalHeroSection from '../components/hero/ProposalHeroSection';
