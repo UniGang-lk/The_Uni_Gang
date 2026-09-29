@@ -219,7 +219,7 @@ const Header = () => {
         : 'bg-transparent py-5'
         }`}
     >
-      <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
+      <div className="container mx-auto max-w-7xl 2xl:max-w-[1600px] px-4 md:px-6 2xl:px-20 flex items-center justify-between">
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group">

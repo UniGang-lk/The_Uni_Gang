@@ -5,16 +5,16 @@ import { motion } from 'framer-motion';
 
 const Hero = () => {
   return (
-    <section id="home" className="relative w-full min-h-screen flex items-start justify-center px-4 lg:px-12 max-w-7xl mx-auto overflow-hidden pt-10">
-      <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center w-full">
+    <section id="home" className="relative w-full min-h-screen flex items-center justify-center px-4 lg:px-12 2xl:px-20 max-w-7xl 2xl:max-w-[1600px] mx-auto overflow-hidden pt-20 pb-10">
+      <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 2xl:gap-24 items-center w-full">
         {/* Left Content Column */}
         <div className="space-y-8 order-2 lg:order-1 relative z-10">
           <div className="space-y-6 animate-fade-up">
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold text-slate-900 dark:text-white leading-[1.1] tracking-tight font-sans">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl 2xl:text-8xl font-extrabold text-slate-900 dark:text-white leading-[1.1] tracking-tight font-sans">
               Welcome to <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-indigo-600 text-3xl sm:text-5xl lg:text-7xl">Uni Gang World</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-indigo-600 text-3xl sm:text-5xl lg:text-7xl 2xl:text-8xl">Uni Gang World</span>
             </h1>
-            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed font-light">
+            <p className="text-xl 2xl:text-2xl text-slate-600 dark:text-slate-400 max-w-xl 2xl:max-w-2xl leading-relaxed font-light">
               Experience the future of student collaboration. Connect with elite campuses, track your academic milestones, and join a global network of innovators in an environment designed for modern excellence.
             </p>
           </div>
@@ -44,7 +44,7 @@ const Hero = () => {
         {/* Right Visual Column */}
         <div className="relative order-1 lg:order-2 flex justify-center items-center animate-fade-right [animation-delay:400ms]">
           {/* Main Image Frame with Soft Frosted Glass */}
-          <div className="relative w-full max-w-[14rem] sm:max-w-[18rem] lg:max-w-[20rem] aspect-[3/4] rounded-[3rem] overflow-hidden shadow-[0px_40px_80px_rgba(220,38,246,0.15)] border-[10px] border-white/40 dark:border-slate-800/40 backdrop-blur-xl z-10 bg-white/20 dark:bg-slate-900/20">
+          <div className="relative w-full max-w-[14rem] sm:max-w-[18rem] lg:max-w-[22rem] 2xl:max-w-[30rem] aspect-[3/4] rounded-[3rem] overflow-hidden shadow-[0px_40px_80px_rgba(220,38,246,0.15)] border-[10px] border-white/40 dark:border-slate-800/40 backdrop-blur-xl z-10 bg-white/20 dark:bg-slate-900/20">
             <img
               alt="Modern University Architecture"
               className="w-full h-full object-cover"
