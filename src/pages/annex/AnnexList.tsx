@@ -153,7 +153,7 @@ const AnnexList = () => {
             const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/annexes?${queryParams.toString()}`);
             const data = await response.json();
             
-            const rawList = Array.isArray(data) ? data : [];
+            const rawList = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
             let filtered = rawList;
             if (searchTerm.trim() !== "") {
                 const query = searchTerm.toLowerCase();
