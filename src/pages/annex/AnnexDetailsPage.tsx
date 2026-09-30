@@ -102,7 +102,7 @@ const AnnexDetailsPage = () => {
         return;
       }
       const data = await response.json();
-      setAnnex(data);
+      setAnnex(data?.data || data);
     } catch (error) {
       console.error("Failed to load details:", error);
     } finally {
@@ -165,9 +165,9 @@ const AnnexDetailsPage = () => {
       return { overall: 5, cleanliness: 5, landlord: 5, count: 0 };
     }
     const count = annex.reviews.length;
-    const overallSum = annex.reviews.reduce((acc: number, r: any) => acc + r.overallRating, 0);
-    const cleanSum = annex.reviews.reduce((acc: number, r: any) => acc + r.cleanlinessRating, 0);
-    const lordSum = annex.reviews.reduce((acc: number, r: any) => acc + r.landlordRating, 0);
+    const overallSum = annex.reviews.reduce((acc: number, r: any) => acc + (r.overallRating || r.overall_rating || 5), 0);
+    const cleanSum = annex.reviews.reduce((acc: number, r: any) => acc + (r.cleanlinessRating || r.cleanliness_rating || 5), 0);
+    const lordSum = annex.reviews.reduce((acc: number, r: any) => acc + (r.landlordRating || r.landlord_rating || 5), 0);
 
     return {
       overall: parseFloat((overallSum / count).toFixed(1)),
@@ -363,14 +363,15 @@ const AnnexDetailsPage = () => {
                     <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">Key Amenities</h2>
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                       {annex.features.map((feat: any, idx: number) => {
-                        const lowercaseName = feat.featureName.toLowerCase();
+                        const featName = feat.featureName || feat.feature_name || "";
+                        const lowercaseName = featName.toLowerCase();
                         const matchingAmenity = Object.keys(AMENITIES_ICONS).find(k => lowercaseName.includes(k));
                         const Icon = matchingAmenity ? AMENITIES_ICONS[matchingAmenity] : LuCircleCheckBig;
 
                         return (
                           <div key={idx} className="bg-white/50 dark:bg-slate-800/50 p-4 rounded-2xl flex flex-col gap-3 items-start border border-white/60 dark:border-slate-700 shadow-sm transition-all hover:-translate-y-1 hover:bg-white dark:hover:bg-slate-800/80">
                             <Icon className="text-blue-700 dark:text-blue-400 text-2xl" />
-                            <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{feat.featureName}</span>
+                            <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{feat.featureName || feat.feature_name}</span>
                           </div>
                         );
                       })}
