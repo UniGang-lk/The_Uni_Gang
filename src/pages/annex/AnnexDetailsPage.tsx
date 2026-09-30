@@ -5,7 +5,7 @@ import {
   LuShieldCheck, LuHouse, LuUsers, LuBus, LuFootprints,
   LuDroplets, LuLock, LuLightbulb, LuBanknote, LuShare2, LuCalculator,
   LuChevronLeft, LuMapPin, LuGraduationCap, LuPhone, LuCamera,
-  LuCalendar, LuBadgePercent, LuInfo
+  LuCalendar, LuBadgePercent, LuInfo, LuHeart
 } from 'react-icons/lu';
 import SEO from '../../components/SEO';
 import VerifiedBadge from '../../components/ui/VerifiedBadge';
@@ -92,6 +92,56 @@ const AnnexDetailsPage = () => {
   const [landlord, setLandlord] = useState(5);
   const [comment, setComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
+
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  // Check initial favorite status from localStorage
+  useEffect(() => {
+    if (!id) return;
+    try {
+      const saved = JSON.parse(localStorage.getItem('annex_favorites') || '[]');
+      if (Array.isArray(saved) && saved.includes(id)) {
+        setIsFavorite(true);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, [id]);
+
+  const handleToggleFavorite = async () => {
+    if (!id) return;
+    try {
+      const saved = JSON.parse(localStorage.getItem('annex_favorites') || '[]');
+      const safeSaved = Array.isArray(saved) ? saved : [];
+      let updated: string[];
+
+      if (safeSaved.includes(id)) {
+        updated = safeSaved.filter(item => item !== id);
+        setIsFavorite(false);
+        toast('Removed from saved list', { icon: '🤍' });
+      } else {
+        updated = [...safeSaved, id];
+        setIsFavorite(true);
+        toast.success('Saved to your favorites!');
+
+        // Notify backend / landlord lead tracking
+        const token = localStorage.getItem('userToken');
+        if (token) {
+          fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/annexes/${id}/lead`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ actionType: 'favorite' })
+          }).catch(console.error);
+        }
+      }
+      localStorage.setItem('annex_favorites', JSON.stringify(updated));
+    } catch (e) {
+      console.error('Error toggling favorite:', e);
+    }
+  };
 
   const fetchAnnexDetails = async () => {
     try {
@@ -227,6 +277,20 @@ const AnnexDetailsPage = () => {
             </div>
 
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleToggleFavorite}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs transition-colors border cursor-pointer ${
+                  isFavorite
+                    ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/40 dark:border-rose-800'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-rose-50 hover:text-rose-500'
+                }`}
+                title="Save to Favorites"
+              >
+                <LuHeart size={14} className={isFavorite ? 'fill-rose-500 text-rose-500' : ''} />
+                <span className="hidden sm:inline">{isFavorite ? 'Saved' : 'Save'}</span>
+              </button>
+
               <a
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this student accommodation on The Uni Gang: ${annex.title}\n\nhttps://unigang.lk/share/annex/${annex.id}`)}`}
                 target="_blank"

@@ -514,10 +514,37 @@ const Profile = () => {
       setShowOrdersModal(true);
       fetchMyOrders();
     }
-    if (tab === 'inbox') {
+    if (tab === 'inbox' || tab === 'annex_inbox') {
       setShowInboxModal(true);
-      setInboxTab(type as any);
-      if (type === 'marketplace' && chatId) {
+      const actualType = tab === 'annex_inbox' ? 'annex' : type;
+      setInboxTab(actualType as any);
+
+      if (actualType === 'annex') {
+        const selectParamAnnexChat = async () => {
+          try {
+            setLoadingAnnexChats(true);
+            const token = localStorage.getItem('userToken');
+            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/annexes/chats`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (data.success && Array.isArray(data.chats)) {
+              setAnnexChats(data.chats);
+              if (chatId) {
+                const found = data.chats.find((c: any) => c.id === chatId);
+                if (found) {
+                  setSelectedAnnexChat(found);
+                }
+              }
+            }
+          } catch (err) {
+            console.error('Error selecting param annex chat:', err);
+          } finally {
+            setLoadingAnnexChats(false);
+          }
+        };
+        selectParamAnnexChat();
+      } else if (actualType === 'marketplace' && chatId) {
         const selectParamChat = async () => {
           try {
             const data = await api.getMarketplaceChats();
@@ -531,7 +558,7 @@ const Profile = () => {
           }
         };
         selectParamChat();
-      } else if (type === 'event' && chatId) {
+      } else if (actualType === 'event' && chatId) {
         const selectParamEventChat = async () => {
           try {
             const data = await api.getEventChats();

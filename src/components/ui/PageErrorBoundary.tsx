@@ -22,13 +22,29 @@ export default class PageErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Page render error caught by PageErrorBoundary:', error, errorInfo);
+
+    const isChunkError =
+      error?.message?.includes('dynamically imported module') ||
+      error?.message?.includes('Failed to fetch dynamically imported module') ||
+      error?.name === 'ChunkLoadError';
+
+    // Auto-reload once to fetch fresh assets if a lazy chunk failed to load after deploy/HMR
+    if (isChunkError) {
+      const hasRetried = sessionStorage.getItem('chunk_reload_retry');
+      if (!hasRetried) {
+        sessionStorage.setItem('chunk_reload_retry', 'true');
+        window.location.reload();
+      }
+    }
   }
 
   private handleReload = () => {
+    sessionStorage.removeItem('chunk_reload_retry');
     window.location.reload();
   };
 
   private handleGoHome = () => {
+    sessionStorage.removeItem('chunk_reload_retry');
     window.location.href = '/';
   };
 
@@ -36,7 +52,7 @@ export default class PageErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       const isChunkError =
         this.state.error?.message?.includes('dynamically imported module') ||
-        this.state.error?.message?.includes('Failed to fetch') ||
+        this.state.error?.message?.includes('Failed to fetch dynamically imported module') ||
         this.state.error?.name === 'ChunkLoadError';
 
       return (

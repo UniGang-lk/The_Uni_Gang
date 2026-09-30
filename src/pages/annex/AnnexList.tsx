@@ -199,10 +199,46 @@ const AnnexList = () => {
         document.getElementById('listing-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
+    // Initialize favorites from localStorage
+    useEffect(() => {
+        try {
+            const saved = JSON.parse(localStorage.getItem('annex_favorites') || '[]');
+            if (Array.isArray(saved)) {
+                setFavorites(saved);
+            }
+        } catch (e) {
+            // ignore
+        }
+    }, []);
+
     const toggleFavorite = (id: string) => {
         setFavorites(prev => {
             const safePrev = Array.isArray(prev) ? prev : [];
-            return safePrev.includes(id) ? safePrev.filter(fId => fId !== id) : [...safePrev, id];
+            const isFav = safePrev.includes(id);
+            const next = isFav ? safePrev.filter(fId => fId !== id) : [...safePrev, id];
+
+            try {
+                localStorage.setItem('annex_favorites', JSON.stringify(next));
+            } catch (e) {
+                // ignore
+            }
+
+            if (!isFav) {
+                // Track lead in backend for landlord analytics
+                const token = localStorage.getItem('userToken');
+                if (token) {
+                    fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/annexes/${id}/lead`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ actionType: 'favorite' })
+                    }).catch(console.error);
+                }
+            }
+
+            return next;
         });
     };
 
