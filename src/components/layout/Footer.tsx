@@ -82,7 +82,7 @@ const Footer = () => {
       />
 
       {/* ── Main grid ────────────────────────── */}
-      <div className="container mx-auto max-w-7xl px-6 pt-14 pb-10">
+      <div className="container mx-auto max-w-7xl 2xl:max-w-[1600px] px-6 2xl:px-20 pt-14 pb-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
 
           {/* ① Brand column */}

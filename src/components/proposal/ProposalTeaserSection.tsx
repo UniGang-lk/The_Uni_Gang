@@ -41,7 +41,7 @@ const ProposalTeaserSection = () => {
         <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-[600px] h-[600px] bg-pink-500/10 blur-[150px] rounded-full" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
+      <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 lg:px-12 2xl:px-20 relative z-10">
 
         {/* ── Standarized Centered Section Header (Matching Events/Services/Market style) ── */}
         <div className="text-center max-w-3xl mx-auto mb-16">

@@ -72,7 +72,7 @@ function App() {
                     <div id="annex"><FeaturedAnnexes /></div>
                     <div id="market"><MarketSection /></div>
 
-                    <div className="max-w-7xl mx-auto w-full px-6 lg:px-12 my-6">
+                    <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full px-6 lg:px-12 2xl:px-20 my-6">
                       <AdBanner placement="BANNER" />
                     </div>
 
