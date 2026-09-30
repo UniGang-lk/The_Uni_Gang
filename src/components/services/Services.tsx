@@ -209,7 +209,7 @@ const Services = () => {
           </motion.div>
 
           {/* RIGHT: Compact visual category deck (65% width / 8 cols) */}
-          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-6 2xl:gap-8">
             {categories.map((cat, idx) => (
               <motion.div
                 key={cat.id}
@@ -218,11 +218,11 @@ const Services = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.7, delay: idx * 0.12 }}
                 onClick={handleExploreServices}
-                className="group relative bg-white dark:bg-slate-900/50 backdrop-blur-xl border border-slate-150 dark:border-slate-800/80 rounded-[2rem] p-4 transition-all duration-300 flex flex-col justify-between cursor-pointer hover:border-indigo-500/40"
+                className="group relative bg-white dark:bg-slate-900/50 backdrop-blur-xl border border-slate-150 dark:border-slate-800/80 rounded-[2rem] p-4 2xl:p-6 transition-all duration-300 flex flex-col justify-between cursor-pointer hover:border-indigo-500/40"
                 whileHover={{ y: -6, transition: { duration: 0.2 } }}
               >
                 {/* Top Image Thumbnail with gradient overlay */}
-                <div className="relative h-[150px] rounded-[1.5rem] overflow-hidden mb-5">
+                <div className="relative h-[150px] 2xl:h-[190px] rounded-[1.5rem] overflow-hidden mb-5">
                   <img
                     src={cat.image}
                     alt={cat.title}
@@ -239,10 +239,10 @@ const Services = () => {
                 {/* Content */}
                 <div className="px-2 flex-grow flex flex-col justify-between">
                   <div>
-                    <h4 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors uppercase tracking-tight">
+                    <h4 className="text-base 2xl:text-lg font-extrabold text-slate-900 dark:text-white group-hover:text-indigo-500 transition-colors uppercase tracking-tight">
                       {cat.title}
                     </h4>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed font-medium">
+                    <p className="text-xs 2xl:text-sm text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed font-medium">
                       {cat.desc}
                     </p>
 

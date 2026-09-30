@@ -88,12 +88,12 @@ const Annex = () => {
             transition={{ duration: 0.8 }}
             className="lg:col-span-7 flex justify-center relative"
           >
-            <div className="relative w-full max-w-lg h-[460px] flex items-center justify-center">
+            <div className="relative w-full max-w-lg 2xl:max-w-xl h-[460px] 2xl:h-[520px] flex items-center justify-center">
 
               {/* Background decorative circular rings (blue/teal) */}
               <div className="absolute inset-0 flex items-center justify-center opacity-30">
-                <div className="w-[420px] h-[420px] border border-blue-500/20 rounded-full animate-[spin_30s_linear_infinite]" />
-                <div className="absolute w-[320px] h-[320px] border border-dashed border-teal-500/20 rounded-full animate-[spin_20s_linear_infinite_reverse]" />
+                <div className="w-[420px] 2xl:w-[480px] h-[420px] 2xl:h-[480px] border border-blue-500/20 rounded-full animate-[spin_30s_linear_infinite]" />
+                <div className="absolute w-[320px] 2xl:w-[380px] h-[320px] 2xl:h-[380px] border border-dashed border-teal-500/20 rounded-full animate-[spin_20s_linear_infinite_reverse]" />
               </div>
 
               {/* Main Lifestyle Room Visual */}
@@ -102,7 +102,7 @@ const Annex = () => {
                   <div className="absolute -inset-1.5 bg-gradient-to-r from-blue-600 to-teal-500 rounded-[3rem] blur opacity-25 group-hover:opacity-45 transition duration-1000" />
 
                   <div className="relative bg-white dark:bg-slate-900 rounded-[2.5rem] p-4 border border-white/50 dark:border-slate-800 shadow-2xl">
-                    <div className="relative h-[360px] rounded-[2rem] overflow-hidden">
+                    <div className="relative h-[360px] 2xl:h-[420px] rounded-[2rem] overflow-hidden">
                       <img
                         src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=800&auto=format&fit=crop"
                         alt="Premium Student Room"
