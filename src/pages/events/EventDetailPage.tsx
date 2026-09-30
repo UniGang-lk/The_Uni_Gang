@@ -9,6 +9,7 @@ import { api } from '../../api';
 import toast from 'react-hot-toast';
 import SEO from '../../components/SEO';
 import AdBanner from '../../components/advertise/AdBanner';
+import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 
 interface EventData {
     id: number;
@@ -195,13 +196,18 @@ const EventDetailPage: React.FC = () => {
                 }}
             />
             
-            {/* Back Button */}
-            <button
-                onClick={() => navigate(-1)}
-                className="mb-8 inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs uppercase tracking-wider transition-all"
-            >
-                <LuArrowLeft size={16} /> Back
-            </button>
+            {/* Top Breadcrumb Navigation */}
+            <PageBreadcrumb
+                items={[
+                    { label: 'Events', to: '/event-list' },
+                    { label: event.category || 'Campus Pulse', to: `/event-list?category=${event.category || ''}`, active: true },
+                    { label: event.title }
+                ]}
+                backTo="/event-list"
+                backLabel="Back to Events"
+                shareTitle={`Join ${event.title} at ${event.uni} on The Uni Gang!`}
+                className="mb-8"
+            />
 
             {/* Main Content Layout */}
             <div className="w-full bg-white dark:bg-slate-900 rounded-[2.5rem] md:rounded-[3.5rem] shadow-xl flex flex-col md:flex-row border border-slate-100 dark:border-slate-800 overflow-hidden min-h-[60vh]">

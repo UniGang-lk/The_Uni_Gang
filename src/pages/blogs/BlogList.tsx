@@ -34,6 +34,7 @@ import BlogCard from './ArticleCard';
 import ContributorLeaderboard from './ContributorLeaderboard';
 import SEO from '../../components/SEO';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
+import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import TiltCard from '../../components/ui/TiltCard';
 import AdSidebarWidget from '../../components/advertise/AdSidebarWidget';
 import AdNativeFeed from '../../components/advertise/AdNativeFeed';
@@ -195,8 +196,20 @@ const BlogList: React.FC = () => {
               <div className="absolute bottom-[20%] left-[-10%] w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[100px]" />
             </div>
 
+            {/* Top Breadcrumb Navigation */}
+            <div className="max-w-7xl mx-auto px-4 md:px-8 pt-4 relative z-10">
+              <PageBreadcrumb
+                items={[
+                  { label: 'Campus Blogs', active: true }
+                ]}
+                backTo="/"
+                backLabel="Back to Home"
+                shareTitle="Campus Voices & Student Wisdom - The Uni Gang"
+              />
+            </div>
+
             {/* Hero Section */}
-            <section className="relative pt-6 pb-14 px-4 md:px-8 max-w-7xl mx-auto z-10">
+            <section className="relative pt-2 pb-14 px-4 md:px-8 max-w-7xl mx-auto z-10">
               <div className="grid lg:grid-cols-2 gap-12 items-center">
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}

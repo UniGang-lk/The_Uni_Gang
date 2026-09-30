@@ -10,6 +10,7 @@ import EventDetails from './EventDetails';
 import { api } from '../../api';
 import toast from 'react-hot-toast';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
+import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import AdBanner from '../../components/advertise/AdBanner';
 import AdNativeFeed from '../../components/advertise/AdNativeFeed';
 import SEO from '../../components/SEO';
@@ -202,8 +203,20 @@ const EventList: React.FC = () => {
                             <div className="absolute bottom-[20%] left-[-10%] w-[500px] h-[500px] bg-cyan-500/10 dark:bg-cyan-600/10 rounded-full blur-[120px]" />
                         </div>
 
+                        {/* Top Breadcrumb Navigation */}
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 relative z-10">
+                            <PageBreadcrumb
+                                items={[
+                                    { label: 'Campus Events', active: true }
+                                ]}
+                                backTo="/"
+                                backLabel="Back to Home"
+                                shareTitle="Discover University Events & Tech Meetups across Sri Lanka - The Uni Gang"
+                            />
+                        </div>
+
                         {/* Top Hero Section */}
-                        <section className="relative pt-6 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto z-10">
+                        <section className="relative pt-2 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto z-10">
                             <div className="grid lg:grid-cols-12 gap-10 items-center">
                                 
                                 {/* Left Column: Headline and Proof */}

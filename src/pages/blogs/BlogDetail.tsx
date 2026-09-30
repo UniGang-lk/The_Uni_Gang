@@ -21,6 +21,7 @@ import { api } from '../../api';
 import { Blog } from '../../types/blog';
 import SEO from '../../components/SEO';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
+import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 import DOMPurify from 'dompurify';
@@ -486,23 +487,22 @@ const BlogDetail: React.FC = () => {
             {/* Main Article Container */}
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
               
-              {/* Breadcrumb Navigation (Matching Screenshot 1) */}
-              <nav className="flex items-center gap-2 text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-6 flex-wrap">
-                <Link to="/" className="hover:text-blue-600 transition-colors">Home</Link>
-                <span className="text-slate-300 dark:text-slate-700">/</span>
-                <Link to="/blogs" className="hover:text-blue-600 transition-colors">Blogs</Link>
-                <span className="text-slate-300 dark:text-slate-700">/</span>
-                <Link
-                  to={`/blogs?category=${encodeURIComponent(blog.category)}`}
-                  className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
-                >
-                  {blog.category}
-                </Link>
-                <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">/</span>
-                <span className="text-slate-700 dark:text-slate-300 font-medium truncate max-w-xs sm:max-w-sm hidden sm:inline">
-                  {blog.title}
-                </span>
-              </nav>
+              {/* Modern Top Breadcrumb Navigation */}
+              <PageBreadcrumb
+                items={[
+                  { label: 'Blogs', to: '/blogs' },
+                  {
+                    label: blog.category,
+                    to: `/blogs?category=${encodeURIComponent(blog.category)}`,
+                    active: true
+                  },
+                  { label: blog.title }
+                ]}
+                backTo="/blogs"
+                backLabel="Back to Blogs"
+                shareTitle={blog.title}
+                className="mb-8"
+              />
 
               {/* Hero Banner Featured Image (Matching Screenshot 1) */}
               {blog.featuredImage ? (

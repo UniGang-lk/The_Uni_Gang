@@ -10,6 +10,7 @@ import {
 import SEO from '../../components/SEO';
 import VerifiedBadge from '../../components/ui/VerifiedBadge';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
+import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -255,53 +256,46 @@ const AnnexDetailsPage = () => {
           transition={{ duration: 0.35 }}
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 space-y-6"
         >
-          {/* Top Bar Navigation (Similar to Proposal Profile Header) */}
-          <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 py-3.5 shadow-sm">
-            <button
-              onClick={() => navigate('/annex-list')}
-              className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors cursor-pointer bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700/80 px-3 py-1.5 rounded-xl border border-slate-200/60 dark:border-slate-700"
-            >
-              <LuChevronLeft size={16} />
-              <span>Back to Listings</span>
-            </button>
-
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-full border border-blue-200/80 dark:border-blue-900/60 uppercase tracking-wider">
-                ID: #{annex.id ? String(annex.id).slice(0, 8) : 'ANNEX'}
-              </span>
-              {annex.status === 'Approved' && (
-                <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-0.5 rounded-full border border-emerald-200/80 dark:border-emerald-800/60">
-                  <LuShieldCheck size={14} /> Verified Listing
+          {/* Modern Top Breadcrumb Navigation */}
+          <PageBreadcrumb
+            items={[
+              { label: 'Annexes', to: '/annex-list' },
+              {
+                label: annex.listing_type === 'ROOMMATE_WANTED' ? 'Roommate Finder' : 'Boarding Places',
+                to: `/annex-list?category=${annex.listing_type}`,
+                active: true
+              },
+              { label: annex.title }
+            ]}
+            backTo="/annex-list"
+            backLabel="Back to Listings"
+            shareTitle={`Check out this student accommodation on The Uni Gang: ${annex.title}`}
+            rightSlot={
+              <div className="flex items-center gap-2 mr-2">
+                <span className="text-[11px] font-extrabold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-1 rounded-full border border-blue-200/80 dark:border-blue-900/60 uppercase tracking-wider">
+                  ID: #{annex.id ? String(annex.id).slice(0, 8) : 'ANNEX'}
                 </span>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={handleToggleFavorite}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs transition-colors border cursor-pointer ${
-                  isFavorite
-                    ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/40 dark:border-rose-800'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-rose-50 hover:text-rose-500'
-                }`}
-                title="Save to Favorites"
-              >
-                <LuHeart size={14} className={isFavorite ? 'fill-rose-500 text-rose-500' : ''} />
-                <span className="hidden sm:inline">{isFavorite ? 'Saved' : 'Save'}</span>
-              </button>
-
-              <a
-                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this student accommodation on The Uni Gang: ${annex.title}\n\nhttps://unigang.lk/share/annex/${annex.id}`)}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold text-xs transition-colors border border-emerald-200/70"
-              >
-                <LuShare2 size={14} />
-                <span className="hidden sm:inline">Share</span>
-              </a>
-            </div>
-          </div>
+                {annex.status === 'Approved' && (
+                  <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 rounded-full border border-emerald-200/80 dark:border-emerald-800/60">
+                    <LuShieldCheck size={14} /> Verified
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={handleToggleFavorite}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-xs transition-colors border cursor-pointer ${
+                    isFavorite
+                      ? 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/40 dark:border-rose-800'
+                      : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-rose-50 hover:text-rose-500'
+                  }`}
+                  title="Save to Favorites"
+                >
+                  <LuHeart size={14} className={isFavorite ? 'fill-rose-500 text-rose-500' : ''} />
+                  <span className="hidden sm:inline">{isFavorite ? 'Saved' : 'Save'}</span>
+                </button>
+              </div>
+            }
+          />
 
           {/* Main 2-Column Balanced Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

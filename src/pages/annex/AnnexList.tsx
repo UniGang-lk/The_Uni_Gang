@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import universitiesData from "../../constants/annex/Universities.json";
 import PremiumPageLoader from "../../components/ui/PremiumPageLoader";
+import PageBreadcrumb from "../../components/ui/PageBreadcrumb";
 import AdNativeFeed from "../../components/advertise/AdNativeFeed";
 import SEO from "../../components/SEO";
 import VerifiedBadge from "../../components/ui/VerifiedBadge";
@@ -254,14 +255,16 @@ const AnnexList = () => {
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5 }}
                     >
-                        {/* Top Action Bar */}
-                        <div className="max-w-7xl mx-auto px-4 md:px-8 pt-4 flex justify-between items-center relative z-20">
-                            <button
-                                onClick={() => navigate('/')}
-                                className="flex items-center gap-2 px-4 py-2 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md rounded-full text-slate-700 dark:text-slate-300 font-semibold border border-white/40 dark:border-slate-800 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors shadow-sm"
-                            >
-                                <LuArrowLeft /> Back to Home
-                            </button>
+                        {/* Top Action Bar with Breadcrumbs */}
+                        <div className="max-w-7xl mx-auto px-4 md:px-8 pt-4 relative z-20">
+                            <PageBreadcrumb
+                                items={[
+                                    { label: 'Accommodations', active: true }
+                                ]}
+                                backTo="/"
+                                backLabel="Back to Home"
+                                shareTitle="Find Student Accommodations & Annexes in Sri Lanka - The Uni Gang"
+                            />
                         </div>
 
                         {/* Hero Section */}

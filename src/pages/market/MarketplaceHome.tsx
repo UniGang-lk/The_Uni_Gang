@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import { api } from '../../api';
 import AdBanner from '../../components/advertise/AdBanner';
 import AdNativeFeed from '../../components/advertise/AdNativeFeed';
+import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import SEO from '../../components/SEO';
 
 const MarketplaceHome: React.FC = () => {
@@ -437,6 +438,16 @@ const MarketplaceHome: React.FC = () => {
         }}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Top Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[
+            { label: 'Marketplace', active: true }
+          ]}
+          backTo="/"
+          backLabel="Back to Home"
+          shareTitle="Campus Marketplace & Hustle Hub | The Uni Gang"
+          className="mb-6"
+        />
 
         {/* Premium Advanced Hero Section */}
         <div className="relative rounded-[2.5rem] overflow-hidden bg-slate-950 shadow-2xl shadow-purple-500/10 mb-12 border border-slate-800/50">
