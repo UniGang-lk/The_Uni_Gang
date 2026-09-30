@@ -319,6 +319,10 @@ const AnnexDetailsPage = () => {
                       : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${galleryImages[activeImageIdx]?.imageUrl}`}
                     alt={annex.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={(e: any) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
+                    }}
                   />
 
                   {/* Rating Tag */}

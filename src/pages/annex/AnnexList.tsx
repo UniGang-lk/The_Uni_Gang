@@ -525,11 +525,15 @@ const AnnexList = () => {
                                                         transition={{ duration: 0.5, delay: index * 0.05 }}
                                                         className="group relative h-full bg-white/45 dark:bg-slate-900/45 backdrop-blur-[24px] border border-white/40 dark:border-slate-800 rounded-[2.5rem] p-4 hover:shadow-[0_40px_80px_-20px_rgba(0,63,221,0.12)] transition-all duration-500 flex flex-col"
                                                     >
-                                                        <div className="relative h-[280px] rounded-[2rem] overflow-hidden mb-6">
+                                                        <div className="relative h-[280px] rounded-[2rem] overflow-hidden mb-6 bg-slate-100 dark:bg-slate-800">
                                                             <img
                                                                 alt={item.title}
                                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                                                 src={coverImage}
+                                                                onError={(e: any) => {
+                                                                    e.currentTarget.onerror = null;
+                                                                    e.currentTarget.src = "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
+                                                                }}
                                                             />
 
                                                             {/* Verified Badge */}
