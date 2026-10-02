@@ -75,7 +75,7 @@ const EventList: React.FC = () => {
 
     const displayEvents = events;
     const featuredEvent = displayEvents[0] || null;
-    const featuredImageUrl = featuredEvent.image
+    const featuredImageUrl = featuredEvent?.image
         ? (featuredEvent.image.startsWith('http') ? featuredEvent.image : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${featuredEvent.image}`)
         : "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=1200";
 
@@ -227,7 +227,7 @@ const EventList: React.FC = () => {
                                                 <div className="flex items-center justify-between pt-1 px-1">
                                                     <div className="flex items-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
                                                         <span className="flex items-center gap-1 text-slate-700 dark:text-slate-200">
-                                                            <LuCalendar className="text-blue-500" /> {new Date(featuredEvent.date).toLocaleDateString()}
+                                                            <LuCalendar className="text-blue-500" /> {featuredEvent.date ? (isNaN(new Date(featuredEvent.date).getTime()) ? featuredEvent.date : new Date(featuredEvent.date).toLocaleDateString()) : 'Upcoming'}
                                                         </span>
                                                         <span>•</span>
                                                         <span className="flex items-center gap-1">
