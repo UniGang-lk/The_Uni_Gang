@@ -16,100 +16,6 @@ import AdNativeFeed from '../../components/advertise/AdNativeFeed';
 import SEO from '../../components/SEO';
 import CreateEventModal from '../../components/events/CreateEventModal';
 
-// Mock Data for University Events
-const DUMMY_EVENTS = [
-    {
-        id: 1,
-        title: "Tech Summit 2024",
-        image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200",
-        uni: "UOM",
-        faculty: "Engineering",
-        description: "Explore the latest in AI and Robotics at the biggest tech gathering of the year.",
-        date: "2024-11-12",
-        time: "09:00 AM",
-        contact: "+94771234567",
-        category: "Tech",
-        location: "Main Auditorium",
-        extra: "Drone shots included",
-        requirements: "Ticket required"
-    },
-    {
-        id: 2,
-        title: "Neon Nights Musical",
-        image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1200",
-        uni: "UOC",
-        faculty: "Arts",
-        description: "A night of vibrant music and dance featuring top student talent.",
-        date: "2024-10-24",
-        time: "06:30 PM",
-        contact: "+94777654321",
-        category: "Culture",
-        location: "Nelum Pokuna",
-        extra: "Refreshments provided",
-        requirements: "Open for all"
-    },
-    {
-        id: 3,
-        title: "Inter-Uni Cricket",
-        image: "https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=1200",
-        uni: "SLIIT",
-        faculty: "Computing",
-        description: "The ultimate showdown on the pitch. Support your campus team!",
-        date: "2024-12-05",
-        time: "08:00 AM",
-        contact: "+94778889990",
-        category: "Sports",
-        location: "University Grounds",
-        extra: "Live streaming",
-        requirements: "Student ID required"
-    },
-    {
-        id: 4,
-        title: "InnovateX Forum",
-        image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?q=80&w=1200",
-        uni: "NSBM",
-        faculty: "Business",
-        description: "Pitch your ideas to top entrepreneurs and win grand prizes.",
-        date: "2025-01-18",
-        time: "10:00 AM",
-        contact: "+94770001112",
-        category: "Business",
-        location: "Auditorium A1",
-        extra: "Mentorship sessions",
-        requirements: "Registration ends Dec 30"
-    },
-    {
-        id: 5,
-        title: "Global Beats Festival",
-        image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=1200",
-        uni: "UOM",
-        faculty: "Architecture",
-        description: "Experience food, music, and art from around the world.",
-        date: "2025-02-02",
-        time: "04:00 PM",
-        contact: "+94772223334",
-        category: "Lifestyle",
-        location: "Civil Grounds",
-        extra: "After-party DJ",
-        requirements: "Early bird tickets available"
-    },
-    {
-        id: 6,
-        title: "Code Sprint 2024",
-        image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1200",
-        uni: "IIT",
-        faculty: "Software Eng",
-        description: "24-hour hackathon to solve real-world problems with code.",
-        date: "2024-11-20",
-        time: "08:00 AM",
-        contact: "+94774445556",
-        category: "Tech",
-        location: "Digital Lab",
-        extra: "T-shirts and snacks",
-        requirements: "Team of 4"
-    }
-];
-
 const FloatingIcon = ({ icon: Icon, index }: { icon: React.ComponentType, index: number }) => (
     <motion.div
         initial={{ opacity: 0, scale: 0 }}
@@ -167,10 +73,8 @@ const EventList: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const displayEvents = events.length > 0 
-        ? [...events, ...DUMMY_EVENTS.filter(d => !events.some((e: any) => e.title === d.title))]
-        : DUMMY_EVENTS;
-    const featuredEvent = displayEvents[0] || DUMMY_EVENTS[0];
+    const displayEvents = events;
+    const featuredEvent = displayEvents[0] || null;
     const featuredImageUrl = featuredEvent.image
         ? (featuredEvent.image.startsWith('http') ? featuredEvent.image : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${featuredEvent.image}`)
         : "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=1200";
@@ -288,53 +192,69 @@ const EventList: React.FC = () => {
                                     <FloatingIcon icon={LuSparkles} index={1} />
                                     <FloatingIcon icon={LuGraduationCap} index={2} />
 
-                                    <TiltCard>
-                                        <div
-                                            onClick={() => navigate(`/events/${featuredEvent.id}`)}
-                                            className="group cursor-pointer relative rounded-[2rem] overflow-hidden border border-white/60 dark:border-white/10 shadow-2xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl p-4 sm:p-5 transition-all duration-300 hover:border-blue-500/50"
-                                        >
-                                            <div className="relative h-64 sm:h-72 rounded-2xl overflow-hidden mb-4">
-                                                <img
-                                                    src={featuredImageUrl}
-                                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                                    alt={featuredEvent.title}
-                                                />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+                                    {featuredEvent ? (
+                                        <TiltCard>
+                                            <div
+                                                onClick={() => navigate(`/events/${featuredEvent.id}`)}
+                                                className="group cursor-pointer relative rounded-[2rem] overflow-hidden border border-white/60 dark:border-white/10 shadow-2xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl p-4 sm:p-5 transition-all duration-300 hover:border-blue-500/50"
+                                            >
+                                                <div className="relative h-64 sm:h-72 rounded-2xl overflow-hidden mb-4">
+                                                    <img
+                                                        src={featuredImageUrl}
+                                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                                        alt={featuredEvent.title}
+                                                    />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
 
-                                                <div className="absolute top-3.5 left-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5">
-                                                    <LuSparkles className="w-3 h-3" /> Spotlight Event
-                                                </div>
-
-                                                <div className="absolute top-3.5 right-3.5 bg-black/50 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
-                                                    {featuredEvent.category}
-                                                </div>
-
-                                                <div className="absolute bottom-4 left-4 right-4">
-                                                    <div className="flex items-center gap-2 text-cyan-300 text-xs font-bold uppercase tracking-wider mb-1">
-                                                        <LuGraduationCap className="text-sm" /> {featuredEvent.uni}{featuredEvent.faculty ? ` - ${featuredEvent.faculty}` : ''}
+                                                    <div className="absolute top-3.5 left-3.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-lg flex items-center gap-1.5">
+                                                        <LuSparkles className="w-3 h-3" /> Spotlight Event
                                                     </div>
-                                                    <h3 className="text-2xl font-black text-white tracking-tight leading-tight group-hover:text-cyan-300 transition-colors">
-                                                        {featuredEvent.title}
-                                                    </h3>
-                                                </div>
-                                            </div>
 
-                                            <div className="flex items-center justify-between pt-1 px-1">
-                                                <div className="flex items-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                                                    <span className="flex items-center gap-1 text-slate-700 dark:text-slate-200">
-                                                        <LuCalendar className="text-blue-500" /> {new Date(featuredEvent.date).toLocaleDateString()}
-                                                    </span>
-                                                    <span>•</span>
-                                                    <span className="flex items-center gap-1">
-                                                        <LuMapPin className="text-blue-500" /> {featuredEvent.location}
+                                                    <div className="absolute top-3.5 right-3.5 bg-black/50 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
+                                                        {featuredEvent.category || 'Event'}
+                                                    </div>
+
+                                                    <div className="absolute bottom-4 left-4 right-4">
+                                                        <div className="flex items-center gap-2 text-cyan-300 text-xs font-bold uppercase tracking-wider mb-1">
+                                                            <LuGraduationCap className="text-sm" /> {featuredEvent.uni || featuredEvent.university || 'Campus Fest'}{featuredEvent.faculty ? ` - ${featuredEvent.faculty}` : ''}
+                                                        </div>
+                                                        <h3 className="text-2xl font-black text-white tracking-tight leading-tight group-hover:text-cyan-300 transition-colors">
+                                                            {featuredEvent.title}
+                                                        </h3>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center justify-between pt-1 px-1">
+                                                    <div className="flex items-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                                        <span className="flex items-center gap-1 text-slate-700 dark:text-slate-200">
+                                                            <LuCalendar className="text-blue-500" /> {new Date(featuredEvent.date).toLocaleDateString()}
+                                                        </span>
+                                                        <span>•</span>
+                                                        <span className="flex items-center gap-1">
+                                                            <LuMapPin className="text-blue-500" /> {featuredEvent.location}
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-xs font-black text-blue-600 dark:text-cyan-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                                                        View RSVP <LuArrowRight className="w-3.5 h-3.5" />
                                                     </span>
                                                 </div>
-                                                <span className="text-xs font-black text-blue-600 dark:text-cyan-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                                                    View RSVP <LuArrowRight className="w-3.5 h-3.5" />
-                                                </span>
                                             </div>
+                                        </TiltCard>
+                                    ) : (
+                                        <div className="relative rounded-[2rem] overflow-hidden border border-dashed border-white/20 dark:border-white/10 shadow-xl bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl p-8 text-center flex flex-col items-center justify-center min-h-[320px]">
+                                            <div className="w-14 h-14 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center mb-3">
+                                                <LuCalendar size={28} />
+                                            </div>
+                                            <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">Campus Spotlight</h3>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mb-5">Be the first to publish your campus event and claim the spotlight banner across Sri Lanka.</p>
+                                            <button
+                                                onClick={() => setIsCreateModalOpen(true)}
+                                                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-500/25 border-none cursor-pointer"
+                                            >
+                                                Post Campus Event
+                                            </button>
                                         </div>
-                                    </TiltCard>
+                                    )}
                                 </motion.div>
 
                             </div>

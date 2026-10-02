@@ -48,52 +48,7 @@ const Events = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [liveEvents, setLiveEvents] = useState<any[]>([]);
 
-  const defaultEventsList = [
-    {
-      id: 1,
-      title: "Neon Nights: The University Concert",
-      uni: "University of Moratuwa",
-      date: "OCT 24",
-      price: "Free",
-      image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=600&auto=format&fit=crop"
-    },
-    {
-      id: 2,
-      title: "AI & Robotics Hackathon 2024",
-      uni: "SLIIT Malabe",
-      date: "NOV 05",
-      price: "LKR 1,000",
-      image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=500&auto=format&fit=crop"
-    },
-    {
-      id: 3,
-      title: "Inter-Uni Cricket Championship 2024",
-      uni: "University of Peradeniya",
-      date: "NOV 12",
-      price: "Free",
-      image: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=500&auto=format&fit=crop"
-    },
-    {
-      id: 4,
-      title: "Batch Party '24 - Retro Night",
-      uni: "University of Sri Jayewardenepura",
-      date: "NOV 18",
-      price: "LKR 1,500",
-      image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=500&auto=format&fit=crop"
-    },
-    {
-      id: 5,
-      title: "CodeSprint IX Annual Summit",
-      uni: "University of Kelaniya",
-      date: "DEC 02",
-      price: "Free",
-      image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=500&auto=format&fit=crop"
-    }
-  ];
-
-  const displayEventsList = liveEvents.length > 0
-    ? [...liveEvents, ...defaultEventsList.filter(d => !liveEvents.some((e: any) => e.title === d.title))]
-    : defaultEventsList;
+  const displayEventsList = liveEvents;
 
   // Load live approved events
   const fetchLiveEvents = async () => {
@@ -380,7 +335,7 @@ const Events = () => {
             <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white dark:from-[#020617] to-transparent z-20 pointer-events-none" />
 
             <div className="flex gap-5 animate-marquee whitespace-nowrap">
-              {[...displayEventsList, ...displayEventsList].map((event, idx) => (
+              {(displayEventsList.length > 0 ? (displayEventsList.length === 1 ? [...displayEventsList, ...displayEventsList, ...displayEventsList, ...displayEventsList] : [...displayEventsList, ...displayEventsList]) : []).map((event, idx) => (
                 <div
                   key={idx}
                   onClick={() => navigate('/event-list')}

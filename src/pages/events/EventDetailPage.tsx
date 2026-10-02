@@ -36,117 +36,6 @@ interface EventData {
   user?: { id: string, name?: string, email?: string, profile_pic?: string };
 }
 
-const DUMMY_EVENTS: EventData[] = [
-  {
-    id: 1,
-    title: "Tech Summit 2024",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1200",
-    uni: "University of Moratuwa",
-    faculty: "Faculty of Engineering",
-    description: "Explore the latest breakthroughs in AI, Robotics, and Embedded Systems at the biggest university tech gathering of the year. Join industry leaders, startup founders, and student innovators for hands-on workshops, live demos, and networking opportunities.",
-    date: "2024-11-12",
-    time: "09:00 AM",
-    contact: "+94771234567",
-    category: "Tech & Innovation",
-    location: "Main University Auditorium, Moratuwa",
-    extra: "Live drone aerial shows & hackathon prizes included",
-    requirements: "Student ID / Free Registration Ticket required",
-    price: "Free Entry",
-    capacity: 350,
-    attendees: [{ id: "1", name: "Kasun Perera", email: "kasun@demo.lk" }]
-  },
-  {
-    id: 2,
-    title: "Neon Nights Musical Festival",
-    image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1200",
-    uni: "University of Colombo",
-    faculty: "Faculty of Arts",
-    description: "A night of vibrant neon lights, live band performances, DJ sets, and traditional fusion dances featuring top student talent from across Sri Lankan universities.",
-    date: "2024-10-24",
-    time: "06:30 PM",
-    contact: "+94777654321",
-    category: "Gigs & Culture",
-    location: "Open Air Amphitheatre, Colombo",
-    extra: "Free glow sticks & refreshments provided",
-    requirements: "Open for all students and alumni",
-    price: "LKR 1,000",
-    capacity: 500,
-    attendees: []
-  },
-  {
-    id: 3,
-    title: "Inter-Uni Cricket Championship 2024",
-    image: "https://images.unsplash.com/photo-1531415074968-036ba1b575da?q=80&w=1200",
-    uni: "SLIIT Malabe",
-    faculty: "Faculty of Computing",
-    description: "The ultimate university derby on the pitch. Support your campus team as 16 universities battle for glory in this high-octane T20 tournament.",
-    date: "2024-12-05",
-    time: "08:00 AM",
-    contact: "+94778889990",
-    category: "Sports Arena",
-    location: "SLIIT Main Sports Grounds, Malabe",
-    extra: "Live big-screen broadcasting & food stalls",
-    requirements: "Student ID required at gate",
-    price: "Free Entry",
-    capacity: 600,
-    attendees: []
-  },
-  {
-    id: 4,
-    title: "InnovateX Startup Pitch Forum",
-    image: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?q=80&w=1200",
-    uni: "NSBM Green University",
-    faculty: "School of Business",
-    description: "Pitch your groundbreaking business ideas to top venture capitalists, angel investors, and tech mentors to secure seed funding and incubation.",
-    date: "2025-01-18",
-    time: "10:00 AM",
-    contact: "+94770001112",
-    category: "Entrepreneurship",
-    location: "Auditorium Complex A1, Homagama",
-    extra: "1-on-1 VC speed networking sessions",
-    requirements: "Team pitchdeck submission required",
-    price: "Free for Pitchers",
-    capacity: 200,
-    attendees: []
-  },
-  {
-    id: 5,
-    title: "Global Beats Cultural Carnival",
-    image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?q=80&w=1200",
-    uni: "University of Moratuwa",
-    faculty: "Faculty of Architecture",
-    description: "Experience international food stalls, fashion parades, art exhibits, and acoustic jam sessions hosted by university student societies.",
-    date: "2025-02-02",
-    time: "04:00 PM",
-    contact: "+94772223334",
-    category: "Lifestyle & Arts",
-    location: "Civil Open Grounds, Moratuwa",
-    extra: "After-party live DJ set until midnight",
-    requirements: "Early bird tickets available online",
-    price: "LKR 500",
-    capacity: 800,
-    attendees: []
-  },
-  {
-    id: 6,
-    title: "CodeSprint 24-Hour Hackathon",
-    image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1200",
-    uni: "Informatics Institute of Technology (IIT)",
-    faculty: "Department of Software Engineering",
-    description: "An intense 24-hour non-stop hackathon where student developers design software prototypes to solve pressing real-world challenges.",
-    date: "2024-11-20",
-    time: "08:00 AM",
-    contact: "+94774445556",
-    category: "Hackathon",
-    location: "Digital Innovation Lab, Colombo 06",
-    extra: "Free swag bags, meals & midnight pizza",
-    requirements: "Teams of 3 - 4 members",
-    price: "Free Entry",
-    capacity: 150,
-    attendees: []
-  }
-];
-
 const EventDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -207,14 +96,9 @@ const EventDetailPage: React.FC = () => {
         try {
           data = await api.getEventById(id);
         } catch {
-          data = DUMMY_EVENTS.find(d => String(d.id) === String(id)) || null;
+          data = null;
         }
-
-        if (!data) {
-          data = DUMMY_EVENTS.find(d => String(d.id) === String(id)) || null;
-        }
-
-        if (data) {
+if (data) {
           setEvent(data);
           setAttendeeCount(data.attendees?.length || 0);
 
@@ -238,10 +122,10 @@ const EventDetailPage: React.FC = () => {
         // Related events
         try {
           const allApproved = await api.getApprovedEvents();
-          const list = Array.isArray(allApproved) && allApproved.length > 0 ? allApproved : DUMMY_EVENTS;
+          const list = Array.isArray(allApproved) ? allApproved : [];
           setRelatedEvents(list.filter((e: any) => String(e.id) !== String(id)).slice(0, 3));
         } catch {
-          setRelatedEvents(DUMMY_EVENTS.filter(e => String(e.id) !== String(id)).slice(0, 3));
+          setRelatedEvents([]);
         }
       } catch (err) {
         console.error('Failed to load event details:', err);
@@ -786,6 +670,24 @@ const EventDetailPage: React.FC = () => {
           </div>
 
         </motion.div>
+      )}
+    </div>
+      )}
+
+      {!event && !loading && (
+        <div className="max-w-lg mx-auto py-28 text-center px-4">
+          <div className="w-16 h-16 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center mx-auto mb-4">
+            <LuCircleAlert size={32} />
+          </div>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Event Not Found</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">This campus event may have concluded, expired, or been removed.</p>
+          <Link
+            to="/event-list"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-500/25 hover:bg-blue-700 transition-all"
+          >
+            Explore Active Events
+          </Link>
+        </div>
       )}
     </div>
   );
