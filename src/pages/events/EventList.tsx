@@ -143,20 +143,22 @@ const EventList: React.FC = () => {
     const [events, setEvents] = useState<any[]>([]);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-    const loadEvents = async () => {
+    const loadEvents = async (silent = false) => {
         try {
-            setLoading(true);
+            if (!silent) setLoading(true);
             const data = await api.getApprovedEvents();
             setEvents(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error("Failed to load approved events:", err);
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
 
     useEffect(() => {
         loadEvents();
+        const interval = setInterval(() => loadEvents(true), 5000);
+        return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
@@ -165,8 +167,13 @@ const EventList: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const displayEvents = events.length > 0 ? events : DUMMY_EVENTS;
+    const displayEvents = events.length > 0 
+        ? [...events, ...DUMMY_EVENTS.filter(d => !events.some((e: any) => e.title === d.title))]
+        : DUMMY_EVENTS;
     const featuredEvent = displayEvents[0] || DUMMY_EVENTS[0];
+    const featuredImageUrl = featuredEvent.image
+        ? (featuredEvent.image.startsWith('http') ? featuredEvent.image : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${featuredEvent.image}`)
+        : "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=1200";
 
     const handleStartChat = async (e: React.MouseEvent, eventId: string) => {
         e.stopPropagation();
@@ -288,7 +295,7 @@ const EventList: React.FC = () => {
                                         >
                                             <div className="relative h-64 sm:h-72 rounded-2xl overflow-hidden mb-4">
                                                 <img
-                                                    src={featuredEvent.image || "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=1200"}
+                                                    src={featuredImageUrl}
                                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                                     alt={featuredEvent.title}
                                                 />
@@ -315,7 +322,7 @@ const EventList: React.FC = () => {
                                             <div className="flex items-center justify-between pt-1 px-1">
                                                 <div className="flex items-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
                                                     <span className="flex items-center gap-1 text-slate-700 dark:text-slate-200">
-                                                        <LuCalendar className="text-blue-500" /> {featuredEvent.date}
+                                                        <LuCalendar className="text-blue-500" /> {new Date(featuredEvent.date).toLocaleDateString()}
                                                     </span>
                                                     <span>•</span>
                                                     <span className="flex items-center gap-1">

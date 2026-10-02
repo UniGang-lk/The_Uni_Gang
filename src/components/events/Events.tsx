@@ -91,7 +91,9 @@ const Events = () => {
     }
   ];
 
-  const displayEventsList = liveEvents.length > 0 ? liveEvents : defaultEventsList;
+  const displayEventsList = liveEvents.length > 0
+    ? [...liveEvents, ...defaultEventsList.filter(d => !liveEvents.some((e: any) => e.title === d.title))]
+    : defaultEventsList;
 
   // Load live approved events
   const fetchLiveEvents = async () => {
@@ -105,6 +107,8 @@ const Events = () => {
 
   useEffect(() => {
     fetchLiveEvents();
+    const interval = setInterval(() => fetchLiveEvents(), 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleUpcomingClick = () => {
@@ -383,7 +387,7 @@ const Events = () => {
                   className="inline-flex items-center gap-4 p-3 pr-6 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/10 shadow-lg hover:border-rose-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all cursor-pointer shrink-0"
                 >
                   <img
-                    src={event.image || 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=300'}
+                    src={event.image ? (event.image.startsWith('http') ? event.image : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${event.image}`) : 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=300'}
                     alt={event.title}
                     className="w-14 h-14 rounded-xl object-cover border border-slate-200 dark:border-slate-800 shrink-0"
                   />

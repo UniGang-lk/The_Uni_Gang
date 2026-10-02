@@ -317,14 +317,14 @@ export const api = {
     const response = await fetch(`${BASE_URL}/api/events`);
     if (!response.ok) throw new Error('Failed to fetch approved events');
     const result = await response.json();
-    return result.data || [];
+    return Array.isArray(result) ? result : (result.data || []);
   },
 
   getEventById: async (id: string): Promise<any> => {
     const response = await fetch(`${BASE_URL}/api/events/${id}`);
     if (!response.ok) throw new Error('Event not found');
     const result = await response.json();
-    return result.data;
+    return result?.data ?? result;
   },
 
 
@@ -418,7 +418,7 @@ export const api = {
     });
     if (!response.ok) throw new Error('Failed to fetch your events');
     const data = await response.json();
-    return data.data ?? [];
+    return Array.isArray(data) ? data : (data.data ?? []);
   },
 
   deleteEvent: async (id: string, token: string): Promise<any> => {
@@ -868,7 +868,7 @@ export const api = {
     });
     if (!response.ok) throw new Error('Failed to fetch admin events');
     const result = await response.json();
-    return result.data || [];
+    return Array.isArray(result) ? result : (result.data || []);
   },
 
   updateAdminEventStatus: async (eventId: string, status: string, token: string): Promise<any> => {
