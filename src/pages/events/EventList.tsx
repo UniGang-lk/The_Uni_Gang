@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     LuCalendar, LuMapPin, LuGraduationCap,
     LuClock, LuMessageCircle, LuArrowRight, LuSparkles,
-    LuTicket
+    LuTicket, LuPlus
 } from "react-icons/lu";
 import { motion, AnimatePresence } from "framer-motion";
 import TiltCard from '../../components/ui/TiltCard';
-import EventDetails from './EventDetails';
 import { api } from '../../api';
 import toast from 'react-hot-toast';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
@@ -14,6 +14,7 @@ import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import AdBanner from '../../components/advertise/AdBanner';
 import AdNativeFeed from '../../components/advertise/AdNativeFeed';
 import SEO from '../../components/SEO';
+import CreateEventModal from '../../components/events/CreateEventModal';
 
 // Mock Data for University Events
 const DUMMY_EVENTS = [
@@ -109,8 +110,6 @@ const DUMMY_EVENTS = [
     }
 ];
 
-
-
 const FloatingIcon = ({ icon: Icon, index }: { icon: React.ComponentType, index: number }) => (
     <motion.div
         initial={{ opacity: 0, scale: 0 }}
@@ -138,23 +137,25 @@ const FloatingIcon = ({ icon: Icon, index }: { icon: React.ComponentType, index:
 );
 
 const EventList: React.FC = () => {
-    const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+    const navigate = useNavigate();
     const [, setIsScrolled] = useState(false);
     const [loading, setLoading] = useState(true);
     const [events, setEvents] = useState<any[]>([]);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    const loadEvents = async () => {
+        try {
+            setLoading(true);
+            const data = await api.getApprovedEvents();
+            setEvents(Array.isArray(data) ? data : []);
+        } catch (err) {
+            console.error("Failed to load approved events:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const loadEvents = async () => {
-            try {
-                setLoading(true);
-                const data = await api.getApprovedEvents();
-                setEvents(Array.isArray(data) ? data : []);
-            } catch (err) {
-                console.error("Failed to load approved events:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
         loadEvents();
     }, []);
 
@@ -167,7 +168,8 @@ const EventList: React.FC = () => {
     const displayEvents = events.length > 0 ? events : DUMMY_EVENTS;
     const featuredEvent = displayEvents[0] || DUMMY_EVENTS[0];
 
-    const handleStartChat = async (eventId: string) => {
+    const handleStartChat = async (e: React.MouseEvent, eventId: string) => {
+        e.stopPropagation();
         const token = localStorage.getItem('userToken');
         if (!token) {
             toast.error("Please login to chat with the host.");
@@ -218,7 +220,7 @@ const EventList: React.FC = () => {
                         {/* Top Hero Section */}
                         <section className="relative pt-2 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto z-10">
                             <div className="grid lg:grid-cols-12 gap-10 items-center">
-                                
+
                                 {/* Left Column: Headline and Proof */}
                                 <motion.div
                                     initial={{ opacity: 0, y: 30 }}
@@ -226,10 +228,6 @@ const EventList: React.FC = () => {
                                     transition={{ duration: 0.8 }}
                                     className="lg:col-span-7 space-y-6 text-center lg:text-left"
                                 >
-                                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200/60 dark:border-blue-800/60 text-blue-600 dark:text-cyan-400 font-black text-xs uppercase tracking-wider shadow-sm">
-                                        <LuSparkles className="w-3.5 h-3.5 animate-pulse" /> Sri Lanka's Campus Heartbeat
-                                    </div>
-
                                     <h1 className="text-5xl sm:text-7xl font-black text-slate-900 dark:text-white leading-[0.95] tracking-tight">
                                         University <br />
                                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500">Pulse.</span>
@@ -285,7 +283,7 @@ const EventList: React.FC = () => {
 
                                     <TiltCard>
                                         <div
-                                            onClick={() => setSelectedEvent(featuredEvent)}
+                                            onClick={() => navigate(`/events/${featuredEvent.id}`)}
                                             className="group cursor-pointer relative rounded-[2rem] overflow-hidden border border-white/60 dark:border-white/10 shadow-2xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl p-4 sm:p-5 transition-all duration-300 hover:border-blue-500/50"
                                         >
                                             <div className="relative h-64 sm:h-72 rounded-2xl overflow-hidden mb-4">
@@ -344,7 +342,7 @@ const EventList: React.FC = () => {
                             </div>
 
                             {/* Section Header */}
-                            <div className="flex items-center justify-between mb-8">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
                                 <div>
                                     <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                                         Upcoming University Events
@@ -353,6 +351,25 @@ const EventList: React.FC = () => {
                                         Showing {displayEvents.length} active campus events
                                     </p>
                                 </div>
+
+                                {/* Post Campus Event Action Button */}
+                                <motion.button
+                                    whileHover={{ scale: 1.03, y: -2 }}
+                                    whileTap={{ scale: 0.97 }}
+                                    onClick={() => setIsCreateModalOpen(true)}
+                                    className="group relative inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:via-indigo-500 hover:to-cyan-400 text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-blue-500/25 hover:shadow-cyan-500/35 transition-all duration-300 border border-white/20 cursor-pointer overflow-hidden self-start sm:self-auto shrink-0"
+                                >
+                                    {/* Shimmer sweep effect */}
+                                    <span className="absolute inset-0 w-1/2 h-full bg-white/25 skew-x-12 -translate-x-full group-hover:translate-x-[300%] transition-transform duration-1000 ease-out pointer-events-none" />
+
+                                    <div className="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm shadow-inner group-hover:rotate-90 transition-transform duration-300">
+                                        <LuPlus className="w-4 h-4 text-white" />
+                                    </div>
+                                    <span>Post Campus Event</span>
+                                    <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md bg-white/20 text-[10px] font-black uppercase tracking-wider text-cyan-200">
+                                        Free
+                                    </span>
+                                </motion.button>
                             </div>
 
                             {/* Events Grid */}
@@ -380,8 +397,11 @@ const EventList: React.FC = () => {
                                                     transition={{ duration: 0.4, delay: index * 0.05 }}
                                                 >
                                                     <div className="h-full">
-                                                        <div className="group h-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 rounded-3xl p-5 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col relative overflow-hidden">
-                                                            
+                                                        <div 
+                                                            onClick={() => navigate(`/events/${event.id}`)}
+                                                            className="group h-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 rounded-3xl p-5 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col relative overflow-hidden cursor-pointer"
+                                                        >
+
                                                             {/* Image Capsule */}
                                                             <div className="relative aspect-[16/10] rounded-2xl overflow-hidden mb-5 bg-slate-100 dark:bg-slate-800">
                                                                 <img
@@ -457,13 +477,16 @@ const EventList: React.FC = () => {
                                                                 {/* Interaction Buttons */}
                                                                 <div className="pt-3 border-t border-slate-100 dark:border-white/5 grid grid-cols-[1fr_auto] gap-2.5 mt-auto">
                                                                     <button
-                                                                        onClick={() => setSelectedEvent(event)}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            navigate(`/events/${event.id}`);
+                                                                        }}
                                                                         className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-500/20 active:scale-95 cursor-pointer border-none"
                                                                     >
                                                                         <LuTicket className="w-3.5 h-3.5" /> View & RSVP
                                                                     </button>
                                                                     <button
-                                                                        onClick={() => handleStartChat(event.id.toString())}
+                                                                        onClick={(e) => handleStartChat(e, event.id.toString())}
                                                                         className="flex items-center justify-center p-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-all active:scale-95 cursor-pointer border-none"
                                                                         title="Chat with Event Organizer"
                                                                     >
@@ -502,19 +525,25 @@ const EventList: React.FC = () => {
                                         No Events Scheduled
                                     </h3>
                                     <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-6">
-                                        There are currently no active campus events. Check back soon!
+                                        There are currently no active campus events. Be the first to publish your campus event!
                                     </p>
+                                    <button
+                                        onClick={() => setIsCreateModalOpen(true)}
+                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-blue-500/25 cursor-pointer border-none"
+                                    >
+                                        <LuPlus className="w-4 h-4" /> Post Your Event
+                                    </button>
                                 </motion.div>
                             )}
 
-                            {/* Event Details Modal Popup */}
-                            <EventDetails
-                                event={selectedEvent}
-                                isOpen={!!selectedEvent}
-                                onClose={() => setSelectedEvent(null)}
-                            />
-
                         </section>
+
+                        {/* Create Campus Event Modal */}
+                        <CreateEventModal
+                            isOpen={isCreateModalOpen}
+                            onClose={() => setIsCreateModalOpen(false)}
+                            onSuccess={loadEvents}
+                        />
                     </motion.div>
                 )}
             </AnimatePresence>

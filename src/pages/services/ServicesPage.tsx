@@ -136,6 +136,9 @@ const ServicesPage = () => {
   const [showAuthGate, setShowAuthGate] = useState(false);
   const [step, setStep] = useState(1);
   const [configSelections, setConfigSelections] = useState<any>({});
+  const [submittedRequestData, setSubmittedRequestData] = useState<any | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (showToast) {
@@ -187,11 +190,17 @@ const ServicesPage = () => {
         if (webFeatures.includes('cms')) {
           minPrice += 20000; maxPrice += 30000; days += 3;
         }
+        if (webFeatures.includes('auth')) {
+          minPrice += 15000; maxPrice += 25000; days += 2;
+        }
         if (webFeatures.includes('chat')) {
           minPrice += 10000; maxPrice += 15000; days += 1;
         }
         if (webFeatures.includes('seo')) {
           minPrice += 15000; maxPrice += 20000; days += 1;
+        }
+        if (webFeatures.includes('api')) {
+          minPrice += 25000; maxPrice += 40000; days += 4;
         }
         break;
 
@@ -217,6 +226,12 @@ const ServicesPage = () => {
         }
         if (mobFeatures.includes('payments')) {
           minPrice += 20000; maxPrice += 30000; days += 3;
+        }
+        if (mobFeatures.includes('admin')) {
+          minPrice += 25000; maxPrice += 35000; days += 4;
+        }
+        if (mobFeatures.includes('chat')) {
+          minPrice += 15000; maxPrice += 20000; days += 2;
         }
         break;
 
@@ -375,8 +390,9 @@ const ServicesPage = () => {
     }
 
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
-      await api.submitServiceRequest({
+      const created = await api.submitServiceRequest({
         serviceName: selectedService.title,
         clientPhone: phone,
         clientEmail: email || undefined,
@@ -385,14 +401,18 @@ const ServicesPage = () => {
         budget: budget || undefined
       }, token);
 
-      // window.open(`https://wa.me/94724478148?text=${encodeURIComponent(message)}`, '_blank');
-
       setIsSubmitting(false);
+      setSubmittedRequestData(created || {
+        serviceName: selectedService.title,
+        clientPhone: phone,
+        budget,
+        deadline
+      });
       setSelectedService(null);
-      setShowToast(true);
+      setShowSuccessModal(true);
     } catch (error: any) {
       console.error(error);
-      alert(error.message || 'Failed to submit service request. Please try again.');
+      setSubmitError(error.message || 'Failed to submit service request. Please try again.');
       setIsSubmitting(false);
     }
   };
@@ -405,10 +425,11 @@ const ServicesPage = () => {
     if (!token || !pendingRequestStr) return;
 
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
       const pendingData = JSON.parse(pendingRequestStr);
       
-      await api.submitServiceRequest({
+      const created = await api.submitServiceRequest({
         serviceName: pendingData.serviceTitle,
         clientPhone: pendingData.phone,
         clientEmail: pendingData.email || undefined,
@@ -417,14 +438,18 @@ const ServicesPage = () => {
         budget: pendingData.budget || undefined
       }, token);
 
-      // window.open(`https://wa.me/94724478148?text=${encodeURIComponent(message)}`, '_blank');
-
       localStorage.removeItem('pending_service_request');
+      setSubmittedRequestData(created || {
+        serviceName: pendingData.serviceTitle,
+        clientPhone: pendingData.phone,
+        budget: pendingData.budget,
+        deadline: pendingData.deadline
+      });
       setSelectedService(null);
-      setShowToast(true);
+      setShowSuccessModal(true);
     } catch (error: any) {
       console.error(error);
-      alert(error.message || 'Failed to submit cached request after authenticating.');
+      setSubmitError(error.message || 'Failed to submit cached request after authenticating.');
     } finally {
       setIsSubmitting(false);
     }
@@ -727,13 +752,15 @@ const ServicesPage = () => {
                                     </div>
 
                                     <div>
-                                      <label className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-2 block ml-1">Integrations Checklist</label>
+                                      <label className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-2 block ml-1">Core Features & Capabilities</label>
                                       <div className="grid grid-cols-2 gap-2">
                                         {[
-                                          { id: 'payment', label: 'Payments' },
-                                          { id: 'cms', label: 'CMS (Admin)' },
-                                          { id: 'chat', label: 'Live Chat' },
-                                          { id: 'seo', label: 'SEO Audit' }
+                                          { id: 'payment', label: 'Payment Gateway', desc: 'Cards & Online Checkout' },
+                                          { id: 'cms', label: 'Admin Panel & CMS', desc: 'Manage content & users' },
+                                          { id: 'auth', label: 'User Login & Profiles', desc: 'Member accounts' },
+                                          { id: 'chat', label: 'Live Chat Support', desc: 'Real-time client chat' },
+                                          { id: 'seo', label: 'SEO & Speed Optimization', desc: 'Google ranking boost' },
+                                          { id: 'api', label: 'Custom API / Database', desc: 'Advanced backend data' }
                                         ].map((f) => {
                                           const current = configSelections.webFeatures || [];
                                           const has = current.includes(f.id);
@@ -745,14 +772,17 @@ const ServicesPage = () => {
                                                 const next = has ? current.filter((x: string) => x !== f.id) : [...current, f.id];
                                                 setConfigSelections({ ...configSelections, webFeatures: next });
                                               }}
-                                              className={`py-2.5 px-3 rounded-xl text-xs font-black uppercase tracking-tight border transition-all flex items-center justify-between ${
+                                              className={`p-3 rounded-xl text-left border transition-all flex flex-col justify-between ${
                                                 has
                                                   ? 'bg-blue-600/10 border-blue-600 text-blue-600 shadow-xs'
                                                   : 'bg-white/5 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
                                               }`}
                                             >
-                                              <span>{f.label}</span>
-                                              {has && <LuCheck size={14} />}
+                                              <div className="flex items-center justify-between w-full">
+                                                <span className="text-xs font-black uppercase tracking-tight">{f.label}</span>
+                                                {has && <LuCheck size={14} className="text-blue-600 shrink-0" />}
+                                              </div>
+                                              <span className="text-[10px] opacity-70 mt-1 font-medium leading-tight">{f.desc}</span>
                                             </button>
                                           );
                                         })}
@@ -788,13 +818,15 @@ const ServicesPage = () => {
                                     </div>
 
                                     <div>
-                                      <label className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-2 block ml-1">App Integrations</label>
+                                      <label className="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] mb-2 block ml-1">Core App Capabilities</label>
                                       <div className="grid grid-cols-2 gap-2">
                                         {[
-                                          { id: 'auth', label: 'Profiles & Auth' },
-                                          { id: 'push', label: 'Push Alert' },
-                                          { id: 'gps', label: 'GPS / Maps' },
-                                          { id: 'payments', label: 'In-app Pay' }
+                                          { id: 'auth', label: 'Profiles & Auth', desc: 'User accounts & login' },
+                                          { id: 'push', label: 'Push Alerts', desc: 'Real-time notifications' },
+                                          { id: 'gps', label: 'GPS & Location', desc: 'Maps & live tracking' },
+                                          { id: 'payments', label: 'In-App Payments', desc: 'Card & wallet pay' },
+                                          { id: 'admin', label: 'Admin Portal', desc: 'Control & analytics panel' },
+                                          { id: 'chat', label: 'In-App Messaging', desc: 'User to admin messaging' }
                                         ].map((f) => {
                                           const current = configSelections.mobFeatures || [];
                                           const has = current.includes(f.id);
@@ -806,14 +838,17 @@ const ServicesPage = () => {
                                                 const next = has ? current.filter((x: string) => x !== f.id) : [...current, f.id];
                                                 setConfigSelections({ ...configSelections, mobFeatures: next });
                                               }}
-                                              className={`py-2.5 px-3 rounded-xl text-xs font-black uppercase tracking-tight border transition-all flex items-center justify-between ${
+                                              className={`p-3 rounded-xl text-left border transition-all flex flex-col justify-between ${
                                                 has
                                                   ? 'bg-blue-600/10 border-blue-600 text-blue-600 shadow-xs'
                                                   : 'bg-white/5 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
                                               }`}
                                             >
-                                              <span>{f.label}</span>
-                                              {has && <LuCheck size={14} />}
+                                              <div className="flex items-center justify-between w-full">
+                                                <span className="text-xs font-black uppercase tracking-tight">{f.label}</span>
+                                                {has && <LuCheck size={14} className="text-blue-600 shrink-0" />}
+                                              </div>
+                                              <span className="text-[10px] opacity-70 mt-1 font-medium leading-tight">{f.desc}</span>
                                             </button>
                                           );
                                         })}
@@ -1011,30 +1046,7 @@ const ServicesPage = () => {
                                   </div>
                                 )}
 
-                                <div className="p-5 rounded-2xl bg-blue-500/5 dark:bg-slate-950/40 border border-blue-500/10 dark:border-slate-800/60 flex flex-col justify-between items-center sm:flex-row gap-4 mt-8">
-                                  <div className="flex items-center gap-3 text-left">
-                                    <div className="p-3 bg-blue-500/10 text-blue-650 rounded-xl">
-                                      <LuDollarSign className="size-6" />
-                                    </div>
-                                    <div>
-                                      <p className="text-[9px] font-black tracking-widest text-slate-400 dark:text-slate-450 uppercase">Budget Estimate</p>
-                                      <p className="text-base font-black text-slate-900 dark:text-white mt-1">
-                                        LKR {calculateEstimate().minPrice.toLocaleString()} - {calculateEstimate().maxPrice.toLocaleString()}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="flex items-center gap-3 text-left">
-                                    <div className="p-3 bg-indigo-500/10 text-indigo-500 rounded-xl">
-                                      <LuClock className="size-6" />
-                                    </div>
-                                    <div>
-                                      <p className="text-[9px] font-black tracking-widest text-slate-400 dark:text-slate-455 uppercase">Estimated Delivery</p>
-                                      <p className="text-base font-black text-slate-900 dark:text-white mt-1">
-                                        ~ {calculateEstimate().days} Days
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
+
 
                                 <div className="pt-2">
                                   <button
@@ -1119,26 +1131,35 @@ const ServicesPage = () => {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                   <div className="space-y-2">
                                     <label className="text-[10px] sm:text-[11px] font-black text-blue-600 uppercase tracking-[0.3em] ml-1">
-                                      Launch Date
+                                      Your Target Budget Range
                                     </label>
-                                    <motion.input
-                                      whileFocus={{ scale: 1.01 }}
-                                      name="deadline"
-                                      type="date"
-                                      defaultValue={getEstimatedDateString(calculateEstimate().days)}
-                                      className="w-full px-5 py-4 sm:p-5 rounded-2xl bg-white/40 dark:bg-slate-950/40 border border-slate-200/60 dark:border-slate-800/60 focus:border-blue-600 focus:ring-8 focus:ring-blue-600/5 outline-none transition-all text-sm dark:text-slate-350 backdrop-blur-sm"
-                                    />
+                                    <select
+                                      name="budget"
+                                      defaultValue="Flexible / Open for Discussion"
+                                      className="w-full px-5 py-4 sm:p-5 rounded-2xl bg-white/40 dark:bg-slate-950/40 border border-slate-200/60 dark:border-slate-800/60 focus:border-blue-600 focus:ring-8 focus:ring-blue-600/5 outline-none transition-all text-sm font-bold dark:text-white cursor-pointer"
+                                    >
+                                      <option value="Flexible / Open for Discussion" className="dark:bg-slate-900">💬 Flexible / Open for Discussion</option>
+                                      <option value="Under LKR 35,000" className="dark:bg-slate-900">💡 Under LKR 35,000 (Starter Budget)</option>
+                                      <option value="LKR 35,000 - LKR 75,000" className="dark:bg-slate-900">🚀 LKR 35,000 - 75,000 (Standard)</option>
+                                      <option value="LKR 75,000 - LKR 150,000" className="dark:bg-slate-900">⭐ LKR 75,000 - 150,000 (Professional)</option>
+                                      <option value="LKR 150,000+" className="dark:bg-slate-900">🔥 LKR 150,000+ (Enterprise / Full Custom)</option>
+                                    </select>
                                   </div>
+
                                   <div className="space-y-2">
                                     <label className="text-[10px] sm:text-[11px] font-black text-blue-600 uppercase tracking-[0.3em] ml-1">
-                                      Budget (LKR)
+                                      Expected Timeline
                                     </label>
-                                    <motion.input
-                                      whileFocus={{ scale: 1.01 }}
-                                      name="budget"
-                                      placeholder={`LKR ${calculateEstimate().minPrice.toLocaleString()} - ${calculateEstimate().maxPrice.toLocaleString()}`}
-                                      className="w-full px-5 py-4 sm:p-5 rounded-2xl bg-white/40 dark:bg-slate-950/40 border border-slate-200/60 dark:border-slate-800/60 focus:border-blue-600 focus:ring-8 focus:ring-blue-600/5 outline-none transition-all text-sm placeholder:text-slate-400 backdrop-blur-sm dark:text-white"
-                                    />
+                                    <select
+                                      name="deadline"
+                                      defaultValue="Standard (1 - 2 weeks)"
+                                      className="w-full px-5 py-4 sm:p-5 rounded-2xl bg-white/40 dark:bg-slate-950/40 border border-slate-200/60 dark:border-slate-800/60 focus:border-blue-600 focus:ring-8 focus:ring-blue-600/5 outline-none transition-all text-sm font-bold dark:text-white cursor-pointer"
+                                    >
+                                      <option value="Standard (1 - 2 weeks)" className="dark:bg-slate-900">📅 Standard (1 - 2 weeks)</option>
+                                      <option value="ASAP / Urgent (Within 1 week)" className="dark:bg-slate-900">⚡ Urgent / ASAP (Within 1 week)</option>
+                                      <option value="Flexible (Within 1 month)" className="dark:bg-slate-900">⏳ Flexible (Within 1 month)</option>
+                                      <option value="No Strict Deadline / Planning Phase" className="dark:bg-slate-900">💡 No Rush / Planning Phase</option>
+                                    </select>
                                   </div>
                                 </div>
 
@@ -1224,6 +1245,109 @@ const ServicesPage = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Success Confirmation Card Modal */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowSuccessModal(false)}
+              className="fixed inset-0 z-[110] bg-slate-950/70 backdrop-blur-xl"
+            />
+            <div className="fixed inset-0 z-[111] overflow-y-auto flex items-center justify-center p-4 sm:p-6 pointer-events-none">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 30 }}
+                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                className="w-full max-w-md bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-[2.5rem] p-6 sm:p-8 shadow-2xl border border-white/40 dark:border-white/10 pointer-events-auto relative overflow-hidden text-center"
+              >
+                <div className="size-16 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/10">
+                  <LuCheck className="size-8" />
+                </div>
+
+                <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 font-black text-[10px] uppercase tracking-widest inline-block mb-3">
+                  Project Request Transmitted
+                </span>
+
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                  {submittedRequestData?.serviceName || 'Service Request'}
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                  Your request has been registered in the Uni Gang Helpdesk system.
+                </p>
+
+                <div className="my-5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200/60 dark:border-slate-800/60 text-left space-y-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider text-[10px]">Status</span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 font-black text-[9px] uppercase border border-amber-500/20">
+                      ⚡ Pending Review
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <p className="text-[9px] font-black uppercase text-slate-400 tracking-wider">Target Budget</p>
+                      <p className="text-xs font-black text-slate-800 dark:text-white truncate mt-0.5">
+                        {submittedRequestData?.budget || 'Flexible'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black uppercase text-slate-400 tracking-wider">Timeline</p>
+                      <p className="text-xs font-black text-slate-800 dark:text-white truncate mt-0.5">
+                        {submittedRequestData?.deadline || 'Standard'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-200/50 dark:border-slate-800/50 flex items-center justify-between text-xs">
+                    <span className="text-slate-400 font-bold text-[10px] uppercase">WhatsApp</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-300">{submittedRequestData?.clientPhone}</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowSuccessModal(false);
+                      window.location.href = '/profile';
+                    }}
+                    className="flex-1 py-3.5 bg-blue-600 text-white font-black rounded-xl text-xs uppercase tracking-wider hover:bg-blue-700 transition-all border-none cursor-pointer shadow-md shadow-blue-500/20"
+                  >
+                    Track Request in Profile ➔
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowSuccessModal(false)}
+                    className="py-3.5 px-5 bg-slate-200/60 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs uppercase tracking-wider hover:bg-slate-300 dark:hover:bg-slate-700 transition-all border-none cursor-pointer"
+                  >
+                    Close
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Error Toast */}
+      {submitError && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          className="fixed bottom-6 right-6 z-[200] max-w-md bg-red-500 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-between gap-3 text-xs font-bold"
+        >
+          <span>{submitError}</span>
+          <button onClick={() => setSubmitError(null)} className="text-white hover:opacity-80 border-none bg-transparent cursor-pointer">
+            <LuX size={16} />
+          </button>
+        </motion.div>
+      )}
     </section>
   );
 };

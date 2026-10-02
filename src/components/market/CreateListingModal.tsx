@@ -32,7 +32,7 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(interval);
-          onClose();
+          setTimeout(() => onClose(), 0);
           return 0;
         }
         return prev - 1;

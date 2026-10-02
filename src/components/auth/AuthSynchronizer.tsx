@@ -27,7 +27,12 @@ const AuthSynchronizer = () => {
           console.error('Failed to synchronize session token:', error);
         }
       } else {
-        // If the user was signed out from Firebase, clean up the session
+        // If the user was signed out from Firebase, clean up session UNLESS it's a Demo session!
+        const currentToken = localStorage.getItem('userToken');
+        const currentEmail = localStorage.getItem('userEmail');
+        if (currentToken === 'dummy_token' || currentEmail === 'kasun.demo@unigang.lk') {
+          return;
+        }
         localStorage.removeItem('userToken');
         localStorage.removeItem('userName');
         localStorage.removeItem('userEmail');

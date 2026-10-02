@@ -268,7 +268,7 @@ export const api = {
     });
     if (!response.ok) {
       const err = await response.json();
-      throw new Error(err.message || 'Failed to submit service request');
+      throw new Error(err.error || err.message || 'Failed to submit service request');
     }
     return response.json();
   },
@@ -615,7 +615,7 @@ export const api = {
     return response.json();
   },
 
-  startMarketplaceChat: async (itemId: string): Promise<any> => {
+  startMarketplaceChat: async (itemId: string, sellerId?: string): Promise<any> => {
     const token = localStorage.getItem('userToken');
     const response = await fetch(`${BASE_URL}/api/market/chats/start`, {
       method: 'POST',
@@ -623,7 +623,7 @@ export const api = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({ itemId })
+      body: JSON.stringify({ itemId, sellerId })
     });
     if (!response.ok) {
       const err = await response.json();

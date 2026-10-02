@@ -456,7 +456,10 @@ const MarketplaceHome: React.FC = () => {
             <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[150%] bg-purple-600/20 blur-[120px] rounded-full mix-blend-screen animate-pulse" />
             <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[120%] bg-indigo-600/20 blur-[120px] rounded-full mix-blend-screen" />
             {/* Grid overlay */}
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNTQgNThoLTQ2di00NmgyMnYtMmgtMjR2NTBoNTB2LTI0aC0ydjIyeiIgZmlsbD0icmdiYSgyNTUsIDI1NSLCAyNTUsIDAuMDUpIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=')] opacity-20" />
+            <div 
+              className="absolute inset-0 opacity-20" 
+              style={{ backgroundImage: 'url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNTQgNThoLTQ2di00NmgyMnYtMmgtMjR2NTBoNTB2LTI0aC0ydjIyeiIgZmlsbD0icmdiYSgyNTUsIDI1NSLCAyNTUsIDAuMDUpIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiLz48L3N2Zz4=")' }}
+            />
           </div>
 
           <div className="relative z-10 p-10 md:p-16 lg:p-20 flex flex-col lg:flex-row items-center justify-between gap-12">
