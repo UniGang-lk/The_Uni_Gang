@@ -255,7 +255,7 @@ const EventList: React.FC = () => {
                                                         </span>
                                                     </div>
                                                     <span className="text-xs font-black text-blue-600 dark:text-cyan-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                                                        View RSVP <LuArrowRight className="w-3.5 h-3.5" />
+                                                        View Details & Join <LuArrowRight className="w-3.5 h-3.5" />
                                                     </span>
                                                 </div>
                                             </div>
@@ -448,8 +448,8 @@ const EventList: React.FC = () => {
                                                                 {event.capacity && (
                                                                     <div className="mb-4 pt-3 border-t border-slate-100 dark:border-white/5 flex flex-col gap-1.5">
                                                                         <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                                                                            <span>RSVP Capacity</span>
-                                                                            <span className="text-blue-600 dark:text-cyan-400">{event.attendees?.length || 0} / {event.capacity} Spots</span>
+                                                                            <span>Available Spots</span>
+                                                                            <span className="text-blue-600 dark:text-cyan-400">{event.attendees?.length || 0} / {event.capacity} Taken</span>
                                                                         </div>
                                                                         <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                                                             <div
@@ -469,7 +469,7 @@ const EventList: React.FC = () => {
                                                                         }}
                                                                         className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-500/20 active:scale-95 cursor-pointer border-none"
                                                                     >
-                                                                        <LuTicket className="w-3.5 h-3.5" /> View & RSVP
+                                                                        <LuTicket className="w-3.5 h-3.5" /> View & Join
                                                                     </button>
                                                                     <button
                                                                         onClick={(e) => handleStartChat(e, event.id.toString())}

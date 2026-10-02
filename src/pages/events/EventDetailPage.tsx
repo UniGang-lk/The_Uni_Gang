@@ -165,7 +165,7 @@ const EventDetailPage: React.FC = () => {
     if (!event) return;
     const token = localStorage.getItem('userToken') || localStorage.getItem('userEmail');
     if (!token) {
-      toast.error('Please sign in to RSVP for campus events.');
+      toast.error('Please sign in to join campus events.');
       return;
     }
 
@@ -182,9 +182,9 @@ const EventDetailPage: React.FC = () => {
           origin: { y: 0.6 }
         });
       }
-      toast.success(res.message || (attending ? "RSVP confirmed! See you at the event." : "RSVP removed."));
+      toast.success(res.message || (attending ? "Spot reserved! You're attending 🎉" : "Attendance cancelled."));
     } catch (err: any) {
-      toast.error(err.message || "Failed to update RSVP.");
+      toast.error(err.message || "Failed to update attendance.");
     } finally {
       setIsLoadingRsvp(false);
     }
@@ -504,8 +504,8 @@ const EventDetailPage: React.FC = () => {
                 {event.capacity && (
                   <div className="space-y-2 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
                     <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                      <span>RSVP Spots Filled</span>
-                      <span className="text-blue-600 dark:text-cyan-400">{attendeeCount} / {event.capacity} Spots</span>
+                      <span>Spots Reserved</span>
+                      <span className="text-blue-600 dark:text-cyan-400">{attendeeCount} / {event.capacity} Taken</span>
                     </div>
                     <div className="h-2 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                       <motion.div
@@ -530,7 +530,7 @@ const EventDetailPage: React.FC = () => {
                 </p>
               </div>
 
-              {/* Action Bar (RSVP / Calendar / Host Roster) */}
+              {/* Action Bar (Join / Calendar / Host Roster) */}
               <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 border border-slate-200 dark:border-slate-800 shadow-md space-y-4">
                 <div className="flex items-center gap-3">
                   <button
@@ -565,11 +565,11 @@ const EventDetailPage: React.FC = () => {
                       }`}
                     >
                       {isLoadingRsvp ? (
-                        <span className="font-bold">Updating RSVP...</span>
+                        <span className="font-bold">Updating Spot...</span>
                       ) : (
                         <>
                           {isInterested ? <LuCheck size={18} /> : <LuTicket size={18} />}
-                          <span>{isInterested ? "RSVP Confirmed (Click to Cancel)" : "RSVP Now & Reserve Spot"}</span>
+                          <span>{isInterested ? "✓ I'm Attending (Click to Cancel)" : "Join Event / Reserve Spot"}</span>
                         </>
                       )}
                     </button>
@@ -600,7 +600,7 @@ const EventDetailPage: React.FC = () => {
 
                         <div className="max-h-48 overflow-y-auto pr-2 custom-scrollbar space-y-2">
                           {!event.attendees || event.attendees.length === 0 ? (
-                            <p className="text-center text-xs text-slate-500 py-4 font-medium italic">No RSVPs registered yet. Share your event flyer!</p>
+                            <p className="text-center text-xs text-slate-500 py-4 font-medium italic">No attendees registered yet. Share your event flyer!</p>
                           ) : (
                             event.attendees.map((attendee: any, idx: number) => (
                               <div key={idx} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white dark:hover:bg-slate-900 transition-colors border border-transparent hover:border-slate-100 dark:hover:border-slate-800">
