@@ -671,8 +671,6 @@ if (data) {
 
         </motion.div>
       )}
-    </div>
-      )}
 
       {!event && !loading && (
         <div className="max-w-lg mx-auto py-28 text-center px-4">
