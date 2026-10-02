@@ -98,19 +98,43 @@ const EventDetailPage: React.FC = () => {
         } catch {
           data = null;
         }
-if (data) {
+        if (data) {
           setEvent(data);
           setAttendeeCount(data.attendees?.length || 0);
 
           const token = localStorage.getItem('userToken');
-          if (token) {
+          const currentEmail = localStorage.getItem('userEmail');
+          if (token || currentEmail) {
             try {
-              const payload = JSON.parse(atob(token.split('.')[1]));
-              if (data.user && data.user.id === payload.id) {
-                setIsHost(true);
+              let payload: any = {};
+              if (token && token.includes('.')) {
+                try {
+                  payload = JSON.parse(atob(token.split('.')[1]));
+                } catch {
+                  /* ignore */
+                }
               }
-              if (data.attendees) {
-                const isAttending = data.attendees.some((a: any) => a.id === payload.id);
+
+              // Resilient host detection
+              const isHostUser = Boolean(
+                data.user && (
+                  (currentEmail && data.user.email && data.user.email.toLowerCase() === currentEmail.toLowerCase()) ||
+                  (payload.id && data.user.id === payload.id) ||
+                  (payload.user_id && (data.user.firebaseUid === payload.user_id || data.user.id === payload.user_id)) ||
+                  (payload.sub && (data.user.firebaseUid === payload.sub || data.user.id === payload.sub))
+                )
+              );
+              setIsHost(isHostUser);
+
+              // Resilient attendee matching
+              if (data.attendees && Array.isArray(data.attendees)) {
+                const isAttending = data.attendees.some((a: any) => {
+                  if (currentEmail && a.email && a.email.toLowerCase() === currentEmail.toLowerCase()) return true;
+                  if (payload.id && a.id === payload.id) return true;
+                  if (payload.user_id && (a.firebaseUid === payload.user_id || a.id === payload.user_id)) return true;
+                  if (payload.sub && (a.firebaseUid === payload.sub || a.id === payload.sub)) return true;
+                  return false;
+                });
                 setIsInterested(isAttending);
               }
             } catch {
@@ -148,33 +172,19 @@ if (data) {
     setIsLoadingRsvp(true);
     try {
       const res = await api.toggleEventRsvp(event.id.toString(), token);
-      setIsInterested(res.isAttending);
-      setAttendeeCount(prev => res.isAttending ? prev + 1 : prev - 1);
-      if (res.isAttending) {
+      const attending = res.isAttending ?? res.rsvpd ?? !isInterested;
+      setIsInterested(attending);
+      setAttendeeCount(prev => attending ? prev + 1 : Math.max(0, prev - 1));
+      if (attending) {
         confetti({
           particleCount: 90,
           spread: 80,
           origin: { y: 0.6 }
         });
       }
-      toast.success(res.message);
-    } catch {
-      // Optimistic RSVP fallback
-      setIsInterested(prev => {
-        const next = !prev;
-        setAttendeeCount(cnt => next ? cnt + 1 : cnt - 1);
-        if (next) {
-          confetti({
-            particleCount: 90,
-            spread: 80,
-            origin: { y: 0.6 }
-          });
-          toast.success("RSVP Confirmed! See you at the event.");
-        } else {
-          toast.success("RSVP Cancelled.");
-        }
-        return next;
-      });
+      toast.success(res.message || (attending ? "RSVP confirmed! See you at the event." : "RSVP removed."));
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update RSVP.");
     } finally {
       setIsLoadingRsvp(false);
     }

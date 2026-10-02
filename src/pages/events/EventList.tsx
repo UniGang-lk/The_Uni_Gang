@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     LuCalendar, LuMapPin, LuGraduationCap,
     LuClock, LuMessageCircle, LuArrowRight, LuSparkles,
-    LuTicket, LuPlus
+    LuTicket, LuPlus, LuSearch, LuX
 } from "react-icons/lu";
 import { motion, AnimatePresence } from "framer-motion";
 import TiltCard from '../../components/ui/TiltCard';
@@ -48,6 +48,10 @@ const EventList: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [events, setEvents] = useState<any[]>([]);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('All');
+
+    const CATEGORY_TABS = ['All', 'Tech', 'Culture', 'Sports', 'Business', 'Academic', 'Lifestyle'];
 
     const loadEvents = async (silent = false) => {
         try {
@@ -73,8 +77,24 @@ const EventList: React.FC = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const displayEvents = events;
-    const featuredEvent = displayEvents[0] || null;
+    const filteredEvents = events.filter((e) => {
+        const term = searchTerm.toLowerCase().trim();
+        const matchesSearch = !term ||
+            (e.title || '').toLowerCase().includes(term) ||
+            (e.location || '').toLowerCase().includes(term) ||
+            (e.uni || e.university || '').toLowerCase().includes(term) ||
+            (e.faculty || '').toLowerCase().includes(term) ||
+            (e.description || '').toLowerCase().includes(term) ||
+            (e.category || '').toLowerCase().includes(term);
+
+        const matchesCategory = selectedCategory === 'All' ||
+            (e.category || '').toLowerCase() === selectedCategory.toLowerCase();
+
+        return matchesSearch && matchesCategory;
+    });
+
+    const displayEvents = filteredEvents;
+    const featuredEvent = events[0] || null;
     const featuredImageUrl = featuredEvent?.image
         ? (featuredEvent.image.startsWith('http') ? featuredEvent.image : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${featuredEvent.image}`)
         : "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=1200";
@@ -269,13 +289,13 @@ const EventList: React.FC = () => {
                             </div>
 
                             {/* Section Header */}
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                                 <div>
                                     <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                                         Upcoming University Events
                                     </h2>
                                     <p className="text-slate-500 dark:text-slate-400 font-semibold text-xs mt-1">
-                                        Showing {displayEvents.length} active campus events
+                                        Showing {displayEvents.length} {displayEvents.length === 1 ? 'event' : 'events'} {events.length !== displayEvents.length ? `(filtered from ${events.length} total)` : 'live'}
                                     </p>
                                 </div>
 
@@ -297,6 +317,45 @@ const EventList: React.FC = () => {
                                         Free
                                     </span>
                                 </motion.button>
+                            </div>
+
+                            {/* Search Bar & Category Filters */}
+                            <div className="space-y-4 mb-8">
+                                <div className="relative">
+                                    <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 w-5 h-5 pointer-events-none" />
+                                    <input
+                                        type="text"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        placeholder="Search by event title, university (UOM, SLIIT, Colombo...), or category..."
+                                        className="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition-all"
+                                    />
+                                    {searchTerm && (
+                                        <button
+                                            onClick={() => setSearchTerm('')}
+                                            className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 border-none bg-transparent cursor-pointer"
+                                        >
+                                            <LuX className="w-4 h-4" />
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* Category Pills */}
+                                <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+                                    {CATEGORY_TABS.map((cat) => (
+                                        <button
+                                            key={cat}
+                                            onClick={() => setSelectedCategory(cat)}
+                                            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer border ${
+                                                selectedCategory === cat
+                                                    ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/25'
+                                                    : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:border-blue-400/50 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                            }`}
+                                        >
+                                            {cat}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
                             {/* Events Grid */}
