@@ -301,8 +301,24 @@ const BlogDetail: React.FC = () => {
   const userEmail = getLoggedInUserEmail();
   const currentUserId = localStorage.getItem('userId');
   const currentUserName = localStorage.getItem('userName');
+  const userToken = localStorage.getItem('userToken');
+  let tokenUid = '';
+  let tokenRole = '';
+  if (userToken && userToken.includes('.')) {
+    try {
+      const payload = JSON.parse(atob(userToken.split('.')[1]));
+      tokenUid = payload.id || payload.user_id || payload.sub || '';
+      tokenRole = payload.role || '';
+    } catch {
+      /* ignore */
+    }
+  }
+
+  const isAdmin = tokenRole === 'admin' || localStorage.getItem('userRole') === 'admin';
+
   const isAuthor = Boolean(
     blog?.author && (
+      (tokenUid && (blog.author.id === tokenUid || (blog.author as any).firebaseUid === tokenUid)) ||
       (currentUserId && blog.author.id === currentUserId) ||
       (userEmail && (blog.author as any)?.email && (blog.author as any).email.toLowerCase() === userEmail.toLowerCase()) ||
       (currentUserName && blog.author.name && blog.author.name.toLowerCase() === currentUserName.toLowerCase())
@@ -711,7 +727,22 @@ const BlogDetail: React.FC = () => {
                     <div className="space-y-4">
                       {blog.comments && blog.comments.length > 0 ? (
                         blog.comments.map((comment) => {
-                          const isOwner = comment.user?.email === userEmail;
+                          const isCommentOwner = Boolean(
+                            comment.user && (
+                              (userEmail && comment.user.email && comment.user.email.toLowerCase() === userEmail.toLowerCase()) ||
+                              (tokenUid && (comment.user.id === tokenUid || (comment.user as any).firebaseUid === tokenUid || comment.userId === tokenUid)) ||
+                              (currentUserId && (comment.user.id === currentUserId || comment.userId === currentUserId)) ||
+                              (currentUserName && comment.user.name && comment.user.name.toLowerCase() === currentUserName.toLowerCase())
+                            )
+                          );
+                          const canDelete = isCommentOwner || isAuthor || isAdmin;
+                          const isCommentAuthorOfBlog = Boolean(
+                            blog.author && comment.user && (
+                              (blog.author.id && comment.user.id && blog.author.id === comment.user.id) ||
+                              ((blog.author as any).email && comment.user.email && (blog.author as any).email.toLowerCase() === comment.user.email.toLowerCase())
+                            )
+                          );
+
                           return (
                             <div
                               key={comment.id}
@@ -728,15 +759,20 @@ const BlogDetail: React.FC = () => {
                                     <span className="font-bold text-xs text-slate-900 dark:text-white">
                                       {comment.user?.name || 'Anonymous'}
                                     </span>
+                                    {isCommentAuthorOfBlog && (
+                                      <span className="px-1.5 py-0.5 rounded-md bg-amber-400/20 text-amber-600 dark:text-amber-400 font-black text-[9px] uppercase tracking-wider">
+                                        Author
+                                      </span>
+                                    )}
                                     <span className="text-[10px] text-slate-400">
                                       {new Date(comment.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                                     </span>
                                   </div>
-                                  {isOwner && (
+                                  {canDelete && (
                                     <button
                                       onClick={() => handleCommentDelete(comment.id)}
-                                      className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 p-1 transition-all"
-                                      title="Delete comment"
+                                      className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 p-1 transition-all cursor-pointer border-none bg-transparent"
+                                      title={isCommentOwner ? "Delete your comment" : (isAuthor ? "Delete comment (as Story Author)" : "Delete comment (as Admin)")}
                                     >
                                       <LuTrash2 className="w-3.5 h-3.5" />
                                     </button>
