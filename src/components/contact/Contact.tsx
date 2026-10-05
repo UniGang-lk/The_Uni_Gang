@@ -14,56 +14,7 @@ interface Feedback {
     rating: number;
 }
 
-const feedbacks: Feedback[] = [
-    {
-        id: 1,
-        name: "Amara Perera",
-        role: "Club President, UOM",
-        comment: "The Uni Gang designed our club's website perfectly! The campus events display is a game changer for our member engagement.",
-        avatar: "https://i.pravatar.cc/150?u=1",
-        rating: 5,
-    },
-    {
-        id: 2,
-        name: "Kasun Jayawardena",
-        role: "Annex Owner",
-        comment: "Outstanding SEO services. Our annex listings are now on the first page of search results, bringing in more students than ever.",
-        avatar: "https://i.pravatar.cc/150?u=2",
-        rating: 5,
-    },
-    {
-        id: 3,
-        name: "Sajini Fernando",
-        role: "Secretary, Student Society",
-        comment: "The web app they developed for our student society is incredibly intuitive and fast. Highly recommend their development team!",
-        avatar: "https://i.pravatar.cc/150?u=3",
-        rating: 4,
-    },
-    {
-        id: 4,
-        name: "Nuwan Silva",
-        role: "University Student",
-        comment: "I love how easy it is to find and track campus events here. Great service for students to stay connected.",
-        avatar: "https://i.pravatar.cc/150?u=4",
-        rating: 5,
-    },
-    {
-        id: 5,
-        name: "Dilini Ratnayake",
-        role: "Tech Entrepreneur",
-        comment: "Professional web designing at its best. They really understood our brand identity and delivered a stunning platform.",
-        avatar: "https://i.pravatar.cc/150?u=5",
-        rating: 5,
-    },
-    {
-        id: 6,
-        name: "Tharindu Bandara",
-        role: "Event Organizer",
-        comment: "Their digital solutions have significantly improved our engagement. The event listing feature is top-notch.",
-        avatar: "https://i.pravatar.cc/150?u=6",
-        rating: 5,
-    }
-];
+
 
 
 
@@ -142,8 +93,8 @@ const Contact = () => {
     const [feedbackText, setFeedbackText] = useState('');
     const [feedbackSuccess, setFeedbackSuccess] = useState(false);
 
-    // Dynamic testimonials state
-    const [activeFeedbacks, setActiveFeedbacks] = useState<Feedback[]>(feedbacks);
+    // Dynamic testimonials state (Real approved client feedbacks only)
+    const [activeFeedbacks, setActiveFeedbacks] = useState<Feedback[]>([]);
 
     // Copy states
     const [copiedItem, setCopiedItem] = useState<string | null>(null);
@@ -153,16 +104,20 @@ const Contact = () => {
         const fetchFeedbacks = async () => {
             try {
                 const approved = await api.getApprovedFeedbacks();
-                if (approved && approved.length > 0) {
+                if (Array.isArray(approved) && approved.length > 0) {
                     const mapped: Feedback[] = approved.map((f: any) => ({
                         id: f.id,
                         name: f.name,
                         role: f.institution || 'Verified Client',
                         comment: f.comment,
-                        avatar: f.avatar.startsWith('http') ? f.avatar : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${f.avatar}`,
-                        rating: f.rating
+                        avatar: f.avatar
+                            ? (f.avatar.startsWith('http') ? f.avatar : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${f.avatar}`)
+                            : `https://ui-avatars.com/api/?name=${encodeURIComponent(f.name || 'User')}&background=0D8ABC&color=fff`,
+                        rating: f.rating || 5
                     }));
                     setActiveFeedbacks(mapped);
+                } else {
+                    setActiveFeedbacks([]);
                 }
             } catch (err) {
                 console.error("Failed to load approved feedbacks:", err);
@@ -539,24 +494,39 @@ const Contact = () => {
                     <div className="w-24 h-1 bg-gradient-to-r from-transparent via-[#E91E63] to-transparent mx-auto"></div>
                 </motion.div>
 
-                <div className="relative overflow-hidden pt-15 pb-30">
-                    <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-[#f7f9fb] dark:from-slate-950 to-transparent z-10 pointer-events-none"></div>
-                    <div className="absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-[#f7f9fb] dark:from-slate-950 to-transparent z-10 pointer-events-none"></div>
+                {activeFeedbacks.length >= 3 ? (
+                    <div className="relative overflow-hidden pt-15 pb-30">
+                        <div className="absolute inset-y-0 left-0 w-40 bg-gradient-to-r from-[#f7f9fb] dark:from-slate-950 to-transparent z-10 pointer-events-none"></div>
+                        <div className="absolute inset-y-0 right-0 w-40 bg-gradient-to-l from-[#f7f9fb] dark:from-slate-950 to-transparent z-10 pointer-events-none"></div>
 
-                    <div className="flex gap-8 animate-marquee">
-                        {[...activeFeedbacks, ...activeFeedbacks, ...activeFeedbacks].map((f, i) => (
-                            <TestimonialCard key={`${f.id}-${i}`} feedback={f} />
+                        <div className="flex gap-8 animate-marquee">
+                            {[...activeFeedbacks, ...activeFeedbacks, ...activeFeedbacks].map((f, i) => (
+                                <TestimonialCard key={`${f.id}-${i}`} feedback={f} />
+                            ))}
+                        </div>
+
+                        <style dangerouslySetInnerHTML={{
+                            __html: `
+                                @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-33.33%); } }
+                                .animate-marquee { animation: marquee 60s linear infinite; width: max-content; }
+                                .animate-marquee:hover { animation-play-state: paused; }
+                            `
+                        }} />
+                    </div>
+                ) : activeFeedbacks.length > 0 ? (
+                    <div className="py-12 flex flex-wrap justify-center gap-8 items-center max-w-5xl mx-auto">
+                        {activeFeedbacks.map((f) => (
+                            <TestimonialCard key={f.id} feedback={f} />
                         ))}
                     </div>
-
-                    <style dangerouslySetInnerHTML={{
-                        __html: `
-                            @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-33.33%); } }
-                            .animate-marquee { animation: marquee 60s linear infinite; width: max-content; }
-                            .animate-marquee:hover { animation-play-state: paused; }
-                        `
-                    }} />
-                </div>
+                ) : (
+                    <div className="py-16 text-center max-w-md mx-auto">
+                        <div className="p-6 rounded-3xl bg-slate-100/50 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800">
+                            <p className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">No Client Testimonials Approved Yet</p>
+                            <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">Be the first to share your experience! Submit your review above and our admin desk will publish it.</p>
+                        </div>
+                    </div>
+                )}
 
             </div>
         </section>

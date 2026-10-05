@@ -8,24 +8,43 @@ import PremiumPageLoader from '../components/ui/PremiumPageLoader';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
 
+import { api } from '../api';
+
 const ContactUsPage = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 300);
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ name, email, message });
-    setName('');
-    setEmail('');
-    setMessage('');
-    toast.success('Message sent successfully!');
+    if (!name.trim() || !email.trim() || !message.trim()) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await api.submitSupportProblem({
+        name: name.trim(),
+        email: email.trim(),
+        inquiryType: 'General Support Inquiry',
+        message: message.trim()
+      });
+      setName('');
+      setEmail('');
+      setMessage('');
+      toast.success('🎉 Message sent successfully! Our support team will contact you shortly.');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to send message. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -91,9 +110,10 @@ const ContactUsPage = () => {
             </div>
             <button
               type="submit"
-              className="w-full bg-brand-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-200 hover:bg-brand-700 hover:shadow-xl transition-all flex items-center justify-center gap-2"
+              disabled={submitting}
+              className="w-full bg-brand-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-brand-200 hover:bg-brand-700 hover:shadow-xl disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              Send Message <LuSend className="w-5 h-5" />
+              {submitting ? 'Sending...' : 'Send Message'} <LuSend className="w-5 h-5" />
             </button>
           </form>
         </div>
