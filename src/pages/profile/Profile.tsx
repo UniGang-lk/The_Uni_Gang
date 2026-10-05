@@ -18,7 +18,7 @@ import { playNotificationSound, requestNotificationPermission, triggerPushNotifi
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
 
 const getInputClasses = (isEditing: boolean, focusTheme: 'blue' | 'purple' | 'indigo' | 'brand', isPassword = false) => {
-  const base = `w-full pl-14 ${isPassword ? 'pr-14' : 'pr-8'} py-5 rounded-full text-sm font-bold transition-all duration-300 focus:outline-none`;
+  const base = `w-full pl-12 ${isPassword ? 'pr-12' : 'pr-4'} py-3 rounded-xl text-sm font-semibold transition-all duration-300 focus:outline-none`;
 
   if (isEditing) {
     let focusClasses = "";
@@ -38,7 +38,7 @@ const getInputClasses = (isEditing: boolean, focusTheme: 'blue' | 'purple' | 'in
 };
 
 const getIconClasses = (isEditing: boolean, theme: 'blue' | 'purple' | 'indigo' | 'brand') => {
-  const base = "absolute left-3 p-2 rounded-full transition-all duration-300";
+  const base = "absolute left-3 p-2 rounded-lg transition-all duration-300";
   if (isEditing) {
     if (theme === 'blue') {
       return `${base} bg-blue-500/10 text-blue-500 dark:bg-blue-500/20 dark:text-blue-400`;
@@ -264,6 +264,17 @@ const Profile = () => {
         body: data.message?.message || 'You received a new message regarding a campus event.'
       });
       fetchEventChats();
+    });
+
+    socket.on('new_notification', (data: any) => {
+      playNotificationSound();
+      triggerPushNotification(data.title || 'Notification', {
+        body: data.message || 'You have a new update.'
+      });
+    });
+
+    socket.on('blog_updated', (data: any) => {
+      setSubmittedBlogs(prev => prev.map(b => b.id === data.blogId ? { ...b, status: data.status, ...(data.blog || {}) } : b));
     });
 
     return () => {
@@ -814,403 +825,324 @@ const Profile = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="max-w-6xl mx-auto relative z-10"
+            className="max-w-7xl mx-auto relative z-10"
           >
-            <motion.div
-              className="relative glass-card rounded-[3rem] shadow-2xl backdrop-blur-3xl overflow-hidden border border-slate-200/60 dark:border-white/10"
-            >
-              {/* ── Subdued Header Area ───────────────────── */}
-              <div className="h-64 relative overflow-hidden group">
-                <div className="absolute inset-0 bg-linear-to-br from-blue-600/10 via-indigo-600/10 to-purple-600/10 translate-z-0"></div>
-                <div className="absolute inset-0 opacity-20"
-                  style={{
-                    backgroundImage: `radial-gradient(at 10% 10%, #3b82f6 0, transparent 40%), 
-                                      radial-gradient(at 90% 10%, #6366f1 0, transparent 40%)`
-                  }}
-                />
+            <div className="grid grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)] gap-6 items-start">
 
-                <div className="absolute top-8 right-8 flex gap-3">
-                  <button className="p-3 rounded-full bg-white/40 dark:bg-black/20 backdrop-blur-xl border border-white/40 dark:border-white/10 text-slate-700 dark:text-white hover:bg-white/60 transition-all hover:scale-110 shadow-sm">
-                    <LuSettings className="w-5 h-5" />
-                  </button>
-                  <button className="p-3 rounded-full bg-white/40 dark:bg-black/20 backdrop-blur-xl border border-white/40 dark:border-white/10 text-slate-700 dark:text-white hover:bg-red-500/20 transition-all hover:scale-110 shadow-sm">
-                    <LuLogOut className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
+              {/* ═════════ LEFT: Profile Sidebar ═════════ */}
+              <aside className="lg:sticky lg:top-24 space-y-4">
+                <div className="rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm overflow-hidden">
+                  {/* Cover */}
+                  <div className="h-24 relative bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600">
+                    <div
+                      className="absolute inset-0 opacity-30"
+                      style={{ backgroundImage: 'radial-gradient(at 20% 20%, rgba(255,255,255,0.4) 0, transparent 50%)' }}
+                    />
+                    <div className="absolute top-3 right-3 flex gap-1.5">
+                      <button type="button" aria-label="Settings" className="p-2 rounded-lg bg-white/15 hover:bg-white/25 border border-white/20 text-white transition-all cursor-pointer">
+                        <LuSettings className="w-4 h-4" />
+                      </button>
+                      <button type="button" aria-label="Log out" className="p-2 rounded-lg bg-white/15 hover:bg-red-500/70 border border-white/20 text-white transition-all cursor-pointer">
+                        <LuLogOut className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
 
-              <div className="px-8 sm:px-16 pb-20">
-                {/* ── Identity & Circular Avatar ───────────────────── */}
-                <div className="relative -mt-32 mb-12 flex flex-col md:flex-row items-center md:items-end justify-between gap-10">
-                  <div className="flex flex-col md:flex-row items-center md:items-end gap-8 text-center md:text-left">
-                    <div className="relative group/avatar">
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        className={`relative p-1.5 rounded-full shadow-lg ${
+                  <div className="px-5 pb-5 -mt-12 text-center">
+                    {/* Avatar */}
+                    <div className="relative inline-block">
+                      <div
+                        className={`p-1 rounded-full shadow-lg ${
                           isVerifiedStudent
-                            ? 'bg-gradient-to-tr from-amber-400 via-yellow-300 to-orange-400 shadow-amber-400/50'
-                            : 'bg-linear-to-tr from-blue-300 via-indigo-300 to-purple-300'
+                            ? 'bg-gradient-to-tr from-amber-400 via-yellow-300 to-orange-400'
+                            : 'bg-white dark:bg-slate-800'
                         }`}
                       >
-                        <div className="w-48 h-48 rounded-full border-[6px] border-white dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900 shadow-inner relative z-10 transition-colors">
+                        <div className="w-24 h-24 rounded-full border-4 border-white dark:border-slate-900 overflow-hidden bg-slate-100 dark:bg-slate-800 relative">
                           {profilePicture ? (
                             <img src={profilePicture} alt="Profile" className="w-full h-full object-cover" />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-slate-50 dark:bg-slate-800">
-                              <LuUser className="w-20 h-20 text-slate-200 dark:text-slate-700" />
+                            <div className="w-full h-full flex items-center justify-center">
+                              <LuUser className="w-10 h-10 text-slate-300 dark:text-slate-600" />
                             </div>
                           )}
-
                           <AnimatePresence>
                             {isEditing && (
                               <motion.button
+                                type="button"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 onClick={() => fileInputRef.current?.click()}
-                                className="absolute inset-0 z-20 flex items-center justify-center bg-black/20 backdrop-blur-[2px] text-white transition-all rounded-full"
+                                className="absolute inset-0 z-20 flex items-center justify-center bg-black/45 text-white cursor-pointer border-none"
                               >
-                                <div className="p-3.5 bg-white/20 rounded-full backdrop-blur-md border border-white/40 hover:bg-white/30 transition-all">
-                                  <LuCamera className="w-7 h-7" />
-                                </div>
+                                <LuCamera className="w-5 h-5" />
                               </motion.button>
                             )}
                           </AnimatePresence>
                         </div>
-                      </motion.div>
+                      </div>
                       <input type="file" ref={fileInputRef} onChange={handleProfilePictureChange} className="hidden" accept="image/*" />
                     </div>
 
-                    <div className="mb-2">
-                      <div className="flex items-center justify-center md:justify-start gap-4 mb-3">
-                        <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-none">
+                    {/* Identity */}
+                    <div className="mt-3 space-y-2">
+                      <div className="flex items-center justify-center gap-2">
+                        <h1 className="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
                           {firstName} {lastName}
                         </h1>
-                        {(isVerifiedStudent || isVerifiedLandlord) ? (
-                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-blue-500/10 to-indigo-500/10 dark:from-blue-500/20 dark:to-indigo-500/10 border border-blue-500/30 dark:border-blue-500/20 text-blue-600 dark:text-blue-400 shadow-sm cursor-default select-none">
-                            <VerifiedBadge size={18} title="Verified Student Member" />
-                            <span className="text-[10px] font-black uppercase tracking-widest hidden sm:block">Verified Student</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/20 dark:border-blue-500/10 text-blue-600 dark:text-blue-400 shadow-sm cursor-default select-none">
-                            <LuShieldCheck className="w-5 h-5" />
-                            <span className="text-[10px] font-black uppercase tracking-widest hidden sm:block">Email Verified</span>
-                          </div>
-                        )}
+                        {(isVerifiedStudent || isVerifiedLandlord) && <VerifiedBadge size={18} title="Verified Student Member" />}
                       </div>
 
-                      <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                        <span className="text-slate-400 dark:text-slate-400 font-bold uppercase tracking-widest text-[10px]">Community Member</span>
-                        {(myAnnexes.length > 0 || submittedEvents.length > 0 || myListings.length > 0) && (
-                          <>
-                            <span className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800"></span>
-                            <div className="flex gap-2 flex-wrap">
-                              {myAnnexes.length > 0 && (
-                                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/5 dark:bg-indigo-500/20 text-indigo-500 dark:text-indigo-400 border border-indigo-500/10 dark:border-white/10 text-[9px] font-black uppercase tracking-wider">
-                                  Annex Provider
-                                </div>
-                              )}
-                              {submittedEvents.length > 0 && (
-                                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-500/5 dark:bg-pink-500/20 text-pink-500 dark:text-pink-400 border border-pink-500/10 dark:border-white/10 text-[9px] font-black uppercase tracking-wider">
-                                  Event Master
-                                </div>
-                              )}
-                              {myListings.length > 0 && (
-                                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/5 dark:bg-cyan-500/20 text-cyan-500 dark:text-cyan-400 border border-cyan-500/10 dark:border-white/10 text-[9px] font-black uppercase tracking-wider">
-                                  Market Seller
-                                </div>
-                              )}
-                            </div>
-                          </>
-                        )}
+                      {(isVerifiedStudent || isVerifiedLandlord) ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/25 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider">
+                          Verified Student
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-500/10 border border-slate-400/25 text-slate-600 dark:text-slate-300 text-[10px] font-bold uppercase tracking-wider">
+                          <LuShieldCheck className="w-3.5 h-3.5" /> Email Verified
+                        </span>
+                      )}
+
+                      <div className="space-y-1 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        {email && <p className="flex items-center justify-center gap-1.5 truncate"><LuMail className="w-3.5 h-3.5 shrink-0" /> <span className="truncate">{email}</span></p>}
+                        {university && <p className="flex items-center justify-center gap-1.5"><LuGraduationCap className="w-3.5 h-3.5 shrink-0" /> <span className="truncate">{university}</span></p>}
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider">Member</span>
+                        {myAnnexes.length > 0 && <span className="px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold uppercase tracking-wider">Annex Provider</span>}
+                        {submittedEvents.length > 0 && <span className="px-2 py-0.5 rounded-md bg-pink-500/10 text-pink-600 dark:text-pink-400 text-[10px] font-bold uppercase tracking-wider">Event Master</span>}
+                        {myListings.length > 0 && <span className="px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 text-[10px] font-bold uppercase tracking-wider">Market Seller</span>}
                       </div>
                     </div>
-                  </div>
 
-                  <div className="flex-shrink-0 mb-4">
-                    <AnimatePresence mode="wait">
-                      {!isEditing ? (
-                        <motion.button
-                          key="edit-btn"
-                          whileHover={{ scale: 1.05, y: -4 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setIsEditing(true)}
-                          className="group relative flex items-center gap-3 px-10 py-5 bg-white dark:bg-white/5 backdrop-blur-xl text-slate-700 dark:text-white font-black text-[11px] uppercase tracking-[0.2em] rounded-full border border-slate-200 dark:border-white/10 shadow-lg transition-all"
-                        >
-                          <LuPencil className="w-4 h-4 shadow-sm" /> Refine Identity
-                        </motion.button>
-                      ) : (
-                        <motion.div
-                          key="actions"
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          className="flex gap-4"
-                        >
-                          <button
-                            onClick={() => setIsEditing(false)}
-                            className="px-8 py-5 bg-slate-50 dark:bg-slate-800 backdrop-blur-xl text-slate-400 dark:text-slate-500 font-bold rounded-full hover:bg-slate-100 transition-all text-[11px] uppercase tracking-widest border border-slate-200 dark:border-slate-700"
-                          >
-                            Cancel
-                          </button>
+                    {/* Edit actions */}
+                    <div className="mt-5">
+                      <AnimatePresence mode="wait">
+                        {!isEditing ? (
                           <motion.button
-                            whileHover={{ scale: 1.05, y: -4 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={handleSave}
-                            className="group flex items-center gap-3 px-10 py-5 bg-blue-600 text-white font-black text-[11px] uppercase tracking-widest rounded-full shadow-xl shadow-blue-600/20"
+                            key="edit-btn"
+                            type="button"
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => setIsEditing(true)}
+                            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold text-xs rounded-xl hover:opacity-90 transition-all cursor-pointer border-none"
                           >
-                            <LuSave className="w-4 h-4" /> Lock Changes
+                            <LuPencil className="w-4 h-4" /> Edit Profile
                           </motion.button>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                        ) : (
+                          <motion.div key="actions" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setIsEditing(false)}
+                              className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all text-xs border border-slate-200 dark:border-slate-700 cursor-pointer"
+                            >
+                              Cancel
+                            </button>
+                            <motion.button
+                              type="button"
+                              whileTap={{ scale: 0.98 }}
+                              onClick={handleSave}
+                              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-blue-600/25 transition-all cursor-pointer border-none"
+                            >
+                              <LuSave className="w-4 h-4" /> Save
+                            </motion.button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
                 </div>
 
-                {/* ── Segmented Navigation Tab Bar ─────────────────── */}
-                <div className="mb-10 flex overflow-x-auto custom-scrollbar p-1.5 bg-slate-200/50 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-slate-300/40 dark:border-white/10 shrink-0">
+                {/* Navigation */}
+                <nav className="rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm p-2 flex lg:flex-col gap-1 overflow-x-auto custom-scrollbar">
                   {[
-                    { id: 'overview', label: 'Overview & Profile', icon: LuUser },
-                    { id: 'annexes', label: `My Annexes (${myAnnexes.length})`, icon: LuBuilding },
-                    { id: 'marketplace', label: `Marketplace (${myListings.length})`, icon: LuLayoutGrid },
-                    { id: 'events', label: `Events & Services (${submittedEvents.length + serviceRequests.length})`, icon: LuCalendar },
-                    { id: 'security', label: 'Security & Preferences', icon: LuLock }
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => setActiveProfileTab(tab.id as any)}
-                      className={`flex-1 min-w-[150px] flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 border-none cursor-pointer ${
-                        activeProfileTab === tab.id
-                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-transparent'
-                      }`}
-                    >
-                      <tab.icon className="w-4 h-4" />
-                      <span>{tab.label}</span>
-                    </button>
-                  ))}
-                </div>
+                    { id: 'overview', label: 'Overview', icon: LuUser, count: null as number | null },
+                    { id: 'annexes', label: 'My Annexes', icon: LuBuilding, count: myAnnexes.length },
+                    { id: 'marketplace', label: 'Marketplace', icon: LuLayoutGrid, count: myListings.length },
+                    { id: 'events', label: 'Events & Services', icon: LuCalendar, count: submittedEvents.length + serviceRequests.length },
+                    { id: 'security', label: 'Security', icon: LuLock, count: null as number | null },
+                  ].map((tab) => {
+                    const active = activeProfileTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setActiveProfileTab(tab.id as any)}
+                        className={`shrink-0 lg:w-full flex items-center justify-between gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border-none ${
+                          active
+                            ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25'
+                            : 'bg-transparent text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2.5 whitespace-nowrap"><tab.icon className="w-4 h-4" /> {tab.label}</span>
+                        {tab.count !== null && (
+                          <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${active ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>{tab.count}</span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </nav>
 
-                {/* ── Subdued Stats Section ────────────────────────── */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-16">
+                <p className="hidden lg:block text-center text-[10px] font-semibold text-slate-400 dark:text-slate-600 uppercase tracking-widest">
+                  Protected by UniGang Security
+                </p>
+              </aside>
+
+              {/* ═════════ RIGHT: Content ═════════ */}
+              <main className="space-y-6 min-w-0">
+                {/* Key metrics */}
+                <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
                   {[
                     { label: 'Followers', value: stats.followers, icon: LuUser, color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
                     { label: 'Following', value: stats.following, icon: LuActivity, color: 'text-blue-500', bg: 'bg-blue-500/10' },
                     { label: 'Activity', value: `${stats.activityScore}%`, icon: LuActivity, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-                    { label: 'Points', value: stats.rewardPoints, icon: LuTrophy, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-                    { label: 'Inbox (Messages)', value: marketplaceChats.length + eventChats.length + supportProblems.length, icon: LuMessageSquare, color: 'text-blue-500', bg: 'bg-blue-500/10', onClick: () => { setShowInboxModal(true); fetchSupportProblems(); fetchChats(); fetchEventChats(); } },
-                    { label: 'My Listings', value: myListings.length, icon: LuLayoutGrid, color: 'text-orange-500', bg: 'bg-orange-500/10', onClick: () => setShowListingsModal(true) },
-                    { label: 'My Ads', value: myAds.length, icon: LuMegaphone, color: 'text-rose-500', bg: 'bg-rose-500/10', onClick: () => setShowAdsModal(true) },
-                    { label: 'My Orders', value: myOrders.length, icon: LuShoppingBag, color: 'text-amber-500', bg: 'bg-amber-500/10', onClick: () => { setShowOrdersModal(true); fetchMyOrders(); } },
-                    { label: 'Services', value: serviceRequests.length, icon: LuBriefcase, color: 'text-sky-500', bg: 'bg-sky-500/10', onClick: () => setShowServicesModal(true) },
-                    { label: 'My Blogs', value: submittedBlogs.length, icon: LuMessageSquare, color: 'text-purple-500', bg: 'bg-purple-500/10', onClick: () => setShowBlogsModal(true) },
-                    { label: 'My Events', value: submittedEvents.length, icon: LuCalendar, color: 'text-pink-500', bg: 'bg-pink-500/10', onClick: () => setShowEventsModal(true) },
-                  ].map((stat, idx) => {
-                    const CardElement = stat.onClick ? 'button' : 'div';
-                    return (
-                      <CardElement
-                        key={idx}
-                        type={stat.onClick ? 'button' : undefined}
-                        onClick={stat.onClick}
-                        className={`p-5 rounded-[2.5rem] bg-white/40 dark:bg-slate-800/35 border border-slate-100 dark:border-white/10 flex flex-col items-center justify-center text-center transition-all shadow-xs ${stat.onClick
-                          ? 'hover:scale-105 hover:bg-white/60 dark:hover:bg-slate-800/50 cursor-pointer active:scale-95 outline-none hover:border-slate-200 dark:hover:border-white/20'
-                          : ''
-                          }`}
-                      >
-                        <div className={`p-3.5 rounded-2xl ${stat.bg} ${stat.color} mb-3`}>
-                          <stat.icon size={20} />
-                        </div>
-                        <div className="text-xl font-black text-slate-800 dark:text-white leading-none mb-1 tracking-tight">{stat.value}</div>
-                        <div className="text-[8px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-350">{stat.label}</div>
-                      </CardElement>
-                    );
-                  })}
-                </div>
-
-                {/* ── TAB 1: OVERVIEW & PROFILE ──────────────────────────── */}
-                {activeProfileTab === 'overview' && (
-                  <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-12 animate-in fade-in duration-300">
-                    {/* ── Personal Info Section ──────────────────────── */}
-                    <div className="space-y-10">
-                      
-                      {/* ── Verification Banner — 3 states ─── */}
-                      {!isVerifiedStudent && (
-                        isVerificationPending ? (
-                          /* Pending state — email entered, awaiting verification code */
-                          <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-6 relative overflow-hidden">
-                            <div className="flex items-start gap-4 relative z-10">
-                              <div className="w-10 h-10 shrink-0 bg-amber-500/15 rounded-full flex items-center justify-center">
-                                <LuClock className="w-5 h-5 text-amber-600" />
-                              </div>
-                              <div>
-                                <h3 className="text-base font-black text-amber-900 mb-1">Verify Campus Email</h3>
-                                <p className="text-sm text-amber-700 font-medium">
-                                  A verification code has been generated for your university email. Please enter the code to complete verification.
-                                </p>
-                                <button
-                                  type="button"
-                                  onClick={() => { setEmailVerificationStep('enter_code'); setShowVerifyIdModal(true); }}
-                                  className="mt-4 inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm cursor-pointer transition-colors shadow-md shadow-amber-500/20 border-none"
-                                >
-                                  <LuShieldCheck className="w-4 h-4" /> Enter Verification Code
-                                </button>
-                              </div>
-                            </div>
-                            <LuClock className="absolute -right-4 -bottom-4 w-28 h-28 text-amber-500/10" />
-                          </div>
-                        ) : (
-                          /* Not submitted — show verify email trigger */
-                          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-3xl p-6 relative overflow-hidden shadow-xl border border-blue-400/30">
-                            <div className="flex items-start justify-between gap-4 relative z-10">
-                              <div>
-                                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider mb-2">
-                                  <LuGraduationCap className="w-4 h-4 text-white shrink-0" /> Official Student Verification
-                                </div>
-                                <h3 className="text-xl font-black text-white mb-2 flex items-center gap-2">
-                                  Verify your .ac.lk Email for Instant Auto-Approval & Blue Badge!
-                                </h3>
-                                <p className="text-sm text-blue-100 font-medium mb-5 max-w-xl leading-relaxed">
-                                  Get instant 10-second verification using your Sri Lankan university email (e.g. .ac.lk, sliit.lk, nsbm.ac.lk). Enjoy auto-approved marketplace ads and 3x higher trust!
-                                </p>
-                                <button
-                                  type="button"
-                                  onClick={() => { setEmailVerificationStep('enter_email'); setShowVerifyIdModal(true); }}
-                                  className="inline-flex items-center gap-2 bg-white text-blue-800 hover:bg-blue-50 px-6 py-3 rounded-2xl font-black text-sm cursor-pointer transition-all shadow-lg hover:scale-105 active:scale-95 border-none"
-                                >
-                                  <LuShieldCheck className="w-5 h-5 text-blue-600" /> Verify with Campus Email Now
-                                </button>
-                              </div>
-                            </div>
-                            <LuShieldCheck className="absolute -right-6 -bottom-6 w-36 h-36 text-white/10" />
-                          </div>
-                        )
-                      )}
-
-                      <div className="flex items-center gap-4 pb-4 border-b border-slate-100 dark:border-slate-800/60 mt-8">
-                        <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-500"><LuUser className="w-6 h-6" /></div>
-                        <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tight">Personal Details</h2>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                        <div className="group space-y-3">
-                          <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-400 ml-2 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors">Forename</label>
-                          <div className="relative flex items-center">
-                            <div className={getIconClasses(isEditing, 'blue')}>
-                              <LuUser className="w-4 h-4" />
-                            </div>
-                            <input
-                              type="text"
-                              value={firstName}
-                              onChange={(e) => setFirstName(e.target.value)}
-                              disabled={!isEditing}
-                              className={getInputClasses(isEditing, 'blue')}
-                            />
-                          </div>
-                        </div>
-                        <div className="group space-y-3">
-                          <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-400 ml-2 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors">Surname</label>
-                          <div className="relative flex items-center">
-                            <div className={getIconClasses(isEditing, 'blue')}>
-                              <LuUser className="w-4 h-4" />
-                            </div>
-                            <input
-                              type="text"
-                              value={lastName}
-                              onChange={(e) => setLastName(e.target.value)}
-                              disabled={!isEditing}
-                              className={getInputClasses(isEditing, 'blue')}
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="group space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-400 ml-2 group-focus-within:text-blue-500 dark:group-focus-within:text-blue-400 transition-colors">Contact Number</label>
-                        <div className="relative flex items-center">
-                          <div className={getIconClasses(isEditing, 'blue')}>
-                            <LuPhone className="w-4 h-4" />
-                          </div>
-                          <input
-                            type="tel"
-                            value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value)}
-                            disabled={!isEditing}
-                            className={getInputClasses(isEditing, 'blue')}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="group space-y-3 opacity-90">
-                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-400 ml-2">Digital Signature (Email)</label>
-                        <div className="relative flex items-center">
-                          <div className="absolute left-3 p-2 rounded-full bg-slate-500/5 text-slate-400 dark:text-slate-500">
-                            <LuMail className="w-4 h-4" />
-                          </div>
-                          <input
-                            type="email"
-                            value={email}
-                            disabled={true}
-                            className="w-full pl-14 pr-8 py-5 rounded-full bg-slate-100/30 dark:bg-slate-800/10 border border-slate-200/40 dark:border-white/5 text-sm font-bold text-slate-500 dark:text-slate-400 cursor-not-allowed"
-                          />
-                        </div>
+                    { label: 'Reward Points', value: stats.rewardPoints, icon: LuTrophy, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+                  ].map((stat) => (
+                    <div key={stat.label} className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm">
+                      <div className={`p-2.5 rounded-xl ${stat.bg} ${stat.color}`}><stat.icon size={18} /></div>
+                      <div>
+                        <div className="text-lg font-black text-slate-900 dark:text-white leading-none">{stat.value}</div>
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1">{stat.label}</div>
                       </div>
                     </div>
+                  ))}
+                </div>
 
-                    {/* ── Social & Academic Section ───────────────────── */}
-                    <div className="space-y-10">
-                      <div className="flex items-center gap-4 pb-4 border-b border-slate-100 dark:border-slate-800/60">
-                        <div className="p-3 bg-purple-500/10 rounded-2xl text-purple-500"><LuBuilding className="w-6 h-6" /></div>
-                        <h2 className="text-xl font-black text-slate-800 dark:text-white tracking-tight">University & Social Networks</h2>
-                      </div>
+                {/* Quick access */}
+                <div className="flex gap-2 overflow-x-auto custom-scrollbar pb-1">
+                  {[
+                    { label: 'Inbox', value: marketplaceChats.length + eventChats.length + supportProblems.length, icon: LuMessageSquare, color: 'text-blue-500', onClick: () => { setShowInboxModal(true); fetchSupportProblems(); fetchChats(); fetchEventChats(); } },
+                    { label: 'Listings', value: myListings.length, icon: LuLayoutGrid, color: 'text-orange-500', onClick: () => setShowListingsModal(true) },
+                    { label: 'Ads', value: myAds.length, icon: LuMegaphone, color: 'text-rose-500', onClick: () => setShowAdsModal(true) },
+                    { label: 'Orders', value: myOrders.length, icon: LuShoppingBag, color: 'text-amber-500', onClick: () => { setShowOrdersModal(true); fetchMyOrders(); } },
+                    { label: 'Services', value: serviceRequests.length, icon: LuBriefcase, color: 'text-sky-500', onClick: () => setShowServicesModal(true) },
+                    { label: 'Blogs', value: submittedBlogs.length, icon: LuMessageSquare, color: 'text-purple-500', onClick: () => setShowBlogsModal(true) },
+                    { label: 'Events', value: submittedEvents.length, icon: LuCalendar, color: 'text-pink-500', onClick: () => setShowEventsModal(true) },
+                  ].map((item) => (
+                    <button
+                      key={item.label}
+                      type="button"
+                      onClick={item.onClick}
+                      className="shrink-0 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 hover:border-blue-400 dark:hover:border-blue-500/60 hover:shadow-sm transition-all cursor-pointer text-xs font-bold text-slate-700 dark:text-slate-200"
+                    >
+                      <item.icon className={`w-4 h-4 ${item.color}`} />
+                      <span>{item.label}</span>
+                      <span className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[10px] font-black text-slate-500 dark:text-slate-400">{item.value}</span>
+                    </button>
+                  ))}
+                </div>
 
-                      <div className="group space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-400 ml-2 group-focus-within:text-purple-500 dark:group-focus-within:text-purple-400 transition-colors">Affiliated Institution</label>
-                        <div className="relative flex items-center">
-                          <div className={getIconClasses(isEditing, 'purple')}>
-                            <LuBuilding className="w-4 h-4" />
+                {/* ── TAB 1: OVERVIEW ── */}
+                {activeProfileTab === 'overview' && (
+                  <form onSubmit={handleSave} className="space-y-6 animate-in fade-in duration-300">
+                    {!isVerifiedStudent && (
+                      isVerificationPending ? (
+                        <div className="flex items-center gap-4 p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20">
+                          <div className="w-10 h-10 shrink-0 bg-amber-500/15 rounded-xl flex items-center justify-center"><LuClock className="w-5 h-5 text-amber-600" /></div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-sm font-bold text-amber-900 dark:text-amber-300">Verify Campus Email</h3>
+                            <p className="text-xs text-amber-700 dark:text-amber-400/80">A verification code was generated for your university email. Enter it to finish verification.</p>
                           </div>
-                          <input
-                            type="text"
-                            value={university}
-                            onChange={(e) => setUniversity(e.target.value)}
-                            disabled={!isEditing}
-                            placeholder="e.g. University of Moratuwa"
-                            className={getInputClasses(isEditing, 'purple')}
-                          />
+                          <button
+                            type="button"
+                            onClick={() => { setEmailVerificationStep('enter_code'); setShowVerifyIdModal(true); }}
+                            className="shrink-0 inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl font-bold text-xs cursor-pointer transition-colors border-none"
+                          >
+                            <LuShieldCheck className="w-4 h-4" /> Enter Code
+                          </button>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white border border-blue-400/30">
+                          <div className="w-10 h-10 shrink-0 bg-white/15 rounded-xl flex items-center justify-center"><LuGraduationCap className="w-5 h-5" /></div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-sm font-bold">Get your Verified Student badge</h3>
+                            <p className="text-xs text-blue-100">Verify with your .ac.lk email for instant approval, auto-approved ads and higher trust.</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => { setEmailVerificationStep('enter_email'); setShowVerifyIdModal(true); }}
+                            className="shrink-0 inline-flex items-center justify-center gap-2 bg-white text-blue-800 hover:bg-blue-50 px-4 py-2 rounded-xl font-bold text-xs cursor-pointer transition-all border-none"
+                          >
+                            <LuShieldCheck className="w-4 h-4" /> Verify Now
+                          </button>
+                        </div>
+                      )
+                    )}
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                        <div className="group space-y-3">
-                          <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-400 ml-2 group-focus-within:text-blue-600 dark:group-focus-within:text-blue-400 transition-colors">Facebook Profile</label>
-                          <div className="relative flex items-center">
-                            <div className={getIconClasses(isEditing, 'blue')}>
-                              <LuFacebook className="w-4 h-4" />
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                      <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm space-y-5">
+                        <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800/60">
+                          <div className="p-2 bg-blue-500/10 rounded-xl text-blue-500"><LuUser className="w-5 h-5" /></div>
+                          <h2 className="text-base font-bold text-slate-900 dark:text-white">Personal Details</h2>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="group space-y-1.5">
+                            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 group-focus-within:text-blue-500 transition-colors">First Name</label>
+                            <div className="relative flex items-center">
+                              <div className={getIconClasses(isEditing, 'blue')}><LuUser className="w-4 h-4" /></div>
+                              <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} disabled={!isEditing} className={getInputClasses(isEditing, 'blue')} />
                             </div>
+                          </div>
+                          <div className="group space-y-1.5">
+                            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 group-focus-within:text-blue-500 transition-colors">Last Name</label>
+                            <div className="relative flex items-center">
+                              <div className={getIconClasses(isEditing, 'blue')}><LuUser className="w-4 h-4" /></div>
+                              <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} disabled={!isEditing} className={getInputClasses(isEditing, 'blue')} />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="group space-y-1.5">
+                          <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 group-focus-within:text-blue-500 transition-colors">Contact Number</label>
+                          <div className="relative flex items-center">
+                            <div className={getIconClasses(isEditing, 'blue')}><LuPhone className="w-4 h-4" /></div>
+                            <input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} disabled={!isEditing} className={getInputClasses(isEditing, 'blue')} />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Email Address</label>
+                          <div className="relative flex items-center">
+                            <div className="absolute left-3 p-2 rounded-lg bg-slate-500/5 text-slate-400 dark:text-slate-500"><LuMail className="w-4 h-4" /></div>
                             <input
-                              type="text"
-                              value={fbHandle}
-                              placeholder="@username"
-                              onChange={(e) => setFbHandle(e.target.value)}
-                              disabled={!isEditing}
-                              className={getInputClasses(isEditing, 'blue')}
+                              type="email"
+                              value={email}
+                              disabled={true}
+                              className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-100/60 dark:bg-slate-800/30 border border-slate-200/60 dark:border-white/5 text-sm font-semibold text-slate-500 dark:text-slate-400 cursor-not-allowed"
                             />
                           </div>
                         </div>
-                        <div className="group space-y-3">
-                          <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-400 ml-2 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors">LinkedIn Profile</label>
+                      </div>
+
+                      <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm space-y-5">
+                        <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800/60">
+                          <div className="p-2 bg-purple-500/10 rounded-xl text-purple-500"><LuBuilding className="w-5 h-5" /></div>
+                          <h2 className="text-base font-bold text-slate-900 dark:text-white">University & Social</h2>
+                        </div>
+
+                        <div className="group space-y-1.5">
+                          <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 group-focus-within:text-purple-500 transition-colors">University</label>
                           <div className="relative flex items-center">
-                            <div className={getIconClasses(isEditing, 'indigo')}>
-                              <LuLinkedin className="w-4 h-4" />
-                            </div>
-                            <input
-                              type="text"
-                              value={linkedinHandle}
-                              placeholder="profile-id"
-                              onChange={(e) => setLinkedinHandle(e.target.value)}
-                              disabled={!isEditing}
-                              className={getInputClasses(isEditing, 'indigo')}
-                            />
+                            <div className={getIconClasses(isEditing, 'purple')}><LuBuilding className="w-4 h-4" /></div>
+                            <input type="text" value={university} onChange={(e) => setUniversity(e.target.value)} disabled={!isEditing} placeholder="e.g. University of Moratuwa" className={getInputClasses(isEditing, 'purple')} />
+                          </div>
+                        </div>
+
+                        <div className="group space-y-1.5">
+                          <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 group-focus-within:text-blue-600 transition-colors">Facebook</label>
+                          <div className="relative flex items-center">
+                            <div className={getIconClasses(isEditing, 'blue')}><LuFacebook className="w-4 h-4" /></div>
+                            <input type="text" value={fbHandle} placeholder="@username" onChange={(e) => setFbHandle(e.target.value)} disabled={!isEditing} className={getInputClasses(isEditing, 'blue')} />
+                          </div>
+                        </div>
+
+                        <div className="group space-y-1.5">
+                          <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 group-focus-within:text-indigo-600 transition-colors">LinkedIn</label>
+                          <div className="relative flex items-center">
+                            <div className={getIconClasses(isEditing, 'indigo')}><LuLinkedin className="w-4 h-4" /></div>
+                            <input type="text" value={linkedinHandle} placeholder="profile-id" onChange={(e) => setLinkedinHandle(e.target.value)} disabled={!isEditing} className={getInputClasses(isEditing, 'indigo')} />
                           </div>
                         </div>
                       </div>
@@ -1218,94 +1150,86 @@ const Profile = () => {
                   </form>
                 )}
 
-                {/* ── TAB 2: MY ANNEXES & BOARDING PLACES ───────────────── */}
+                {/* ── TAB 2: ANNEXES ── */}
                 {activeProfileTab === 'annexes' && (
-                  <div className="space-y-8 animate-in fade-in duration-300">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-200/60 dark:border-slate-800">
+                  <div className="space-y-5 animate-in fade-in duration-300">
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
                       <div>
-                        <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">My Boarding Places & Annexes</h2>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">Manage your active boarding listings and view student inquiries</p>
+                        <h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">My Boarding Places & Annexes</h2>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Manage your listings and view student inquiries</p>
                       </div>
-                      <div className="flex gap-3 flex-wrap">
+                      <div className="flex gap-2 flex-wrap">
                         <button
                           type="button"
                           onClick={() => { setShowInboxModal(true); setInboxTab('annex'); fetchAnnexChats(); }}
-                          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 border-none cursor-pointer"
+                          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:border-blue-400 transition-all cursor-pointer"
                         >
-                          <LuMessageSquare className="w-4 h-4" /> Annex Inquiries ({annexChats.length})
+                          <LuMessageSquare className="w-4 h-4" /> Inquiries ({annexChats.length})
                         </button>
-                        <a
-                          href="/post-ad"
-                          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 border-none cursor-pointer text-decoration-none"
-                        >
-                          <LuBuilding className="w-4 h-4" /> + Post New Annex
+                        <a href="/post-ad" className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all no-underline">
+                          <LuBuilding className="w-4 h-4" /> Post New Annex
                         </a>
                       </div>
                     </div>
 
                     {myAnnexes.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {myAnnexes.map((annexItem: any) => (
-                          <div key={annexItem.id} className="p-5 rounded-3xl bg-white/60 dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/10 shadow-sm flex flex-col justify-between space-y-4">
-                            <div>
-                              <div className="flex justify-between items-start mb-2">
-                                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${annexItem.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-600 border border-amber-500/20'}`}>
+                          <div key={annexItem.id} className="p-5 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-4">
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${annexItem.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-600 border border-amber-500/20'}`}>
                                   {annexItem.status || 'Approved'}
                                 </span>
-                                <span className="text-lg font-black text-blue-600 dark:text-blue-400">Rs. {parseFloat(annexItem.price || 0).toLocaleString()}</span>
+                                <span className="text-sm font-black text-blue-600 dark:text-blue-400">Rs. {parseFloat(annexItem.price || 0).toLocaleString()}</span>
                               </div>
-                              <h4 className="text-lg font-bold text-slate-900 dark:text-white line-clamp-1">{annexItem.title}</h4>
-                              <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 mt-1">{annexItem.address}</p>
+                              <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">{annexItem.title}</h4>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">{annexItem.address}</p>
                             </div>
-                            <a
-                              href={`/annex/${annexItem.id}`}
-                              className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl text-center transition-all block text-decoration-none"
-                            >
-                              View Listing Details
+                            <a href={`/annex/${annexItem.id}`} className="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl text-center transition-all block no-underline">
+                              View Listing
                             </a>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="p-12 text-center rounded-3xl bg-slate-100/50 dark:bg-slate-900/40 border border-dashed border-slate-300 dark:border-slate-800">
-                        <LuBuilding className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-white">No Annex Listings Found</h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-4">You have not posted any boarding places or annexes yet.</p>
-                        <a href="/post-ad" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md text-decoration-none">
-                          + Post Your Boarding Place
-                        </a>
+                      <div className="p-10 text-center rounded-2xl bg-white dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-700">
+                        <LuBuilding className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                        <h3 className="text-sm font-bold text-slate-800 dark:text-white">No annex listings yet</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-4">You have not posted any boarding places or annexes.</p>
+                        <a href="/post-ad" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl no-underline">+ Post Your Boarding Place</a>
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* ── TAB 3: MARKETPLACE & ORDERS ──────────────────────── */}
+                {/* ── TAB 3: MARKETPLACE ── */}
                 {activeProfileTab === 'marketplace' && (
-                  <div className="space-y-8 animate-in fade-in duration-300">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-200/60 dark:border-slate-800">
+                  <div className="space-y-5 animate-in fade-in duration-300">
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
                       <div>
-                        <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Marketplace & Orders</h2>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">Manage your items for sale and view your buyer orders</p>
+                        <h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">Marketplace & Orders</h2>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Manage items for sale and your buyer orders</p>
                       </div>
-                      <div className="flex gap-3 flex-wrap">
+                      <div className="flex gap-2 flex-wrap">
                         <button
                           type="button"
                           onClick={() => { setShowOrdersModal(true); fetchMyOrders(); }}
-                          className="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 border-none cursor-pointer"
+                          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:border-blue-400 transition-all cursor-pointer"
                         >
-                          <LuShoppingBag className="w-4 h-4" /> My Orders ({myOrders.length})
+                          <LuShoppingBag className="w-4 h-4" /> Orders ({myOrders.length})
                         </button>
                         <button
                           type="button"
                           onClick={() => { setShowInboxModal(true); setInboxTab('marketplace'); fetchChats(); }}
-                          className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 border-none cursor-pointer"
+                          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:border-blue-400 transition-all cursor-pointer"
                         >
                           <LuMessageSquare className="w-4 h-4" /> Buyer Chats ({marketplaceChats.length})
                         </button>
                         <button
                           type="button"
                           onClick={() => setShowListingsModal(true)}
-                          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 border-none cursor-pointer"
+                          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all cursor-pointer border-none"
                         >
                           <LuLayoutGrid className="w-4 h-4" /> Manage Listings ({myListings.length})
                         </button>
@@ -1313,159 +1237,126 @@ const Profile = () => {
                     </div>
 
                     {myListings.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                         {myListings.map((item: any) => (
-                          <div key={item.id} className="p-5 rounded-3xl bg-white/60 dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/10 shadow-sm flex flex-col justify-between space-y-4">
-                            <div>
-                              <div className="flex justify-between items-start mb-2">
-                                <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${item.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-600 border border-amber-500/20'}`}>
+                          <div key={item.id} className="p-5 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md transition-all flex flex-col justify-between gap-4">
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${item.status === 'AVAILABLE' ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-600 border border-amber-500/20'}`}>
                                   {item.status || 'AVAILABLE'}
                                 </span>
-                                <span className="text-lg font-black text-indigo-600 dark:text-indigo-400">Rs. {parseFloat(item.price || 0).toLocaleString()}</span>
+                                <span className="text-sm font-black text-indigo-600 dark:text-indigo-400">Rs. {parseFloat(item.price || 0).toLocaleString()}</span>
                               </div>
-                              <h4 className="text-lg font-bold text-slate-900 dark:text-white line-clamp-1">{item.title}</h4>
-                              <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mt-1">{item.description}</p>
+                              <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">{item.title}</h4>
+                              <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{item.description}</p>
                             </div>
-                            <div className="flex gap-2">
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteListing(item.id)}
-                                className="flex-1 py-2 bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white text-xs font-bold rounded-xl transition-all border-none cursor-pointer"
-                              >
-                                Delete
-                              </button>
-                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteListing(item.id)}
+                              className="w-full py-2 bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white text-xs font-bold rounded-xl transition-all border-none cursor-pointer"
+                            >
+                              Delete
+                            </button>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="p-12 text-center rounded-3xl bg-slate-100/50 dark:bg-slate-900/40 border border-dashed border-slate-300 dark:border-slate-800">
-                        <LuLayoutGrid className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-white">No Marketplace Items</h3>
-                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 mb-4">You have not listed any items for sale in the Hustle Hub yet.</p>
+                      <div className="p-10 text-center rounded-2xl bg-white dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-700">
+                        <LuLayoutGrid className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                        <h3 className="text-sm font-bold text-slate-800 dark:text-white">No marketplace items</h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">You have not listed any items in Hustle Hub yet.</p>
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* ── TAB 4: EVENTS, SERVICES & BLOGS ─────────────────── */}
+                {/* ── TAB 4: EVENTS, SERVICES & BLOGS ── */}
                 {activeProfileTab === 'events' && (
-                  <div className="space-y-8 animate-in fade-in duration-300">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-200/60 dark:border-slate-800">
-                      <div>
-                        <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Events, Services & Blogs</h2>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">Manage your campus contributions and service requests</p>
-                      </div>
-                      <div className="flex gap-3 flex-wrap">
-                        <button
-                          type="button"
-                          onClick={() => setShowEventsModal(true)}
-                          className="px-5 py-2.5 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 border-none cursor-pointer"
-                        >
-                          <LuCalendar className="w-4 h-4" /> My Events ({submittedEvents.length})
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setShowServicesModal(true)}
-                          className="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 border-none cursor-pointer"
-                        >
-                          <LuBriefcase className="w-4 h-4" /> Services ({serviceRequests.length})
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setShowBlogsModal(true)}
-                          className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-2 border-none cursor-pointer"
-                        >
-                          <LuMessageSquare className="w-4 h-4" /> My Blogs ({submittedBlogs.length})
-                        </button>
-                      </div>
+                  <div className="space-y-5 animate-in fade-in duration-300">
+                    <div>
+                      <h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">Events, Services & Blogs</h2>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Manage your campus contributions and service requests</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="p-6 rounded-3xl bg-pink-500/5 border border-pink-500/20 space-y-3">
-                        <LuCalendar className="w-8 h-8 text-pink-500" />
-                        <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">Campus Events</h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">You have submitted {submittedEvents.length} campus event concepts.</p>
-                        <button type="button" onClick={() => setShowEventsModal(true)} className="px-4 py-2 bg-pink-600 text-white font-bold rounded-xl text-xs border-none cursor-pointer">View Events</button>
-                      </div>
-
-                      <div className="p-6 rounded-3xl bg-sky-500/5 border border-sky-500/20 space-y-3">
-                        <LuBriefcase className="w-8 h-8 text-sky-500" />
-                        <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">Service Requests</h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">You have {serviceRequests.length} active service requests.</p>
-                        <button type="button" onClick={() => setShowServicesModal(true)} className="px-4 py-2 bg-sky-600 text-white font-bold rounded-xl text-xs border-none cursor-pointer">View Services</button>
-                      </div>
-
-                      <div className="p-6 rounded-3xl bg-purple-500/5 border border-purple-500/20 space-y-3">
-                        <LuMessageSquare className="w-8 h-8 text-purple-500" />
-                        <h3 className="text-lg font-extrabold text-slate-900 dark:text-white">Student Blogs</h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400">You have written {submittedBlogs.length} blog articles.</p>
-                        <button type="button" onClick={() => setShowBlogsModal(true)} className="px-4 py-2 bg-purple-600 text-white font-bold rounded-xl text-xs border-none cursor-pointer">View Blogs</button>
-                      </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {[
+                        { title: 'Campus Events', desc: `You have submitted ${submittedEvents.length} campus events.`, btn: 'View Events', icon: LuCalendar, tone: 'text-pink-500 bg-pink-500/10', onClick: () => setShowEventsModal(true) },
+                        { title: 'Service Requests', desc: `You have ${serviceRequests.length} service requests.`, btn: 'View Services', icon: LuBriefcase, tone: 'text-sky-500 bg-sky-500/10', onClick: () => setShowServicesModal(true) },
+                        { title: 'Student Blogs', desc: `You have written ${submittedBlogs.length} blog articles.`, btn: 'View Blogs', icon: LuMessageSquare, tone: 'text-purple-500 bg-purple-500/10', onClick: () => setShowBlogsModal(true) },
+                      ].map((card) => (
+                        <div key={card.title} className="p-5 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm hover:shadow-md transition-all space-y-3">
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${card.tone}`}><card.icon className="w-5 h-5" /></div>
+                          <div>
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-white">{card.title}</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{card.desc}</p>
+                          </div>
+                          <button type="button" onClick={card.onClick} className="w-full inline-flex items-center justify-center gap-1.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition-all border-none cursor-pointer">
+                            {card.btn} <LuChevronRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
 
-                {/* ── TAB 5: SECURITY & PREFERENCES ────────────────────── */}
+                {/* ── TAB 5: SECURITY ── */}
                 {activeProfileTab === 'security' && (
-                  <div className="space-y-8 animate-in fade-in duration-300 max-w-2xl mx-auto">
-                    <div className="pb-6 border-b border-slate-200/60 dark:border-slate-800">
-                      <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Security & Preferences</h2>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Manage your password, sound notifications, and account options</p>
+                  <div className="space-y-5 animate-in fade-in duration-300">
+                    <div>
+                      <h2 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">Security & Preferences</h2>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Manage your password and notification options</p>
                     </div>
 
-                    <form onSubmit={handleSave} className="space-y-6 bg-white/40 dark:bg-slate-900/40 p-6 rounded-3xl border border-slate-200/60 dark:border-white/10">
-                      <div className="group space-y-3">
-                        <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-400 ml-2">Security Key (Password)</label>
+                    <form onSubmit={handleSave} className="p-6 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm space-y-5">
+                      <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800/60">
+                        <div className="p-2 bg-red-500/10 rounded-xl text-red-500"><LuLock className="w-5 h-5" /></div>
+                        <h3 className="text-base font-bold text-slate-900 dark:text-white">Password</h3>
+                      </div>
+                      <div className="group space-y-1.5 max-w-lg">
+                        <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Security Key</label>
                         <div className="relative flex items-center">
-                          <div className={getIconClasses(isEditing, 'brand')}>
-                            <LuLock className="w-4 h-4" />
-                          </div>
+                          <div className={getIconClasses(isEditing, 'brand')}><LuLock className="w-4 h-4" /></div>
                           <input
-                            type={showPassword ? "text" : "password"}
+                            type={showPassword ? 'text' : 'password'}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             disabled={!isEditing}
                             className={getInputClasses(isEditing, 'brand', true)}
                           />
                           {isEditing && (
-                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-6 text-slate-400 hover:text-red-500 transition-colors">
+                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 text-slate-400 hover:text-red-500 transition-colors bg-transparent border-none cursor-pointer">
                               {showPassword ? <LuEyeOff size={18} /> : <LuEye size={18} />}
                             </button>
                           )}
                         </div>
                       </div>
-
-                      {isEditing && (
-                        <button type="submit" className="w-full py-3 bg-blue-600 text-white font-bold rounded-2xl text-xs shadow-md border-none cursor-pointer">
+                      {isEditing ? (
+                        <button type="submit" className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs border-none cursor-pointer">
                           Update Security Credentials
                         </button>
+                      ) : (
+                        <p className="text-xs text-slate-400">Click “Edit Profile” in the sidebar to change your password.</p>
                       )}
                     </form>
 
-                    <div className="p-6 rounded-3xl bg-slate-100/50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-white/10 space-y-4">
-                      <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">Audio Notifications</h3>
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-slate-600 dark:text-slate-400 font-medium">Web Audio Notification Sound Chimes</span>
-                        <button type="button" onClick={() => playNotificationSound()} className="px-4 py-2 bg-blue-500/10 text-blue-600 font-bold rounded-xl text-xs border border-blue-500/20 cursor-pointer flex items-center gap-1.5">
-                          <LuBell size={13} /> Test Sound Chime
+                    <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-blue-500/10 rounded-xl text-blue-500"><LuBell className="w-5 h-5" /></div>
+                          <div>
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Audio Notifications</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">Chime played when new messages arrive</p>
+                          </div>
+                        </div>
+                        <button type="button" onClick={() => playNotificationSound()} className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-bold rounded-xl text-xs border border-blue-500/20 cursor-pointer">
+                          <LuBell size={13} /> Test Sound
                         </button>
                       </div>
                     </div>
                   </div>
                 )}
-
-                {/* ── Minimalist Footer ──────────────────────────────────── */}
-                <div className="mt-20 pt-10 border-t border-slate-100 dark:border-slate-800/60 flex flex-col items-center gap-4">
-                  <button type="button" className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 hover:text-blue-500 transition-colors">
-                    Audit Logs <LuChevronRight className="w-3.5 h-3.5" />
-                  </button>
-                  <div className="text-[9px] font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest">
-                    Protected by UniGang Security Layer 2.0
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+              </main>
+            </div>
 
             {/* Backdrop-Blurred Ads Tracker Modal */}
             <AnimatePresence>
