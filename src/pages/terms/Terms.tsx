@@ -1,330 +1,230 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    LuScale,
-    LuLayers,
-    LuUserCog,
-    LuMessageSquareWarning,
-    LuClock,
-    LuBan,
-    LuShieldAlert,
-    LuMail,
-    LuHeartHandshake
+  LuScale, LuLayers, LuUserCog, LuMessageSquareWarning,
+  LuClock, LuBan, LuShieldAlert, LuMail, LuHeartHandshake, LuCheck
 } from 'react-icons/lu';
+import SEO from '../../components/SEO';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
+import { Link } from 'react-router-dom';
 
 const Terms = () => {
-    const [loading, setLoading] = useState(true);
-    const lastUpdated = "April 2026";
+  const [loading, setLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState('platform-role');
+  const lastUpdated = 'October 2026';
 
-    useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 300);
-        return () => clearTimeout(timer);
-    }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 300);
+    return () => clearTimeout(timer);
+  }, []);
 
-    const sections = [
-        {
-            id: "platform-role",
-            icon: LuLayers,
-            title: "1. Platform Role & Limitations",
-            content: (
-                <div className="space-y-3">
-                    <p>
-                        "The Uni Gang" operates exclusively as a digital platform and aggregator designed to connect university students
-                        with relevant campus information, events, local accommodations, student blogs, and matchmaking proposals.
-                    </p>
-                    <div className="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30">
-                        <p className="font-medium text-slate-700 dark:text-slate-300">
-                            We act solely as a facilitator. We do <strong>not</strong> own, manage, endorse, or guarantee the quality, safety,
-                            or legality of any external services, event tickets, rental properties, or third-party advertisements listed on our platform.
-                        </p>
-                    </div>
-                </div>
-            )
-        },
-        {
-            id: "user-content",
-            icon: LuUserCog,
-            title: "2. User Content Responsibility",
-            content: (
-                <p>
-                    As a community-driven platform, users are permitted to post event details, upload annex photos, submit student blogs, and create matchmaking profiles. By submitting content to "The Uni Gang", you agree that you are <strong>100% responsible
-                        for the accuracy, legality, and licensing</strong> of the content you upload. For Student Blogs, you retain ownership of your work but grant us a non-exclusive license to display it. We reserve the right to remove any content that involves plagiarism, violates our standards, or is flagged as fraudulent without prior notice.
-                </p>
-            )
-        },
-        {
-            id: "third-party",
-            icon: LuMessageSquareWarning,
-            title: "3. Third-Party Interactions",
-            content: (
-                <div className="space-y-3">
-                    <p>
-                        Our platform facilitates direct connections between students and third parties, such as event organizers
-                        and independent landlords, often via direct WhatsApp links or external websites.
-                    </p>
-                    <p className="font-semibold text-amber-700 dark:text-amber-500">
-                        All offline or third-party interactions, financial transactions, and agreements made outside of "The Uni Gang"
-                        are strictly at your own risk. We strongly advise users to exercise caution and verify the identity of parties
-                        before making payments or sharing sensitive information.
-                    </p>
-                </div>
-            )
-        },
-        {
-            id: "inactivity-policy",
-            icon: LuClock,
-            title: "4. Account Inactivity & Data Retention",
-            content: (
-                <p>
-                    To ensure optimal system performance and respect data privacy, we enforce a strict account data retention policy based on activity:
-                    <ul className="list-disc pl-5 mt-4 space-y-3 text-slate-700 dark:text-slate-300">
-                        <li>
-                            <strong className="text-amber-600 dark:text-amber-400">1 Month Inactivity:</strong> Accounts showing zero activity for a continuous 30-day period will be temporarily archived to conserve database infrastructure.
-                        </li>
-                        <li>
-                            <strong className="text-red-500 dark:text-red-400">12 Months Inactivity:</strong> Accounts and all associated personal data dormant for a consecutive 12-month period will be permanently and irreversibly deleted from our servers.
-                        </li>
-                    </ul>
-                </p>
-            )
-        },
-        {
-            id: "matchmaking-rules",
-            icon: LuHeartHandshake,
-            title: "5. Uni Proposals & Matchmaking Rules",
-            content: (
-                <div className="space-y-3">
-                    <p>
-                        The "Uni Proposals" (Matchmaking) feature is designed exclusively for verified undergraduates and alumni looking for serious relationships. By using this feature, you agree to:
-                    </p>
-                    <ul className="list-disc pl-5 mt-3 space-y-2 opacity-90 text-slate-700 dark:text-slate-300">
-                        <li><strong>Respect Boundaries:</strong> Any form of harassment, hate speech, or unsolicited inappropriate content will result in an immediate and permanent ban.</li>
-                        <li><strong>Premium Subscriptions:</strong> Purchasing a Premium Membership unlocks advanced features (e.g., unlimited proposals, video calls). Subscriptions are billed monthly and can be canceled at any time. Refunds for partial months are not provided.</li>
-                        <li><strong>Authenticity:</strong> You must use your real identity and accurate academic details. Fake profiles discovered during or after verification will be removed.</li>
-                    </ul>
-                </div>
-            )
-        },
-        {
-            id: "prohibited-use",
-            icon: LuBan,
-            title: "6. Prohibited Activities",
-            content: (
-                <p>
-                    While using our platform, you agree not to engage in any of the following prohibited behaviors:
-                    <ul className="list-disc pl-5 mt-3 space-y-2 opacity-90">
-                        <li>Spamming community feeds, mass-messaging users, or scraping platform data.</li>
-                        <li>Posting illegal, fraudulent, or academically dishonest advertisements (e.g., essay writing services).</li>
-                        <li>Plagiarizing articles in the Student Blogs section.</li>
-                        <li>Providing fake, misleading, or deceptive university/faculty affiliations for matchmaking.</li>
-                    </ul>
-                    Violating these rules may result in immediate and permanent suspension from the service.
-                </p>
-            )
-        },
-        {
-            id: "liability",
-            icon: LuShieldAlert,
-            title: "7. Limitation of Liability",
-            content: (
-                <p>
-                    To the maximum extent permitted by applicable law, "The Uni Gang", its creators, and affiliates shall not be
-                    held liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability
-                    to use the platform. This includes, but is not limited to, ticketing issues or refunds for canceled university events, misrepresented accommodations, false advertising by third parties, or disputes strictly between students and landlords.
-                </p>
-            )
-        }
-    ];
-
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.15,
-                delayChildren: 0.2
-            }
-        }
-    };
-
-    const cardVariants = {
-        hidden: { opacity: 0, y: 30, scale: 0.95 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            transition: { type: "spring" as const, stiffness: 100, damping: 20 }
-        }
-    };
-
-    return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 transition-colors duration-500 relative overflow-hidden">
-            <PremiumPageLoader isLoading={loading} message="Reviewing terms..." />
-            
-            <AnimatePresence>
-                {!loading && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                    >
-                        {/* Ambient Animated Backgrounds */}
-                        <motion.div
-                            animate={{
-                                scale: [1, 1.2, 1],
-                                rotate: [0, 90, 0],
-                                opacity: [0.3, 0.5, 0.3]
-                            }}
-                            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                            className="fixed top-0 right-0 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[150px] pointer-events-none -translate-y-1/3 translate-x-1/3"
-                        />
-                        <motion.div
-                            animate={{
-                                scale: [1, 1.5, 1],
-                                rotate: [0, -90, 0],
-                                opacity: [0.2, 0.4, 0.2]
-                            }}
-                            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                            className="fixed bottom-0 left-0 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-[150px] pointer-events-none translate-y-1/3 -translate-x-1/3"
-                        />
-
-                        <div className="max-w-4xl mx-auto relative z-10 pt-10 pb-20">
-                            {/* Header */}
-                            <motion.div
-                                initial={{ opacity: 0, y: -20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, ease: "easeOut" }}
-                                className="text-center mb-16 space-y-6"
-                            >
-                                <motion.div
-                                    whileHover={{ scale: 1.05 }}
-                                    className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/40 dark:bg-slate-900/40 text-indigo-700 dark:text-indigo-300 text-xs font-black uppercase tracking-widest border border-indigo-200/50 dark:border-indigo-800/50 backdrop-blur-xl shadow-lg"
-                                >
-                                    <motion.div
-                                        animate={{ rotate: [0, 15, -15, 0] }}
-                                        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-                                    >
-                                        <LuScale size={18} />
-                                    </motion.div>
-                                    The Uni Gang Legal
-                                </motion.div>
-
-                                <h1 className="text-5xl md:text-7xl font-black text-slate-900 dark:text-white tracking-tighter">
-                                    Terms of <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Service</span>
-                                </h1>
-
-                                <motion.p
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.5 }}
-                                    className="text-slate-500 dark:text-slate-400 font-medium"
-                                >
-                                    Last Updated: <span className="font-bold text-slate-700 dark:text-slate-300 px-3 py-1 rounded-lg bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700">{lastUpdated}</span>
-                                </motion.p>
-                            </motion.div>
-
-                            {/* Content Cards */}
-                            <motion.div
-                                variants={containerVariants}
-                                initial="hidden"
-                                whileInView="visible"
-                                viewport={{ once: true, margin: "-100px" }}
-                                className="space-y-8 relative"
-                            >
-                                {/* Connecting UI Line */}
-                                <div className="absolute left-[39px] sm:left-[51px] top-10 bottom-10 w-px bg-gradient-to-b from-indigo-500/0 via-indigo-500/30 to-purple-500/0 hidden md:block"></div>
-
-                                {sections.map((section) => (
-                                    <motion.div
-                                        key={section.id}
-                                        variants={cardVariants}
-                                        whileHover={{ scale: 1.02, y: -5 }}
-                                        className="group relative bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/60 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-[2rem] p-6 md:p-10 transition-all duration-500 hover:border-indigo-500/40 hover:shadow-[0_20px_40px_rgb(79,70,229,0.1)]"
-                                    >
-                                        {/* Card Inner Glow */}
-                                        <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent dark:from-white/5 dark:to-transparent rounded-[2rem] pointer-events-none" />
-
-                                        <div className="flex items-start gap-5 md:gap-8 relative z-10">
-                                            <motion.div
-                                                whileHover={{ rotate: 10, scale: 1.1 }}
-                                                className="hidden sm:flex mt-1 w-14 h-14 justify-center items-center rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 border border-indigo-100 dark:border-indigo-800/50 text-indigo-600 dark:text-indigo-400 flex-shrink-0 shadow-inner group-hover:text-purple-600 transition-colors"
-                                            >
-                                                <section.icon size={26} />
-                                            </motion.div>
-
-                                            <div className="space-y-4 w-full">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="sm:hidden w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 border border-indigo-100 dark:border-indigo-800/50 flex items-center justify-center text-indigo-600 flex-shrink-0 shadow-inner">
-                                                        <section.icon size={20} />
-                                                    </div>
-                                                    <h3 className="text-2xl md:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                                        {section.title}
-                                                    </h3>
-                                                </div>
-                                                <div className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                                                    {section.content}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </motion.div>
-
-                            {/* Call to Action - Contact */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 50 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ type: "spring", stiffness: 80, damping: 20 }}
-                                className="mt-20 bg-gradient-to-br from-indigo-600 to-purple-800 rounded-[3rem] p-10 md:p-14 text-center text-white shadow-[0_20px_50px_rgba(79,70,229,0.3)] relative overflow-hidden group"
-                            >
-                                {/* Animated Overlay Shapes */}
-                                <motion.div
-                                    animate={{ x: [-20, 20, -20], y: [-20, 20, -20] }}
-                                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                                    className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none"
-                                />
-                                <motion.div
-                                    animate={{ x: [20, -20, 20], y: [20, -20, 20] }}
-                                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                                    className="absolute -bottom-20 -left-20 w-80 h-80 bg-purple-400/20 rounded-full blur-3xl pointer-events-none"
-                                />
-
-                                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay opacity-10"></div>
-
-                                <div className="relative z-10 space-y-8 flex flex-col items-center">
-                                    <motion.div
-                                        whileHover={{ rotate: 180, scale: 1.1 }}
-                                        transition={{ duration: 0.5 }}
-                                        className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center shadow-2xl"
-                                    >
-                                        <LuMail size={36} />
-                                    </motion.div>
-
-                                    <div>
-                                        <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">Need further clarification?</h2>
-                                        <p className="text-indigo-100 font-medium max-w-lg mx-auto text-lg leading-relaxed">
-                                            If you require assistance understanding these terms, please contact our legal and support team.
-                                        </p>
-                                    </div>
-
-                                    <motion.a
-                                        whileHover={{ scale: 1.05, y: -3, boxShadow: "0 20px 40px -10px rgba(0,0,0,0.3)" }}
-                                        whileTap={{ scale: 0.95 }}
-                                        href="mailto:legal@theunigang.com"
-                                        className="inline-flex items-center gap-3 bg-white text-indigo-700 hover:text-purple-800 px-10 py-5 rounded-full font-black uppercase tracking-[0.2em] text-sm transition-all shadow-xl"
-                                    >
-                                        Contact Legal <LuMail size={18} />
-                                    </motion.a>
-                                </div>
-                            </motion.div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+  const sections = [
+    {
+      id: 'platform-role',
+      icon: LuLayers,
+      title: '1. Platform Role & Facilitator Status',
+      content: (
+        <div className="space-y-3">
+          <p>
+            "The Uni Gang" operates exclusively as a digital aggregator and community platform designed to connect Sri Lankan university undergraduates with housing options, campus event updates, peer trading marketplace, student blogs, and matchmaking proposals.
+          </p>
+          <div className="p-4 rounded-2xl bg-blue-50/70 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">
+            We act solely as a digital facilitator. We do <strong>not</strong> own, manage, endorse, or guarantee third-party rental properties, external event tickets, or user-posted advertisements listed on our platform.
+          </div>
         </div>
-    );
+      )
+    },
+    {
+      id: 'user-content',
+      icon: LuUserCog,
+      title: '2. User Submissions & Copyright',
+      content: (
+        <p>
+          As a student platform, users may post event notices, upload annex photos, sell goods on Hustle Hub, and submit student blogs. By submitting content, you confirm that you hold all necessary rights and licenses. For Student Blogs, you retain intellectual property ownership while granting us a non-exclusive license to display your work with author credit.
+        </p>
+      )
+    },
+    {
+      id: 'third-party',
+      icon: LuMessageSquareWarning,
+      title: '3. Offline & Third-Party Transactions',
+      content: (
+        <div className="space-y-3">
+          <p>
+            Our platform enables direct communication between students and third parties (e.g., house owners, event organizers, peer sellers) via WhatsApp or phone.
+          </p>
+          <p className="text-xs sm:text-sm font-bold text-amber-600 dark:text-amber-400">
+            All offline transactions, advance deposits, and agreements conducted outside of "The Uni Gang" are strictly at your own risk. Always inspect properties and verify seller details prior to transferring funds.
+          </p>
+        </div>
+      )
+    },
+    {
+      id: 'inactivity-policy',
+      icon: LuClock,
+      title: '4. Account Inactivity & Data Retention',
+      content: (
+        <div className="space-y-3">
+          <p>To preserve system integrity and ensure data minimization under PDPA rules:</p>
+          <ul className="list-disc pl-5 text-xs sm:text-sm text-slate-600 dark:text-slate-400 space-y-2 font-normal">
+            <li><strong>1 Month Inactivity:</strong> Accounts showing zero activity for 30 consecutive days will be temporarily archived to conserve database resources.</li>
+            <li><strong>12 Months Inactivity:</strong> Accounts and associated data showing zero login activity for 12 consecutive months will be permanently and securely deleted.</li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      id: 'matchmaking-rules',
+      icon: LuHeartHandshake,
+      title: '5. Uni Porondam Matchmaking Rules',
+      content: (
+        <div className="space-y-3">
+          <p>
+            The Uni Porondam matchmaking feature is exclusively reserved for verified undergraduates and alumni seeking genuine relationships. By using this service, you agree to:
+          </p>
+          <ul className="list-disc pl-5 text-xs sm:text-sm text-slate-600 dark:text-slate-400 space-y-2 font-normal">
+            <li><strong>Zero Harassment:</strong> Hate speech, offensive language, or harassment results in an immediate permanent ban.</li>
+            <li><strong>Authentic Identity:</strong> Profiles must reflect real undergraduate credentials; fake accounts are immediately purged.</li>
+            <li><strong>Subscription Terms:</strong> Premium features (unlimited proposals, video calling) are billed on a recurring monthly cycle and can be cancelled at any time.</li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      id: 'prohibited-use',
+      icon: LuBan,
+      title: '6. Prohibited Platform Activities',
+      content: (
+        <div className="space-y-2">
+          <p>Users are strictly prohibited from engaging in the following behaviors:</p>
+          <ul className="list-disc pl-5 text-xs sm:text-sm text-slate-600 dark:text-slate-400 space-y-1.5 font-normal">
+            <li>Scraping platform data or automated spamming of member feeds.</li>
+            <li>Posting fake annex listings or fraudulent marketplace items.</li>
+            <li>Plagiarizing articles in the Student Blogs section.</li>
+            <li>Impersonating another student or university faculty member.</li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      id: 'liability',
+      icon: LuShieldAlert,
+      title: '7. Limitation of Liability',
+      content: (
+        <p>
+          To the maximum extent permitted by applicable law, "The Uni Gang" and its creators shall not be held liable for indirect, incidental, or consequential damages resulting from canceled university events, misrepresented rental annexes, or disputes between buyers and sellers.
+        </p>
+      )
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-500 relative overflow-hidden font-sans select-none">
+      <SEO
+        title="Terms of Service - The Uni Gang"
+        description="Read The Uni Gang Terms of Service governing platform usage, student annex listings, events, marketplace, and matchmaking rules."
+      />
+
+      <PremiumPageLoader isLoading={loading} message="Loading Terms of Service..." />
+
+      <AnimatePresence>
+        {!loading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-24 relative z-10 space-y-12"
+          >
+            {/* Ambient Backgrounds */}
+            <div className="fixed top-20 right-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[140px] pointer-events-none translate-x-1/3" />
+            <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[140px] pointer-events-none -translate-x-1/3" />
+
+            {/* Header */}
+            <div className="text-center space-y-5 max-w-3xl mx-auto">
+              <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-xs font-black uppercase tracking-widest border border-indigo-200 dark:border-indigo-800 shadow-xs">
+                <LuScale size={16} /> Legal Agreement
+              </div>
+
+              <h1 className="text-4xl sm:text-6xl font-black text-slate-900 dark:text-white tracking-tight">
+                Terms of <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">Service</span>
+              </h1>
+
+              <p className="text-slate-600 dark:text-slate-400 font-medium text-sm sm:text-base">
+                Last Updated: <span className="font-bold text-slate-900 dark:text-slate-200 px-3 py-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">{lastUpdated}</span>
+              </p>
+            </div>
+
+            {/* Layout Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* Sticky TOC Sidebar */}
+              <div className="lg:col-span-4 sticky top-28 hidden lg:block">
+                <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xl space-y-4">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-400">Terms Index</h3>
+                  <nav className="flex flex-col gap-1.5">
+                    {sections.map((sec) => (
+                      <a
+                        key={sec.id}
+                        href={`#${sec.id}`}
+                        onClick={() => setActiveSection(sec.id)}
+                        className={`px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2.5 ${
+                          activeSection === sec.id
+                            ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                        }`}
+                      >
+                        <sec.icon size={15} />
+                        <span className="truncate">{sec.title}</span>
+                      </a>
+                    ))}
+                  </nav>
+                </div>
+              </div>
+
+              {/* Main Terms Sections */}
+              <div className="lg:col-span-8 space-y-6">
+                {sections.map((sec) => (
+                  <motion.div
+                    key={sec.id}
+                    id={sec.id}
+                    whileHover={{ y: -2 }}
+                    className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-lg space-y-4"
+                  >
+                    <div className="flex items-center gap-3.5 border-b border-slate-100 dark:border-slate-800/80 pb-3">
+                      <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800 flex items-center justify-center shrink-0">
+                        <sec.icon size={20} />
+                      </div>
+                      <h3 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-wide">{sec.title}</h3>
+                    </div>
+
+                    <div className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">
+                      {sec.content}
+                    </div>
+                  </motion.div>
+                ))}
+
+                {/* Support Banner */}
+                <div className="p-8 rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+                  <div>
+                    <h4 className="text-xl font-black">Need assistance with legal terms?</h4>
+                    <p className="text-blue-100 text-xs sm:text-sm font-medium mt-1">Our support team is ready to answer any questions regarding terms or user guidelines.</p>
+                  </div>
+                  <Link
+                    to="/contact-us"
+                    className="px-6 py-3 rounded-2xl bg-white text-blue-600 hover:bg-blue-50 font-black text-xs uppercase tracking-wider shadow-md transition-all shrink-0 cursor-pointer"
+                  >
+                    Contact Legal Desk
+                  </Link>
+                </div>
+              </div>
+
+            </div>
+
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 };
 
 export default Terms;
