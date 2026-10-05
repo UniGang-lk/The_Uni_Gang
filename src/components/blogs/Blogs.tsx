@@ -5,10 +5,11 @@ import { useState, useEffect } from 'react';
 import TiltCard from '../ui/TiltCard';
 import PremiumTraceButton from '../ui/PremiumTraceButton';
 import PremiumPageLoader from '../ui/PremiumPageLoader';
-import campusLife from "../../assets/campus-life.jpg";
+import campusLife from '../../assets/campus-life.jpg';
 import BlogCard from '../../pages/blogs/ArticleCard';
 import { Blog } from '../../types/blog';
 import { api } from '../../api';
+import { subscribeToBlogUpdates, subscribeToBlogDeletions } from '../../services/realtime';
 
 const latestBlogs: Blog[] = [
   {
@@ -91,6 +92,28 @@ const Blogs = () => {
       }
     };
     fetchLatest();
+
+    // ⚡ Real-time Live Sync: Refresh home blog feed on new approvals or updates
+    const unsubscribeUpdate = subscribeToBlogUpdates((data: any) => {
+      if (data?.status === 'Approved' || data?.action === 'status_changed') {
+        fetchLatest();
+      }
+    });
+
+    const unsubscribeDelete = subscribeToBlogDeletions(() => {
+      fetchLatest();
+    });
+
+    const handleFocus = () => {
+      fetchLatest();
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      unsubscribeUpdate();
+      unsubscribeDelete();
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const handleExploreFeed = () => {

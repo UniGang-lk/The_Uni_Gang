@@ -120,8 +120,8 @@ const EventDetailPage: React.FC = () => {
                 data.user && (
                   (currentEmail && data.user.email && data.user.email.toLowerCase() === currentEmail.toLowerCase()) ||
                   (payload.id && data.user.id === payload.id) ||
-                  (payload.user_id && (data.user.firebaseUid === payload.user_id || data.user.id === payload.user_id)) ||
-                  (payload.sub && (data.user.firebaseUid === payload.sub || data.user.id === payload.sub))
+                  (payload.user_id && ((data.user as any).firebaseUid === payload.user_id || data.user.id === payload.user_id)) ||
+                  (payload.sub && ((data.user as any).firebaseUid === payload.sub || data.user.id === payload.sub))
                 )
               );
               setIsHost(isHostUser);

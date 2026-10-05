@@ -38,6 +38,8 @@ import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import TiltCard from '../../components/ui/TiltCard';
 import AdSidebarWidget from '../../components/advertise/AdSidebarWidget';
 import AdNativeFeed from '../../components/advertise/AdNativeFeed';
+import toast from 'react-hot-toast';
+import { subscribeToBlogUpdates, subscribeToBlogDeletions } from '../../services/realtime';
 
 const FloatingIcon = ({ icon: Icon, index }: { icon: React.ComponentType, index: number }) => (
   <motion.div
@@ -123,6 +125,44 @@ const BlogList: React.FC = () => {
       }
     };
     fetchData();
+
+    // ⚡ Real-time Live Sync: Instantly updates when admin approves/edits a blog in Dashboard
+    const unsubscribeUpdate = subscribeToBlogUpdates((data: any) => {
+      if (data?.status === 'Approved' || data?.action === 'status_changed') {
+        // Silently reload blogs with full relations and tags
+        api.getBlogs().then((updatedList) => {
+          setBlogs(updatedList);
+        }).catch(console.error);
+
+        // Also refresh contributors leaderboard
+        api.getContributors().then(setContributors).catch(() => {});
+
+        if (data?.blog?.title) {
+          toast.success(`🎉 New Story Published: "${data.blog.title}"`, {
+            duration: 4500,
+            position: 'bottom-right'
+          });
+        }
+      } else if (data?.status === 'Rejected') {
+        setBlogs((prev) => prev.filter((b) => b.id !== data.blogId));
+      }
+    });
+
+    const unsubscribeDelete = subscribeToBlogDeletions((data: any) => {
+      setBlogs((prev) => prev.filter((b) => b.id !== data.blogId));
+    });
+
+    // Fallback: Re-sync on window focus (if user returns from another tab)
+    const handleFocus = () => {
+      api.getBlogs().then((latest) => setBlogs(latest)).catch(() => {});
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      unsubscribeUpdate();
+      unsubscribeDelete();
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   // Category counts

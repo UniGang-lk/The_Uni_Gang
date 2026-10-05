@@ -404,7 +404,7 @@ const BlogDetail: React.FC = () => {
                 title="Like story"
               >
                 <LuThumbsUp className="w-4 h-4" />
-                <span className="text-[10px] font-black block text-center mt-0.5 leading-none">{blog.likes || 0}</span>
+                <span className="text-[10px] font-black block text-center mt-0.5 leading-none">{typeof blog.likes === 'number' ? blog.likes : (Array.isArray(blog.likes) ? (blog.likes as any).length : 0)}</span>
               </button>
 
               {/* Jump to Comments */}
@@ -478,7 +478,7 @@ const BlogDetail: React.FC = () => {
               <div className="flex items-center gap-6">
                 <button onClick={handleLike} className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
                   <LuThumbsUp className={`w-5 h-5 ${blog.hasLiked ? 'text-blue-600 fill-blue-600' : ''}`} />
-                  <span className="text-xs font-bold">{blog.likes || 0}</span>
+                  <span className="text-xs font-bold">{typeof blog.likes === 'number' ? blog.likes : (Array.isArray(blog.likes) ? (blog.likes as any).length : 0)}</span>
                 </button>
                 <button onClick={() => document.getElementById('discussion')?.scrollIntoView({ behavior: 'smooth' })} className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
                   <LuMessageSquare className="w-5 h-5" />
@@ -730,8 +730,8 @@ const BlogDetail: React.FC = () => {
                           const isCommentOwner = Boolean(
                             comment.user && (
                               (userEmail && comment.user.email && comment.user.email.toLowerCase() === userEmail.toLowerCase()) ||
-                              (tokenUid && (comment.user.id === tokenUid || (comment.user as any).firebaseUid === tokenUid || comment.userId === tokenUid)) ||
-                              (currentUserId && (comment.user.id === currentUserId || comment.userId === currentUserId)) ||
+                              (tokenUid && (comment.user.id === tokenUid || (comment.user as any).firebaseUid === tokenUid || (comment as any).userId === tokenUid)) ||
+                              (currentUserId && (comment.user.id === currentUserId || (comment as any).userId === currentUserId)) ||
                               (currentUserName && comment.user.name && comment.user.name.toLowerCase() === currentUserName.toLowerCase())
                             )
                           );

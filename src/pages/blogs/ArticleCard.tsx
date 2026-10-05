@@ -29,8 +29,11 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, isFeatured = false }) => {
       {/* Image Container */}
       <div className={`relative overflow-hidden ${isFeatured ? 'h-64 md:h-full' : 'h-48'}`}>
         <img
-          src={blog.featuredImage}
+          src={blog.featuredImage || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=800'}
           alt={blog.title}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=800';
+          }}
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -60,22 +63,22 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, isFeatured = false }) => {
         <div className="mt-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
-              src={blog.author.avatar}
-              alt={blog.author.name}
+              src={blog.author?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${blog.author?.name || 'Author'}`}
+              alt={blog.author?.name}
               className="h-8 w-8 rounded-full border-2 border-white shadow-sm"
             />
             <div className="text-xs">
-              <p className="font-bold text-slate-800 dark:text-white">{blog.author.name}</p>
+              <p className="font-bold text-slate-800 dark:text-white">{blog.author?.name || 'Anonymous'}</p>
               <p className="text-slate-500 dark:text-slate-400">{new Date(blog.createdAt).toLocaleDateString()}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400">
             <span className="flex items-center gap-1 text-xs">
-              <LuThumbsUp className="w-4 h-4" /> {blog.likes}
+              <LuThumbsUp className="w-4 h-4" /> {typeof blog.likes === 'number' ? blog.likes : (Array.isArray(blog.likes) ? (blog.likes as any).length : 0)}
             </span>
             <span className="flex items-center gap-1 text-xs">
-              <LuEye className="w-4 h-4" /> {blog.views}
+              <LuEye className="w-4 h-4" /> {blog.views || 0}
             </span>
           </div>
         </div>
