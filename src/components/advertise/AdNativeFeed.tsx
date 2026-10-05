@@ -26,7 +26,15 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
     const fetchAds = async () => {
       try {
         const activeAds = await api.getActiveAds();
-        const nativeAds = activeAds.filter((a: Ad) => a.placement_type === 'NATIVE_FEED');
+        const nativeAds = activeAds.filter((a: Ad) =>
+          a.placement_type === 'NATIVE_FEED' ||
+          (a.placement_type && (
+            a.placement_type.includes('NATIVE') ||
+            a.placement_type.includes('FEED') ||
+            a.placement_type.includes('Hero') ||
+            a.placement_type.includes('Ultimate')
+          ))
+        );
         setAds(nativeAds);
       } catch (err) {
         console.error('Failed to load native ads', err);
@@ -48,7 +56,32 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
     }
   }, [ads.length, adIndex]);
 
-  if (ads.length === 0) return null;
+  if (ads.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="w-full relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-cyan-500/10 border border-blue-500/20 p-4 sm:p-5 my-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-sm shrink-0 shadow-md">
+            <LuMegaphone className="w-5 h-5 animate-pulse" />
+          </div>
+          <div>
+            <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">Promote Your Brand to 50,000+ Uni Students</h4>
+            <p className="text-[11px] text-slate-500 font-medium">High conversion ad placements for institutes, deals & services.</p>
+          </div>
+        </div>
+        <a
+          href="/advertise"
+          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:scale-105 transition-all shrink-0"
+        >
+          Advertise Here
+        </a>
+      </motion.div>
+    );
+  }
 
   const ad = ads[currentAdIndex];
 

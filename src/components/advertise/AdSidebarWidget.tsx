@@ -10,7 +10,13 @@ export default function AdSidebarWidget() {
     const fetchAd = async () => {
       try {
         const ads = await api.getActiveAds();
-        const sidebarAds = ads.filter(a => a.placement_type === 'SIDEBAR');
+        const sidebarAds = ads.filter(a =>
+          a.placement_type === 'SIDEBAR' ||
+          (a.placement_type && (
+            a.placement_type.includes('SIDEBAR') ||
+            a.placement_type.includes('Starter')
+          ))
+        );
         if (sidebarAds.length > 0) {
           const randomAd = sidebarAds[Math.floor(Math.random() * sidebarAds.length)];
           setAd(randomAd);

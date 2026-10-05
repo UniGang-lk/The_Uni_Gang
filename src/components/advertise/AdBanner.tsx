@@ -10,7 +10,14 @@ export default function AdBanner({ placement = 'BANNER' }: { placement?: string 
     const fetchAd = async () => {
       try {
         const ads = await api.getActiveAds();
-        const bannerAds = ads.filter(a => a.placement_type === placement);
+        const bannerAds = ads.filter(a =>
+          a.placement_type === placement ||
+          (a.placement_type && (
+            a.placement_type.includes(placement) ||
+            a.placement_type.includes('Hero') ||
+            a.placement_type.includes('Ultimate')
+          ))
+        );
         if (bannerAds.length > 0) {
           // Pick a random ad for rotation
           const randomAd = bannerAds[Math.floor(Math.random() * bannerAds.length)];

@@ -33,7 +33,13 @@ export default function AdPopup() {
     const fetchPopupAd = async () => {
       try {
         const ads = await api.getActiveAds();
-        const popupAds = ads.filter((a: Ad) => a.placement_type === 'POPUP');
+        const popupAds = ads.filter((a: Ad) =>
+          a.placement_type === 'POPUP' ||
+          (a.placement_type && (
+            a.placement_type.includes('POPUP') ||
+            a.placement_type.includes('Ultimate')
+          ))
+        );
         
         if (popupAds.length > 0) {
           const randomAd = popupAds[Math.floor(Math.random() * popupAds.length)];
