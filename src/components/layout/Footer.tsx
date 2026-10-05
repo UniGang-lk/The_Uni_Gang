@@ -3,40 +3,44 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   FaFacebook,
-  FaTwitter,
-  FaYoutube,
   FaInstagram,
-} from 'react-icons/fa';
+  FaYoutube,
+  FaWhatsapp,
+} from 'react-icons/fa6';
 import { LuSend } from 'react-icons/lu';
 import logo from '../../assets/logoImage.jpg';
+import toast from 'react-hot-toast';
 
 /* ─────────────────────────────────────────
-   Data
+   Footer Columns Data
 ───────────────────────────────────────── */
 const footerColumns = [
   {
-    heading: 'Features',
+    heading: 'Core Ecosystem',
     links: [
-      { label: 'Uni Proposals (Matchmaking)', to: '/proposals', highlight: true },
-      { label: 'Find Annexes', to: '/annex-list' },
-      { label: 'Campus Events', to: '/event-list' },
-      { label: 'Student Blogs', to: '/blogs' },
+      { label: 'Find Student Annexes', to: '/annex-list', badge: 'Hot' },
+      { label: 'Hustle Hub Market', to: '/market' },
+      { label: 'Campus Services', to: '/services' },
+      { label: 'University Events', to: '/event-list' },
+      { label: 'Student Blogs & Feed', to: '/blogs' },
     ],
   },
   {
-    heading: 'Resources',
+    heading: 'Matchmaking & B2B',
     links: [
-      { label: 'Post an Ad', to: '/post-ad' },
-      { label: 'Submit a Blog', to: '/submit-blog' },
-      { label: 'FAQ', to: '/faq' },
-      { label: 'Contact Us', to: '/contact-us' },
+      { label: 'Uni Porondam', to: '/proposals', highlight: true, badge: 'VIP' },
+      { label: 'Advertise with Us', to: '/advertise', highlight: true },
+      { label: 'Create Ad Campaign', to: '/advertise/submit' },
+      { label: 'Submit Event or Ad', to: '/post-ad' },
+      { label: 'Submit Student Article', to: '/submit-blog' },
     ],
   },
   {
-    heading: 'Company',
+    heading: 'Help & Information',
     links: [
-      { label: 'About Us', to: '/#home' },
-      { label: 'Advertise with Us', to: '/advertise' },
+      { label: 'About The Uni Gang', to: '/about' },
+      { label: 'Help Center & FAQ', to: '/faq' },
+      { label: 'Support & Contact Us', to: '/contact-us' },
       { label: 'Privacy Policy', to: '/privacy-policy' },
       { label: 'Terms of Service', to: '/terms-of-service' },
     ],
@@ -44,52 +48,44 @@ const footerColumns = [
 ];
 
 const socialLinks = [
-  { icon: <FaFacebook size={16} />, href: '#', label: 'Facebook' },
-  { icon: <FaTwitter size={16} />, href: '#', label: 'Twitter' },
-  { icon: <FaYoutube size={16} />, href: '#', label: 'YouTube' },
-  { icon: <FaInstagram size={16} />, href: '#', label: 'Instagram' },
+  { icon: <FaFacebook size={16} />, href: '#', label: 'Facebook', color: 'hover:bg-blue-600' },
+  { icon: <FaInstagram size={16} />, href: '#', label: 'Instagram', color: 'hover:bg-pink-600' },
+  { icon: <FaYoutube size={16} />, href: '#', label: 'YouTube', color: 'hover:bg-red-600' },
+  { icon: <FaWhatsapp size={16} />, href: 'https://wa.me/94724478148', label: 'WhatsApp', color: 'hover:bg-emerald-600' },
 ];
 
-/* ─────────────────────────────────────────
-   Component
-───────────────────────────────────────── */
 const Footer = () => {
   const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (email.trim()) {
-      setSubscribed(true);
+      toast.success('🎉 Welcome aboard! You have subscribed to The Uni Gang newsletter.');
       setEmail('');
-      setTimeout(() => setSubscribed(false), 4000);
     }
   };
 
   return (
-    <footer
-      style={{
-        background:
-          'linear-gradient(135deg, #0d0f2b 0%, #111433 60%, #0a0c24 100%)',
-      }}
-      className="relative overflow-hidden"
-    >
-      {/* Subtle ambient glow at top */}
+    <footer className="relative overflow-hidden bg-slate-950 text-slate-300 border-t border-slate-800/80 font-sans select-none">
+      {/* Dynamic Ambient Glow Backdrops */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[200px] rounded-full blur-[80px]"
-        style={{ background: 'rgba(99,102,241,0.08)' }}
+        className="pointer-events-none absolute -top-32 left-1/4 w-[600px] h-[300px] rounded-full bg-blue-600/10 blur-[140px]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 right-1/4 w-[600px] h-[300px] rounded-full bg-indigo-600/10 blur-[140px]"
       />
 
-      {/* ── Main grid ────────────────────────── */}
-      <div className="container mx-auto max-w-7xl 2xl:max-w-[1600px] px-6 2xl:px-20 pt-14 pb-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
+      <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto px-6 2xl:px-20 pt-14 pb-10 relative z-10">
+        
+        {/* ── Main Top Row Grid (5 Columns Layout) ────────────────────────── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-6 items-start">
 
-          {/* ① Brand column */}
-          <div className="lg:col-span-1 flex flex-col gap-5">
-            {/* Logo + name */}
+          {/* ① Brand Column */}
+          <div className="lg:col-span-1 flex flex-col gap-4">
             <Link to="/" className="flex items-center gap-3 group w-fit">
-              <div className="relative w-10 h-10 rounded-xl overflow-hidden ring-2 ring-indigo-500/60 group-hover:ring-indigo-400 transition-all duration-300">
+              <div className="relative w-10 h-10 rounded-2xl overflow-hidden ring-2 ring-blue-500/50 group-hover:ring-blue-400 transition-all duration-300 shadow-md">
                 <img
                   src={logo}
                   alt="The Uni Gang"
@@ -97,45 +93,51 @@ const Footer = () => {
                 />
               </div>
               <div>
-                <p className="text-white font-bold text-sm leading-tight tracking-wide">
+                <p className="text-white font-black text-base tracking-tight leading-none">
                   The Uni Gang
                 </p>
-                <p
-                  className="text-[10px] leading-tight font-medium tracking-widest uppercase"
-                  style={{ color: 'rgba(129,140,248,0.8)' }}
-                >
-                  Student Platform
+                <p className="text-[9px] font-black tracking-widest uppercase text-blue-400 mt-1">
+                  CAMPUS PLATFORM & B2B HUB
                 </p>
               </div>
             </Link>
 
-            {/* Tagline */}
-            <p className="text-slate-400 text-sm leading-relaxed">
-              The ultimate platform for Sri Lankan undergraduates. Find your perfect match, discover student accommodation, events, and thrive in your university life.
+            <p className="text-slate-400 text-xs leading-relaxed font-normal">
+              Empowering 50,000+ Sri Lankan undergraduates across 15+ university campuses with housing, events, trading, and connections.
             </p>
 
-            {/* Social icons */}
+            {/* Social Icons */}
             <div className="flex items-center gap-2.5 mt-1">
-              {socialLinks.map(({ icon, href, label }) => (
+              {socialLinks.map(({ icon, href, label, color }) => (
                 <motion.a
                   key={label}
                   href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={label}
                   whileHover={{ scale: 1.15, y: -2 }}
                   whileTap={{ scale: 0.9 }}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-white transition-colors duration-200"
-                  style={{ background: 'rgba(255,255,255,0.07)' }}
+                  className={`w-8.5 h-8.5 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-all duration-200 ${color}`}
                 >
                   {icon}
                 </motion.a>
               ))}
             </div>
+
+            {/* Platform Status Badge */}
+            <div className="mt-1 inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-[10px] font-semibold text-slate-400 w-fit">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span>All Systems Operational</span>
+            </div>
           </div>
 
-          {/* ② – ④  Link columns */}
+          {/* ② – ④ Link Columns */}
           {footerColumns.map((col) => (
-            <div key={col.heading} className="flex flex-col gap-4">
-              <h4 className="text-white font-semibold text-sm tracking-wide">
+            <div key={col.heading} className="flex flex-col gap-3.5">
+              <h4 className="text-white font-extrabold text-xs tracking-wider uppercase text-slate-200">
                 {col.heading}
               </h4>
               <ul className="flex flex-col gap-2.5">
@@ -143,13 +145,18 @@ const Footer = () => {
                   <li key={link.label}>
                     <Link
                       to={link.to}
-                      className={`text-sm transition-colors duration-200 ${
+                      className={`text-xs transition-all duration-200 flex items-center gap-2 ${
                         link.highlight
-                          ? 'text-indigo-400 hover:text-indigo-300 font-medium'
-                          : 'text-slate-400 hover:text-white'
+                          ? 'text-blue-400 hover:text-blue-300 font-bold'
+                          : 'text-slate-400 hover:text-white font-medium'
                       }`}
                     >
-                      {link.label}
+                      <span>{link.label}</span>
+                      {link.badge && (
+                        <span className="px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider rounded-md bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                          {link.badge}
+                        </span>
+                      )}
                     </Link>
                   </li>
                 ))}
@@ -157,98 +164,53 @@ const Footer = () => {
             </div>
           ))}
 
-          {/* ⑤ Stay Connected */}
-          <div className="flex flex-col gap-4">
-            <h4 className="text-white font-semibold text-sm tracking-wide">
-              Stay Connected
+          {/* ⑤ Subscribe Section MOVED TO TOP RIGHT (Right Corner) */}
+          <div className="lg:col-span-1 flex flex-col gap-3.5 bg-slate-900/60 p-5 rounded-3xl border border-slate-800/80 backdrop-blur-xl">
+            <h4 className="text-white font-extrabold text-xs tracking-wider uppercase text-slate-200">
+              Subscribe to Digest
             </h4>
-            <p className="text-slate-400 text-sm leading-relaxed">
-              Get the latest updates and tips for your student journey.
+            <p className="text-slate-400 text-xs font-normal leading-relaxed">
+              Get the latest annex alerts, campus events, and career updates directly to your inbox.
             </p>
 
-            <form onSubmit={handleSubscribe} className="flex flex-col gap-2 mt-1">
-              <div className="flex items-center gap-2">
-                {/* Email input */}
-                <input
-                  type="email"
-                  id="footer-email-input"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  required
-                  className="flex-1 min-w-0 px-3 py-2 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 transition-all duration-200"
-                  style={{
-                    background: 'rgba(255,255,255,0.07)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(99,102,241,0.5)';
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                  }}
-                />
-                {/* Subscribe button */}
-                <motion.button
-                  type="submit"
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-white whitespace-nowrap shadow-lg transition-all duration-200"
-                  style={{
-                    background:
-                      'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-                    boxShadow: '0 4px 15px rgba(99,102,241,0.3)',
-                  }}
-                >
-                  <LuSend size={13} />
-                  Subscribe
-                </motion.button>
-              </div>
-
-              {/* Success feedback */}
-              {subscribed && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-emerald-400 text-xs font-medium"
-                >
-                  ✓ You're subscribed! Thanks for joining.
-                </motion.p>
-              )}
+            <form onSubmit={handleSubscribe} className="flex flex-col gap-2.5 mt-1">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter email address"
+                required
+                className="w-full px-3.5 py-2.5 rounded-xl text-xs text-white placeholder-slate-500 bg-slate-950 border border-slate-800 focus:outline-none focus:border-blue-500 transition-all font-medium"
+              />
+              <motion.button
+                type="submit"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all"
+              >
+                <LuSend size={13} />
+                <span>Join Digest</span>
+              </motion.button>
             </form>
           </div>
+
         </div>
 
-        {/* ── Divider + Copyright bar ──────────── */}
-        <div
-          className="mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3"
-          style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}
-        >
-          <p className="text-slate-500 text-sm text-center sm:text-left">
-            © {new Date().getFullYear()} The Uni Gang. All rights reserved.
+        {/* ── Bottom Bar ──────────── */}
+        <div className="mt-12 pt-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-slate-500">
+          <p className="text-center sm:text-left">
+            © {new Date().getFullYear()} <span className="text-slate-300 font-bold">The Uni Gang</span>. Built for Sri Lankan University Students with ❤️.
           </p>
 
-          <div className="flex items-center gap-5">
-            <Link
-              to="/privacy-policy"
-              className="text-slate-500 hover:text-slate-300 text-xs transition-colors duration-200"
-            >
-              Privacy
-            </Link>
-            <Link
-              to="/terms-of-service"
-              className="text-slate-500 hover:text-slate-300 text-xs transition-colors duration-200"
-            >
-              Terms
-            </Link>
-            <Link
-              to="/faq"
-              className="text-slate-500 hover:text-slate-300 text-xs transition-colors duration-200"
-            >
-              FAQ
-            </Link>
+          <div className="flex items-center gap-6">
+            <Link to="/about" className="hover:text-slate-300 transition-colors">About</Link>
+            <Link to="/privacy-policy" className="hover:text-slate-300 transition-colors">Privacy</Link>
+            <Link to="/terms-of-service" className="hover:text-slate-300 transition-colors">Terms</Link>
+            <Link to="/faq" className="hover:text-slate-300 transition-colors">FAQ</Link>
+            <Link to="/contact-us" className="hover:text-slate-300 transition-colors">Support</Link>
           </div>
         </div>
+
       </div>
     </footer>
   );

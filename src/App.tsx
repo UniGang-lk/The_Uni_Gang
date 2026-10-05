@@ -37,6 +37,7 @@ const EventDetailPage = lazy(() => import('./pages/events/EventDetailPage'));
 const PrivacyPolicy = lazy(() => import('./pages/privacyPolicy/PrivacyPolicy'));
 const Terms = lazy(() => import('./pages/terms/Terms'));
 const FAQ = lazy(() => import('./pages/f&q/F&Q'));
+const AboutUs = lazy(() => import('./pages/about/AboutUs'));
 const BlogList = lazy(() => import('./pages/blogs/BlogList'));
 const BlogDetail = lazy(() => import('./pages/blogs/BlogDetail'));
 const SubmitBlog = lazy(() => import('./pages/blogs/SubmitBlog'));
@@ -116,6 +117,9 @@ function App() {
 
           {/* FAQ using SubLayout */}
           <Route path="/faq" element={<SubLayout><FAQ /></SubLayout>} />
+
+          {/* About Us using SubLayout */}
+          <Route path="/about" element={<SubLayout><AboutUs /></SubLayout>} />
 
           {/* Blogs Routes */}
           <Route path="/blogs" element={<SubLayout><BlogList /></SubLayout>} />
