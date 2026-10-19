@@ -222,14 +222,15 @@ export const NotificationDropdown = () => {
                             </p>
                           </div>
 
-                          {/* Action Button */}
+                          {/* Action Button: Stylish visible tick inside a small circle */}
                           {!notification.isRead && (
                             <button 
+                              type="button"
                               onClick={(e) => handleMarkAsRead(notification.id, e)}
-                              className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white dark:bg-slate-700 text-slate-400 hover:text-blue-500 hover:shadow-md dark:hover:bg-slate-600 transition-all opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0"
+                              className="shrink-0 self-center w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-700/60 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-white hover:border-emerald-500 transition-all duration-200 flex items-center justify-center cursor-pointer shadow-xs group/btn"
                               title="Mark as read"
                             >
-                              <FiCheck className="w-4 h-4" />
+                              <FiCheck className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
                             </button>
                           )}
                         </div>

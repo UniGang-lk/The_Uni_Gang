@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { ChevronLeft, ShieldCheck, Mail, Link as LinkIcon, Smartphone, MessageCircle, Crown, Lock, EyeOff } from 'lucide-react';
 import { PrimaryButton, Card, cx } from '../components/ui/ProposalPrimitives';
 import { proposalApi } from '../api/proposalApi';
+import toast from 'react-hot-toast';
 
 interface ProposalSettingsPageProps {
   setPage: (p: string) => void;
@@ -22,13 +23,31 @@ export default function ProposalSettingsPage({ setPage, onDeleteProposalProfile 
     });
   }, []);
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
+    try {
+      await proposalApi.deleteProfile();
+      toast.success("Proposal account permanently purged!");
+    } catch (e) {
+      console.warn("Could not call backend delete, cleaning locally", e);
+    }
     localStorage.removeItem('userHasProposalProfile');
+    localStorage.removeItem('userProposalProfile');
     setShowDeleteModal(false);
     if (onDeleteProposalProfile) {
       onDeleteProposalProfile();
     } else {
-      setPage('dashboard');
+      setPage('landing');
+    }
+  };
+
+  const handleTogglePause = async () => {
+    const next = !isProfilePaused;
+    setIsProfilePaused(next);
+    try {
+      await proposalApi.togglePauseProfile();
+      toast.success(next ? "Profile Paused! Hidden from search matches." : "Profile Activated!");
+    } catch (e) {
+      console.warn("Toggle pause API call failed, kept local state", e);
     }
   };
 
@@ -167,7 +186,7 @@ export default function ProposalSettingsPage({ setPage, onDeleteProposalProfile 
               </div>
               <button 
                 type="button"
-                onClick={() => setIsProfilePaused(!isProfilePaused)}
+                onClick={handleTogglePause}
                 className={`w-12 h-6 rounded-full relative transition-colors duration-300 cursor-pointer ${
                   isProfilePaused ? 'bg-amber-500' : 'bg-slate-300 dark:bg-slate-700'
                 }`}

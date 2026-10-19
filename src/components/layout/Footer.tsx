@@ -146,7 +146,7 @@ const Footer = () => {
                     <Link
                       to={link.to}
                       className={`text-xs transition-all duration-200 flex items-center gap-2 ${
-                        link.highlight
+                        'highlight' in link && link.highlight
                           ? 'text-blue-400 hover:text-blue-300 font-bold'
                           : 'text-slate-400 hover:text-white font-medium'
                       }`}

@@ -91,11 +91,6 @@ export default function ProposalFullProfilePage({
                   className={cx("w-full h-full object-cover transition-all duration-500", profile.blurPhoto && "blur-xl")}
                 />
               </WatermarkOverlay>
-
-              {/* Photo Count Badge */}
-              <div className="absolute top-3 left-3 bg-slate-950/70 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-white border border-white/20 flex items-center gap-1">
-                <Camera size={12} /> Photo {selectedImageIndex + 1} of {allImages.length}
-              </div>
             </div>
 
             {/* 3 Photos Thumbnail Switcher Row */}

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { cx } from './ui/ProposalPrimitives';
 import { WatermarkOverlay } from './privacy/WatermarkOverlay';
+import UnifiedTrustPill from './verification/UnifiedTrustPill';
 
 export default function ProposalProfileModal({ profile, onClose }: { profile: any; onClose: () => void }) {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
@@ -143,12 +144,8 @@ export default function ProposalProfileModal({ profile, onClose }: { profile: an
                           "w-full h-full object-cover transition-transform duration-500",
                           profile.blurPhoto && "blur-2xl brightness-75 scale-110"
                         )} 
-                      />
-                    </WatermarkOverlay>
-                    <div className="absolute top-2 left-2 bg-slate-950/70 text-white text-[9px] font-bold px-2 py-0.5 rounded-full border border-white/20 flex items-center gap-1">
-                      <Camera size={11} /> Photo {activePhotoIndex + 1} of {allImages.length}
+                      </WatermarkOverlay>
                     </div>
-                  </div>
 
                   {/* 3 Photos Thumbnail Switcher Row */}
                   <div className="flex items-center justify-center gap-2.5 mt-3">
@@ -174,9 +171,14 @@ export default function ProposalProfileModal({ profile, onClose }: { profile: an
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-extrabold text-base text-slate-900 dark:text-white">{profile.name}</h3>
-                      <p className="text-[11px] font-bold text-slate-500">{profile.code || 'BR000158'} • Age {profile.age || 31}</p>
+                      <p className="text-[11px] font-bold text-slate-500 mb-1.5">{profile.code || 'BR000158'} • Age {profile.age || 31}</p>
+                      <UnifiedTrustPill 
+                        isVerified={profile.isVerified ?? true}
+                        categoryBadge={profile.categoryBadge || 'Campus Graduate 🎓'}
+                        instituteOrCompany={profile.profession || profile.district}
+                      />
                     </div>
-                    <span className="bg-rose-500/10 text-rose-500 font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1">
+                    <span className="bg-rose-500/10 text-rose-500 font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1 self-start">
                       <Heart size={13} fill="currentColor" /> {profile.matchPercentage || 95}%
                     </span>
                   </div>

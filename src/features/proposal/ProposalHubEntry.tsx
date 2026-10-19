@@ -1,190 +1,244 @@
-import { useState } from 'react';
-import AuthCard from '../../components/auth/AuthCard';
+import { useState, useEffect } from 'react';
 import ProposalNavbar from './components/navbar/ProposalNavbar';
 import ProposalLandingPage from './pages/ProposalLandingPage';
+import ProposalDiscoverPage from './pages/ProposalDiscoverPage';
 import ProposalOnboardingPage from './pages/ProposalOnboardingPage';
 import ProposalHomePage from './pages/ProposalHomePage';
-import ProposalDiscoverPage from './pages/ProposalDiscoverPage';
-import ProposalPremiumPage from './pages/ProposalPremiumPage';
-import ProposalInboxPage from './pages/ProposalInboxPage';
-import ProposalProfilePage from './pages/ProposalProfilePage';
-import ProposalSettingsPage from './pages/ProposalSettingsPage';
 import ProposalFullProfilePage from './pages/ProposalFullProfilePage';
+import ProposalInboxPage from './pages/ProposalInboxPage';
 import ProposalLikesPage from './pages/ProposalLikesPage';
+import ProposalPremiumPage from './pages/ProposalPremiumPage';
+import ProposalSettingsPage from './pages/ProposalSettingsPage';
 import ErrorBoundary from './components/ErrorBoundary';
+import { useTheme } from '../../context/ThemeContext';
+
+export type ProposalView = 
+  | 'landing' 
+  | 'discover' 
+  | 'onboarding' 
+  | 'dashboard' 
+  | 'profile' 
+  | 'inbox' 
+  | 'likes' 
+  | 'premium' 
+  | 'settings';
 
 export default function ProposalHubEntry() {
-  // Single Sign-On (SSO) & Proposal Profile States
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => !!localStorage.getItem('userToken'));
-  const [hasProposalProfile, setHasProposalProfile] = useState<boolean>(() => localStorage.getItem('userHasProposalProfile') === 'true');
-  const [appState, setAppState] = useState<'LANDING' | 'ONBOARDING' | 'HOME'>(() => {
-    const token = localStorage.getItem('userToken');
-    const hasProfile = localStorage.getItem('userHasProposalProfile') === 'true';
-    return (token && hasProfile) ? 'HOME' : 'LANDING';
-  });
-  const [subPage, setSubPage] = useState<'dashboard' | 'discover' | 'premium' | 'inbox' | 'profile' | 'settings' | 'view_profile' | 'likes'>('dashboard');
-  const [activeNavbarTab, setActiveNavbarTab] = useState(() => (localStorage.getItem('userToken') && localStorage.getItem('userHasProposalProfile') === 'true') ? 'discover' : 'home');
-  const [dark] = useState(true);
-  const [selectedProfile, setSelectedProfile] = useState<any | null>(null);
-  const [previousSubPage, setPreviousSubPage] = useState<'dashboard' | 'discover'>('dashboard');
-  const [showAuth, setShowAuth] = useState(false);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
-  const handleOpenProfile = (profile: any, from: 'dashboard' | 'discover') => {
-    setSelectedProfile(profile);
-    setPreviousSubPage(from);
-    setSubPage('view_profile');
+  const [activeView, setActiveView] = useState<ProposalView>('landing');
+  const [previousView, setPreviousView] = useState<ProposalView>('landing');
+  const [selectedProfile, setSelectedProfile] = useState<any | null>(null);
+  const [initialSearchFilters, setInitialSearchFilters] = useState<any>(null);
+  const [hasProfile, setHasProfile] = useState<boolean>(() => {
+    return localStorage.getItem('userHasProposalProfile') === 'true';
+  });
+
+  const isLoggedIn = !!localStorage.getItem('userToken') && localStorage.getItem('userToken') !== 'null';
+
+  // Listen to profile updates in localStorage
+  useEffect(() => {
+    const checkProfile = () => {
+      setHasProfile(localStorage.getItem('userHasProposalProfile') === 'true');
+    };
+    window.addEventListener('storage', checkProfile);
+    return () => window.removeEventListener('storage', checkProfile);
+  }, []);
+
+  const navigateTo = (view: ProposalView) => {
+    setPreviousView(activeView);
+    setActiveView(view);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleGetStarted = () => {
-    const token = localStorage.getItem('userToken');
-    if (!token) {
-      setShowAuth(true);
-      return;
-    }
-    if (!hasProposalProfile) {
-      setAppState('ONBOARDING');
+    if (hasProfile) {
+      navigateTo('dashboard');
     } else {
-      setAppState('HOME');
-      setSubPage('discover');
+      navigateTo('onboarding');
     }
   };
 
-  const handleAuthSuccess = () => {
-    setShowAuth(false);
-    setIsLoggedIn(true);
-    localStorage.setItem('userToken', 'mock_sso_jwt_token');
-
-    if (localStorage.getItem('userHasProposalProfile') === 'true') {
-      setHasProposalProfile(true);
-      setAppState('HOME');
-      setSubPage('dashboard');
-    } else {
-      setAppState('ONBOARDING');
-    }
-  };
-
-  const handleOnboardingComplete = () => {
-    localStorage.setItem('userHasProposalProfile', 'true');
-    setHasProposalProfile(true);
-    setAppState('HOME');
-    setSubPage('dashboard');
-    setActiveNavbarTab('discover');
-  };
-
-  const handleGoToLanding = () => {
-    setAppState('LANDING');
-    setActiveNavbarTab('home');
-  };
-
-  const handleNavbarNavigate = (tabId: string) => {
-    setActiveNavbarTab(tabId);
-    if (tabId === 'profile' || tabId === 'dashboard') {
-      if (isLoggedIn && hasProposalProfile) {
-        setAppState('HOME');
-        setSubPage('dashboard');
+  const handleSearchFromHero = (filters: any) => {
+    // Convert hero search filters to Discover SearchFilterState format
+    const formatted: any = {};
+    if (filters.lookingFor) formatted.lookingFor = filters.lookingFor;
+    if (filters.ageRange) {
+      formatted.ageRange = filters.ageRange;
+      const parts = filters.ageRange.split('-');
+      if (parts.length === 2) {
+        formatted.minAge = parts[0];
+        formatted.maxAge = parts[1];
       }
-    } else if (tabId === 'home') {
-      setAppState('LANDING');
-    } else if (tabId === 'discover') {
-      const token = localStorage.getItem('userToken');
-      if (!token) {
-        setShowAuth(true);
-      } else if (!hasProposalProfile) {
-        setAppState('ONBOARDING');
-      } else if (appState !== 'HOME') {
-        setAppState('HOME');
-        setSubPage('discover');
+    }
+    if (filters.religion && filters.religion !== 'Any') {
+      formatted.religion = filters.religion;
+    }
+    if (filters.livingIn && filters.livingIn !== 'Anywhere') {
+      formatted.country = filters.livingIn;
+    }
+    if (filters.category) {
+      if (filters.category === 'campus') formatted.education = 'University';
+      else if (filters.category === 'working') formatted.profession = 'Working Professional';
+      else if (filters.category === 'abroad') formatted.country = 'Abroad';
+    }
+
+    setInitialSearchFilters(formatted);
+    navigateTo('discover');
+  };
+
+  const handleViewProfile = (profile: any) => {
+    setSelectedProfile(profile);
+    setPreviousView(activeView);
+    setActiveView('profile');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNavClick = (target: string) => {
+    if (target === 'home') {
+      navigateTo('landing');
+    } else if (target === 'discover') {
+      setInitialSearchFilters(null);
+      navigateTo('discover');
+    } else if (target === 'dashboard') {
+      handleGetStarted();
+    } else {
+      // Anchors: how-it-works, trust, faq
+      if (activeView !== 'landing') {
+        setActiveView('landing');
+        setTimeout(() => {
+          const el = document.getElementById(target);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
       } else {
-        setSubPage('discover');
+        const el = document.getElementById(target);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
       }
-    } else if (tabId === 'premium' || tabId === 'pricing') {
-      if (appState !== 'HOME') setAppState('HOME');
-      setSubPage('premium');
     }
   };
-
-  const getUserName = () => {
-    try {
-      const savedRaw = localStorage.getItem('userProposalProfile');
-      if (savedRaw) {
-        const parsed = JSON.parse(savedRaw);
-        if (parsed.name && parsed.name.trim().length > 0) return parsed.name;
-      }
-    } catch (e) {}
-    return 'Kasun Bandara';
-  };
-
-  if (showAuth) {
-    return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center items-center py-10 relative">
-        <button 
-          onClick={() => setShowAuth(false)}
-          className="absolute top-8 left-8 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 font-bold text-sm cursor-pointer"
-        >
-          &larr; Back to Hub
-        </button>
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-black text-slate-900 dark:text-white">යූනි මංගල සේවයට ඇතුළු වන්න</h2>
-          <p className="text-slate-500 text-sm">Please log in or create an account to continue.</p>
-        </div>
-        <AuthCard onAuthSuccess={handleAuthSuccess} />
-      </div>
-    );
-  }
-
-  if (appState === 'LANDING') {
-    return (
-      <ErrorBoundary>
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 font-sans text-slate-900 dark:text-white selection:bg-rose-500/30">
-          <ProposalNavbar
-            activeTab={activeNavbarTab}
-            onNavigate={handleNavbarNavigate}
-            onGetStarted={handleGetStarted}
-            onSignIn={() => setShowAuth(true)}
-            isLoggedIn={isLoggedIn}
-            hasProposalProfile={hasProposalProfile}
-            user={isLoggedIn ? { name: getUserName() } : null}
-            onCreateProposalProfile={() => setAppState('ONBOARDING')}
-          />
-          <ProposalLandingPage dark={dark} onGetStarted={handleGetStarted} hasProposalProfile={isLoggedIn && hasProposalProfile} />
-        </div>
-      </ErrorBoundary>
-    );
-  }
-
-  if (appState === 'ONBOARDING') {
-    return <ProposalOnboardingPage onComplete={handleOnboardingComplete} onBack={handleGoToLanding} dark={dark} />;
-  }
 
   return (
     <ErrorBoundary>
-      <ProposalNavbar
-        activeTab={subPage}
-        onNavigate={handleNavbarNavigate}
-        onGetStarted={handleGetStarted}
-        onSignIn={() => setShowAuth(true)}
-        isLoggedIn={isLoggedIn}
-        hasProposalProfile={hasProposalProfile}
-        user={isLoggedIn ? { name: getUserName() } : null}
-        onCreateProposalProfile={() => setAppState('ONBOARDING')}
-      />
-      {subPage === 'discover' && <ProposalDiscoverPage setPage={(p) => setSubPage(p as any)} openProfile={(p) => handleOpenProfile(p, 'discover')} />}
-      {subPage === 'premium' && <ProposalPremiumPage setPage={(p) => setSubPage(p as any)} />}
-      {subPage === 'inbox' && <ProposalInboxPage setPage={(p) => setSubPage(p as any)} />}
-      {subPage === 'profile' && <ProposalProfilePage setPage={(p) => setSubPage(p as any)} />}
-      {subPage === 'settings' && (
-        <ProposalSettingsPage 
-          setPage={(p) => setSubPage(p as any)} 
-          onDeleteProposalProfile={() => {
-            setHasProposalProfile(false);
-            setAppState('LANDING');
-            setActiveNavbarTab('home');
-          }}
-        />
-      )}
-      {subPage === 'dashboard' && <ProposalHomePage setPage={(p) => setSubPage(p as any)} openProfile={(p) => handleOpenProfile(p, 'dashboard')} goToLanding={handleGoToLanding} />}
-      {subPage === 'likes' && <ProposalLikesPage setPage={(p) => setSubPage(p as any)} />}
-      {subPage === 'view_profile' && <ProposalFullProfilePage profile={selectedProfile} goBack={() => setSubPage(previousSubPage)} />}
+      <div className={`min-h-screen font-sans selection:bg-rose-500/30 transition-colors duration-300 ${
+        isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'
+      }`}>
+        {/* Global Proposal Navbar for Landing & Discover views */}
+        {(activeView === 'landing' || activeView === 'discover') && (
+          <ProposalNavbar
+            onNavigate={handleNavClick}
+            onGetStarted={handleGetStarted}
+            onSignIn={() => navigateTo('dashboard')}
+            isLoggedIn={isLoggedIn || hasProfile}
+          />
+        )}
+
+        <main className="w-full">
+          {activeView === 'landing' && (
+            <ProposalLandingPage
+              onGetStarted={handleGetStarted}
+              onSearch={handleSearchFromHero}
+              onViewProfile={handleViewProfile}
+              hasProposalProfile={hasProfile}
+            />
+          )}
+
+          {activeView === 'discover' && (
+            <ProposalDiscoverPage
+              setPage={(p: any) => {
+                if (p === 'landing' || p === 'home') navigateTo('landing');
+                else if (p === 'onboarding') navigateTo('onboarding');
+                else if (p === 'dashboard') navigateTo('dashboard');
+                else navigateTo(p);
+              }}
+              openProfile={handleViewProfile}
+              initialFilters={initialSearchFilters}
+            />
+          )}
+
+          {activeView === 'onboarding' && (
+            <ProposalOnboardingPage
+              dark={isDark}
+              onComplete={() => {
+                setHasProfile(true);
+                navigateTo('dashboard');
+              }}
+              onBack={() => navigateTo('landing')}
+            />
+          )}
+
+          {activeView === 'dashboard' && (
+            <ProposalHomePage
+              setPage={(page: string) => {
+                if (page === 'landing' || page === 'home') navigateTo('landing');
+                else if (page === 'discover') navigateTo('discover');
+                else if (page === 'onboarding') navigateTo('onboarding');
+                else if (page === 'inbox') navigateTo('inbox');
+                else if (page === 'likes') navigateTo('likes');
+                else if (page === 'premium') navigateTo('premium');
+                else if (page === 'settings') navigateTo('settings');
+                else navigateTo(page as ProposalView);
+              }}
+              openProfile={handleViewProfile}
+              goToLanding={() => navigateTo('landing')}
+            />
+          )}
+
+          {activeView === 'profile' && selectedProfile && (
+            <div className="py-6 px-4">
+              <ProposalFullProfilePage
+                profile={selectedProfile}
+                goBack={() => navigateTo(previousView)}
+                onSendProposal={() => {}}
+              />
+            </div>
+          )}
+
+          {activeView === 'inbox' && (
+            <div className="py-6 px-4">
+              <ProposalInboxPage
+                setPage={(p: any) => {
+                  if (p === 'landing') navigateTo('landing');
+                  else navigateTo('dashboard');
+                }}
+              />
+            </div>
+          )}
+
+          {activeView === 'likes' && (
+            <div className="py-6 px-4">
+              <ProposalLikesPage
+                setPage={(p: any) => {
+                  if (p === 'landing') navigateTo('landing');
+                  else navigateTo('dashboard');
+                }}
+              />
+            </div>
+          )}
+
+          {activeView === 'premium' && (
+            <div className="py-6 px-4">
+              <ProposalPremiumPage
+                setPage={(p: any) => {
+                  if (p === 'landing') navigateTo('landing');
+                  else navigateTo('dashboard');
+                }}
+              />
+            </div>
+          )}
+
+          {activeView === 'settings' && (
+            <div className="py-6 px-4">
+              <ProposalSettingsPage
+                setPage={(p: any) => {
+                  if (p === 'landing') navigateTo('landing');
+                  else navigateTo('dashboard');
+                }}
+              />
+            </div>
+          )}
+        </main>
+      </div>
     </ErrorBoundary>
   );
 }

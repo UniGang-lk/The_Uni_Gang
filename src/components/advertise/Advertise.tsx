@@ -167,7 +167,10 @@ export default function AdvertiseSection() {
                   Launch your campaign today and connect with the most active student community in Sri Lanka.
                 </p>
                 <button
-                  onClick={() => navigate('/advertise/submit')}
+                  onClick={() => {
+                    navigate('/advertise');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   className="flex items-center gap-2 px-8 py-4 bg-white text-blue-700 font-black text-sm uppercase tracking-widest rounded-2xl hover:bg-blue-50 hover:scale-105 transition-all group shadow-xl"
                 >
                   Start Campaign <LuArrowRight className="group-hover:translate-x-1 transition-transform" />

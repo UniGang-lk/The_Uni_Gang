@@ -135,6 +135,37 @@ export const proposalApi = {
     if (!response.ok) throw new Error('Failed to generate test data');
     return response.json();
   },
+
+  // Account Management & Privacy
+  deleteProfile: async () => {
+    const response = await fetch(`${API_URL}/me`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    localStorage.removeItem('userHasProposalProfile');
+    localStorage.removeItem('userProposalProfile');
+    if (!response.ok) throw new Error('Failed to delete profile');
+    return response.json();
+  },
+
+  togglePauseProfile: async () => {
+    const response = await fetch(`${API_URL}/privacy/pause`, {
+      method: 'POST',
+      headers: getHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to toggle pause status');
+    return response.json();
+  },
+
+  submitNICVerification: async (data: { nicFront: string; nicBack: string; categoryBadge?: string }) => {
+    const response = await fetch(`${API_URL}/verification/nic`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('Failed to submit NIC for verification');
+    return response.json();
+  },
 };
 
 // Socket.io Service

@@ -38,6 +38,7 @@ export default function AdvertiseLanding() {
   });
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
     api.getPublicStats().then((data) => {
       if (data && data.estimatedReach) {
         setLiveStats(data);

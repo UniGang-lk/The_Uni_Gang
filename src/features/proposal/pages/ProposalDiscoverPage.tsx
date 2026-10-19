@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, X } from 'lucide-react';
+import { Heart, X, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { PrimaryButton, GhostButton } from '../components/ui/ProposalPrimitives';
 import ProposalSearchHeader from '../components/search/ProposalSearchHeader';
 import ProposalSearchSidebar, { SearchFilterState } from '../components/search/ProposalSearchSidebar';
@@ -200,6 +200,7 @@ const DEFAULT_FILTERS: SearchFilterState = {
   profession: 'Any',
   monthlyIncome: 'Any',
   education: 'Any',
+  category: 'All',
   foodPreference: 'Any',
   drinking: 'Any',
   smoking: 'Any',
@@ -209,20 +210,27 @@ const DEFAULT_FILTERS: SearchFilterState = {
 };
 
 export default function ProposalDiscoverPage({
+  setPage,
   openProfile,
+  initialFilters,
 }: {
   setPage: (p: any) => void;
   openProfile: (p: any) => void;
+  initialFilters?: Partial<SearchFilterState>;
 }) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
   const [layoutMode, setLayoutMode] = useState<'grid' | 'compact'>('grid');
-  const [filters, setFilters] = useState<SearchFilterState>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<SearchFilterState>(() => ({
+    ...DEFAULT_FILTERS,
+    ...(initialFilters || {})
+  }));
   const [candidates] = useState<CandidateProfile[]>(INITIAL_CANDIDATES);
   const [isAdvancedDrawerOpen, setIsAdvancedDrawerOpen] = useState(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [selectedInterestProfile, setSelectedInterestProfile] = useState<CandidateProfile | null>(null);
+  const [showVerificationRequiredModal, setShowVerificationRequiredModal] = useState(false);
 
   // Filter calculation logic
   const filteredCandidates = candidates.filter((item) => {
@@ -270,10 +278,25 @@ export default function ProposalDiscoverPage({
     if (filters.profession && filters.profession !== 'Any' && item.profession !== filters.profession) return false;
     if (filters.civilStatus && filters.civilStatus !== 'Any' && item.civilStatus && !item.civilStatus.includes(filters.civilStatus)) return false;
 
+    // 8. Official Category filter
+    if (filters.category && filters.category !== 'All') {
+      const selected = filters.category.toLowerCase();
+      const badge = (item.categoryBadge || '').toLowerCase();
+      if (selected.includes('graduate') && !badge.includes('graduate')) return false;
+      if (selected.includes('undergrad') && !badge.includes('undergrad') && !badge.includes('student')) return false;
+      if (selected.includes('higher edu') && !badge.includes('higher') && !badge.includes('edu')) return false;
+      if (selected.includes('working') && !badge.includes('working') && !badge.includes('abroad') && !badge.includes('business')) return false;
+    }
+
     return true;
   });
 
   const handleSendInterest = (profile: CandidateProfile) => {
+    const isVerified = localStorage.getItem('userIsVerified') === 'true' || localStorage.getItem('userHasProposalVerified') === 'true';
+    if (!isVerified) {
+      setShowVerificationRequiredModal(true);
+      return;
+    }
     setSelectedInterestProfile(profile);
   };
 
@@ -289,6 +312,23 @@ export default function ProposalDiscoverPage({
       isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'
     }`}>
       <div className="max-w-[1550px] mx-auto">
+        {/* Back navigation */}
+        <div className="mb-6 flex items-center justify-between">
+          <button
+            onClick={() => setPage('landing')}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer border ${
+              isDark 
+                ? 'bg-slate-900 border-slate-800 text-slate-300 hover:text-white hover:border-slate-700' 
+                : 'bg-white border-slate-200 text-slate-700 hover:text-slate-950 hover:border-slate-300 shadow-sm'
+            }`}
+          >
+            <ArrowLeft size={14} className="text-rose-500" />
+            <span>Back to Uni Porondam Home</span>
+          </button>
+          <span className="text-xs font-bold text-slate-400">
+            Uni Porondam • Verified Candidate Directory
+          </span>
+        </div>
         
         {/* ── TWO-COLUMN MAIN LAYOUT: LEFT FILTERS SIDEBAR + RIGHT CANDIDATES AREA ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -306,15 +346,17 @@ export default function ProposalDiscoverPage({
           {/* 2. RIGHT AREA: SEARCH MATCHES HEADER + 3-COLUMN CARDS GRID */}
           <div className="lg:col-span-8 xl:col-span-9 space-y-6">
             
-            {/* SEARCH HEADER CONTROLS (Layout View Switch, Pagination, Mobile Filter Trigger) */}
+            {/* SEARCH HEADER CONTROLS (Layout View Switch, Grooms/Brides Switcher, Mobile Trigger) */}
             <ProposalSearchHeader
-              totalResults={filteredCandidates.length > 0 ? filteredCandidates.length * 502 : 4022}
+              totalResults={filteredCandidates.length}
               currentPage={1}
-              totalPages={202}
+              totalPages={1}
               layoutMode={layoutMode}
               onLayoutModeChange={setLayoutMode}
               onToggleMobileFilters={() => setIsMobileFilterOpen(true)}
               showingOnlyVIP={filters.vipOnly}
+              activeGenderTab={filters.lookingFor as any || 'All'}
+              onGenderTabChange={(tab) => setFilters(prev => ({ ...prev, lookingFor: tab }))}
             />
 
             {/* CANDIDATE RESULTS GRID (OUR PERFECT UNTOUCHED CARDS!) */}
@@ -330,8 +372,8 @@ export default function ProposalDiscoverPage({
                   </PrimaryButton>
                 </div>
               ) : layoutMode === 'grid' ? (
-                /* 3-COLUMN CARDS GRID */
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                /* 4-COLUMN CARDS GRID (MATCHING SCREENSHOT LAYOUT) */
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5">
                   {filteredCandidates.map((profile) => (
                     <ProposalSearchResultCard
                       key={profile.id}
@@ -464,6 +506,57 @@ export default function ProposalDiscoverPage({
               </div>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* VERIFICATION REQUIRED MODAL */}
+      <AnimatePresence>
+        {showVerificationRequiredModal && (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className={`p-6 sm:p-8 rounded-3xl max-w-md w-full border shadow-2xl text-center relative ${
+                isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+              }`}
+            >
+              <button
+                onClick={() => setShowVerificationRequiredModal(false)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-4 border border-emerald-500/20 shadow-md">
+                <ShieldCheck size={36} />
+              </div>
+
+              <h3 className="text-xl font-black mb-2">Identity Verification Required!</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 leading-relaxed">
+                ලංකාවේ ආරක්ෂිතම Matchmaking Platform එක විදියට, අනිත් සාමාජිකයින්ට Proposal Requests යැවීමට හෝ සම්බන්ධ වීමට පෙර කරුණාකර ඔබගේ <strong>NIC හෝ Passport</strong> එක Upload කර Verify කරගන්න.
+              </p>
+              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold mb-6 bg-emerald-50 dark:bg-emerald-950/40 py-2 px-3 rounded-xl border border-emerald-500/20">
+                🛡️ Verified Candidates ලාට 3x ගුණයකින් වැඩි ඉක්මන් ප්‍රතිචාර ලැබේ!
+              </p>
+
+              <div className="flex gap-3">
+                <GhostButton dark={isDark} onClick={() => setShowVerificationRequiredModal(false)} className="flex-1 py-3 text-xs">
+                  පසුව කරන්නම්
+                </GhostButton>
+                <PrimaryButton 
+                  onClick={() => {
+                    setShowVerificationRequiredModal(false);
+                    setPage('dashboard');
+                  }} 
+                  icon={ShieldCheck} 
+                  className="flex-1 py-3 text-xs bg-emerald-600 hover:bg-emerald-700"
+                >
+                  Verify NIC Now
+                </PrimaryButton>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

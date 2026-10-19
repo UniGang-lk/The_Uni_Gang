@@ -20,6 +20,7 @@ export interface SearchFilterState {
   profession: string;
   monthlyIncome: string;
   education: string;
+  category?: string;
   foodPreference: string;
   drinking: string;
   smoking: string;
@@ -27,6 +28,14 @@ export interface SearchFilterState {
   accountCreatedBy: string;
   nicVerified: string;
 }
+
+export const OFFICIAL_CATEGORIES = [
+  'All',
+  'Campus Graduate 🎓',
+  'Campus Undergrad 🏛️',
+  'Higher Edu Verified 📜',
+  'Working Professional 💼 / Abroad ✈️'
+];
 
 const SRI_LANKA_DISTRICTS = [
   'All',
@@ -198,7 +207,35 @@ export default function ProposalSearchSidebar({
           </div>
         </div>
 
-        {/* ── 4. AGE RANGE PILLS (MATCHING SCREENSHOT 1) ── */}
+        {/* ── 4. OFFICIAL CATEGORY DROPDOWN ── */}
+        <div>
+          <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 mb-2 block font-sans">
+            Category (නිල කාණ්ඩය)
+          </label>
+          <div className="relative">
+            <select
+              value={filters.category || 'All'}
+              onChange={(e) => handleChange('category', e.target.value)}
+              className={`w-full px-3.5 py-2.5 pr-8 rounded-xl border text-xs font-semibold appearance-none cursor-pointer transition-all focus:outline-none focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 ${
+                isDark
+                  ? 'bg-slate-950 border-slate-800 text-white'
+                  : 'bg-slate-50/70 border-slate-200 text-slate-900'
+              }`}
+            >
+              {OFFICIAL_CATEGORIES.map((c) => (
+                <option key={c} value={c} className={isDark ? 'bg-slate-900 text-white' : 'bg-white text-slate-900'}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={14}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            />
+          </div>
+        </div>
+
+        {/* ── 5. AGE RANGE PILLS (MATCHING SCREENSHOT 1) ── */}
         <div>
           <label className="text-xs font-extrabold text-slate-700 dark:text-slate-300 mb-2.5 block font-sans">
             Age Range
