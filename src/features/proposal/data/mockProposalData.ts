@@ -69,7 +69,14 @@ export const DISCOVER_PROFILES = [
     drinking: 'No',
     fatherProfession: 'Businessman',
     motherProfession: 'Teacher',
-    siblings: '1 Brother'
+    siblings: '1 Brother',
+    lagna: 'කන්‍යා (Virgo)',
+    nekatha: 'හත (Hastha)',
+    doshaStatus: 'None (දෝෂ රහිතයි)',
+    horoscopeMatchRequired: 'Must Match (අත්‍යවශ්‍යයි)',
+    birthTime: '08:42 AM',
+    birthCity: 'Colombo',
+    horoscopeDocUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 2,
@@ -96,7 +103,14 @@ export const DISCOVER_PROFILES = [
     drinking: 'Occasional',
     fatherProfession: 'Retired Engineer',
     motherProfession: 'Housewife',
-    siblings: 'None'
+    siblings: 'None',
+    lagna: 'තුලා (Libra)',
+    nekatha: 'ස්වාති (Swati)',
+    doshaStatus: 'None (දෝෂ රහිතයි)',
+    horoscopeMatchRequired: 'Preferred (කැමතියි)',
+    birthTime: '02:15 PM',
+    birthCity: 'Gampaha',
+    horoscopeDocUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 3,
@@ -123,7 +137,14 @@ export const DISCOVER_PROFILES = [
     drinking: 'No',
     fatherProfession: 'Government Servant',
     motherProfession: 'Housewife',
-    siblings: '2 Sisters'
+    siblings: '2 Sisters',
+    lagna: 'සිංහ (Leo)',
+    nekatha: 'මා (Makha)',
+    doshaStatus: 'Kuja Dosha (කුජ 7 ඇත)',
+    horoscopeMatchRequired: 'Must Match (අත්‍යවශ්‍යයි)',
+    birthTime: '11:30 AM',
+    birthCity: 'Kurunegala',
+    horoscopeDocUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
   }
 ];
 
