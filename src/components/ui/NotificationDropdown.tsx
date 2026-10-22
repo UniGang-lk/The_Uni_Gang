@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiBell, FiCheck, FiInfo, FiFileText, FiCalendar, FiTool, FiHome, FiShoppingBag } from 'react-icons/fi';
+import { FiBell, FiCheck, FiInfo, FiFileText, FiCalendar, FiTool, FiHome, FiShoppingBag, FiHeart } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../api';
 import { useNavigate } from 'react-router-dom';
 
 const getNotificationIcon = (type: string) => {
   switch (type) {
+    case 'Proposal': return <FiHeart className="w-4 h-4 text-pink-500" />;
     case 'Blog': return <FiFileText className="w-4 h-4 text-purple-500" />;
     case 'Event': return <FiCalendar className="w-4 h-4 text-emerald-500" />;
     case 'Service': return <FiTool className="w-4 h-4 text-orange-500" />;
@@ -18,6 +19,7 @@ const getNotificationIcon = (type: string) => {
 
 const getNotificationColor = (type: string) => {
   switch (type) {
+    case 'Proposal': return 'bg-pink-500/10 border-pink-500/20';
     case 'Blog': return 'bg-purple-500/10 border-purple-500/20';
     case 'Event': return 'bg-emerald-500/10 border-emerald-500/20';
     case 'Service': return 'bg-orange-500/10 border-orange-500/20';
