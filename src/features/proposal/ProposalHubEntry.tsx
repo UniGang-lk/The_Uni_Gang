@@ -8,9 +8,14 @@ import ProposalFullProfilePage from './pages/ProposalFullProfilePage';
 import ProposalInboxPage from './pages/ProposalInboxPage';
 import ProposalLikesPage from './pages/ProposalLikesPage';
 import ProposalPremiumPage from './pages/ProposalPremiumPage';
+import ProposalHowItWorksPage from './pages/ProposalHowItWorksPage';
+import ProposalSafetyPage from './pages/ProposalSafetyPage';
+import ProposalFAQPage from './pages/ProposalFAQPage';
 import ProposalSettingsPage from './pages/ProposalSettingsPage';
 import ErrorBoundary from './components/ErrorBoundary';
+import Footer from '../../components/layout/Footer';
 import { useTheme } from '../../context/ThemeContext';
+import toast from 'react-hot-toast';
 
 export type ProposalView = 
   | 'landing' 
@@ -21,6 +26,9 @@ export type ProposalView =
   | 'inbox' 
   | 'likes' 
   | 'premium' 
+  | 'how-it-works'
+  | 'safety'
+  | 'faq'
   | 'settings';
 
 export default function ProposalHubEntry() {
@@ -31,6 +39,7 @@ export default function ProposalHubEntry() {
   const [previousView, setPreviousView] = useState<ProposalView>('landing');
   const [selectedProfile, setSelectedProfile] = useState<any | null>(null);
   const [initialSearchFilters, setInitialSearchFilters] = useState<any>(null);
+  const [selectedPricingPlan, setSelectedPricingPlan] = useState<'classic_3m' | 'vip_6m' | null>(null);
   const [hasProfile, setHasProfile] = useState<boolean>(() => {
     return localStorage.getItem('userHasProposalProfile') === 'true';
   });
@@ -85,10 +94,29 @@ export default function ProposalHubEntry() {
     }
 
     setInitialSearchFilters(formatted);
+
+    if (!isLoggedIn) {
+      toast("💍 ඔබගේ සෙවුමට ගැළපෙන සහකරුවන් හමුවිය! මූලික තොරතුරු බැලීමට කරුණාකර The Uni Gang ගිණුමට Log In වන්න.", {
+        icon: '🔐',
+        duration: 5000
+      });
+      navigateTo('landing');
+      return;
+    }
+
     navigateTo('discover');
   };
 
   const handleViewProfile = (profile: any) => {
+    if (!hasProfile) {
+      toast("🔒 සත්‍යාපිත මනාල/මනාලියන්ගේ සම්පූර්ණ විස්තර බැලීමට කරුණාකර පළමුව ඔබගේ Bio-Data ගිණුම නොමිලේ සාදාගන්න.", {
+        icon: '💍',
+        duration: 5000
+      });
+      navigateTo('onboarding');
+      return;
+    }
+
     setSelectedProfile(profile);
     setPreviousView(activeView);
     setActiveView('profile');
@@ -99,12 +127,30 @@ export default function ProposalHubEntry() {
     if (target === 'home') {
       navigateTo('landing');
     } else if (target === 'discover') {
+      if (!isLoggedIn) {
+        toast("🔒 අපගේ සාමාජිකයින්ගේ මූලික තොරතුරු පිරික්සීමට කරුණාකර පළමුව The Uni Gang වෙබ් අඩවියට Log In වන්න.", {
+          icon: '🔐',
+          duration: 5000
+        });
+        navigateTo('landing');
+        return;
+      }
       setInitialSearchFilters(null);
       navigateTo('discover');
+    } else if (target === 'pricing' || target === 'premium') {
+      setSelectedPricingPlan(null);
+      navigateTo('premium');
+    } else if (target === 'how-it-works') {
+      navigateTo('how-it-works');
+    } else if (target === 'trust' || target === 'safety') {
+      navigateTo('safety');
+    } else if (target === 'faq') {
+      navigateTo('faq');
     } else if (target === 'dashboard') {
       handleGetStarted();
+    } else if (target === 'settings') {
+      navigateTo('settings');
     } else {
-      // Anchors: how-it-works, trust, faq
       if (activeView !== 'landing') {
         setActiveView('landing');
         setTimeout(() => {
@@ -120,11 +166,11 @@ export default function ProposalHubEntry() {
 
   return (
     <ErrorBoundary>
-      <div className={`min-h-screen font-sans selection:bg-rose-500/30 transition-colors duration-300 ${
+      <div className={`min-h-screen flex flex-col font-sans selection:bg-rose-500/30 transition-colors duration-300 ${
         isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'
       }`}>
-        {/* Global Proposal Navbar for Landing & Discover views */}
-        {(activeView === 'landing' || activeView === 'discover') && (
+        {/* Global Proposal Navbar for Landing, Discover, Pricing, How It Works, Safety & FAQ views */}
+        {(activeView === 'landing' || activeView === 'discover' || activeView === 'premium' || activeView === 'how-it-works' || activeView === 'safety' || activeView === 'faq') && (
           <ProposalNavbar
             onNavigate={handleNavClick}
             onGetStarted={handleGetStarted}
@@ -133,12 +179,23 @@ export default function ProposalHubEntry() {
           />
         )}
 
-        <main className="w-full">
+        <main className="w-full flex-grow">
           {activeView === 'landing' && (
             <ProposalLandingPage
               onGetStarted={handleGetStarted}
               onSearch={handleSearchFromHero}
               onViewProfile={handleViewProfile}
+              onViewPricing={() => {
+                setSelectedPricingPlan(null);
+                navigateTo('premium');
+              }}
+              onChoosePricingPlan={(plan) => {
+                setSelectedPricingPlan(plan);
+                navigateTo('premium');
+              }}
+              onViewHowItWorks={() => navigateTo('how-it-works')}
+              onViewSafety={() => navigateTo('safety')}
+              onViewFAQ={() => navigateTo('faq')}
               hasProposalProfile={hasProfile}
             />
           )}
@@ -161,7 +218,11 @@ export default function ProposalHubEntry() {
               dark={isDark}
               onComplete={() => {
                 setHasProfile(true);
-                navigateTo('dashboard');
+                if (initialSearchFilters) {
+                  navigateTo('discover');
+                } else {
+                  navigateTo('dashboard');
+                }
               }}
               onBack={() => navigateTo('landing')}
             />
@@ -184,12 +245,30 @@ export default function ProposalHubEntry() {
             />
           )}
 
-          {activeView === 'profile' && selectedProfile && (
+          {activeView === 'profile' && (
             <div className="py-6 px-4">
               <ProposalFullProfilePage
-                profile={selectedProfile}
+                profile={selectedProfile || JSON.parse(localStorage.getItem('userProposalProfile') || 'null') || {
+                  name: 'Kasun Bandara',
+                  code: 'UG-101',
+                  age: 26,
+                  district: 'Colombo',
+                  profession: 'Software Engineer',
+                  religion: 'Buddhist'
+                }}
                 goBack={() => navigateTo(previousView)}
-                onSendProposal={() => {}}
+                onSendProposal={() => {
+                  try {
+                    const sentIds: string[] = JSON.parse(localStorage.getItem('sentProposalInterestIds') || '[]');
+                    if (selectedProfile?.id && !sentIds.includes(String(selectedProfile.id))) {
+                      sentIds.push(String(selectedProfile.id));
+                      localStorage.setItem('sentProposalInterestIds', JSON.stringify(sentIds));
+                    }
+                  } catch {
+                    // ignore
+                  }
+                }}
+                onVerifyNow={() => navigateTo('onboarding')}
               />
             </div>
           )}
@@ -198,7 +277,10 @@ export default function ProposalHubEntry() {
             <div className="py-6 px-4">
               <ProposalInboxPage
                 setPage={(p: any) => {
-                  if (p === 'landing') navigateTo('landing');
+                  if (p === 'landing' || p === 'home') navigateTo('landing');
+                  else if (p === 'premium') navigateTo('premium');
+                  else if (p === 'settings') navigateTo('settings');
+                  else if (p === 'discover') navigateTo('discover');
                   else navigateTo('dashboard');
                 }}
               />
@@ -209,7 +291,9 @@ export default function ProposalHubEntry() {
             <div className="py-6 px-4">
               <ProposalLikesPage
                 setPage={(p: any) => {
-                  if (p === 'landing') navigateTo('landing');
+                  if (p === 'landing' || p === 'home') navigateTo('landing');
+                  else if (p === 'premium') navigateTo('premium');
+                  else if (p === 'discover') navigateTo('discover');
                   else navigateTo('dashboard');
                 }}
               />
@@ -220,24 +304,86 @@ export default function ProposalHubEntry() {
             <div className="py-6 px-4">
               <ProposalPremiumPage
                 setPage={(p: any) => {
-                  if (p === 'landing') navigateTo('landing');
-                  else navigateTo('dashboard');
+                  if (p === 'landing' || p === 'home') navigateTo('landing');
+                  else if (p === 'discover') navigateTo('discover');
+                  else if (p === 'dashboard') navigateTo('dashboard');
+                  else navigateTo(p as ProposalView);
                 }}
+                previousView={previousView}
+                initialPlan={selectedPricingPlan}
               />
             </div>
+          )}
+
+          {activeView === 'how-it-works' && (
+            <ProposalHowItWorksPage
+              setPage={(p: any) => {
+                if (p === 'landing' || p === 'home') navigateTo('landing');
+                else if (p === 'discover') navigateTo('discover');
+                else if (p === 'dashboard') navigateTo('dashboard');
+                else if (p === 'premium') navigateTo('premium');
+                else if (p === 'safety') navigateTo('safety');
+                else if (p === 'faq') navigateTo('faq');
+                else navigateTo(p as ProposalView);
+              }}
+              onGetStarted={handleGetStarted}
+              previousView={previousView}
+            />
+          )}
+
+          {activeView === 'safety' && (
+            <ProposalSafetyPage
+              setPage={(p: any) => {
+                if (p === 'landing' || p === 'home') navigateTo('landing');
+                else if (p === 'discover') navigateTo('discover');
+                else if (p === 'dashboard') navigateTo('dashboard');
+                else if (p === 'premium') navigateTo('premium');
+                else if (p === 'how-it-works') navigateTo('how-it-works');
+                else if (p === 'faq') navigateTo('faq');
+                else navigateTo(p as ProposalView);
+              }}
+              onGetStarted={handleGetStarted}
+              previousView={previousView}
+            />
+          )}
+
+          {activeView === 'faq' && (
+            <ProposalFAQPage
+              setPage={(p: any) => {
+                if (p === 'landing' || p === 'home') navigateTo('landing');
+                else if (p === 'discover') navigateTo('discover');
+                else if (p === 'dashboard') navigateTo('dashboard');
+                else if (p === 'premium') navigateTo('premium');
+                else if (p === 'how-it-works') navigateTo('how-it-works');
+                else if (p === 'safety') navigateTo('safety');
+                else navigateTo(p as ProposalView);
+              }}
+              onGetStarted={handleGetStarted}
+              previousView={previousView}
+            />
           )}
 
           {activeView === 'settings' && (
             <div className="py-6 px-4">
               <ProposalSettingsPage
                 setPage={(p: any) => {
-                  if (p === 'landing') navigateTo('landing');
+                  if (p === 'landing' || p === 'home') navigateTo('landing');
+                  else if (p === 'premium') navigateTo('premium');
                   else navigateTo('dashboard');
+                }}
+                onDeleteProposalProfile={() => {
+                  setHasProfile(false);
+                  navigateTo('landing');
                 }}
               />
             </div>
           )}
         </main>
+
+        {/* The Uni Gang Platform Main Footer */}
+        {activeView !== 'inbox' && (
+          <Footer />
+        )}
       </div>
     </ErrorBoundary>
   );
