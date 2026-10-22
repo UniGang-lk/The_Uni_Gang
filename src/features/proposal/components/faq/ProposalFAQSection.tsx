@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, Heart } from 'lucide-react';
+import { ChevronDown, Heart, HelpCircle, ArrowRight } from 'lucide-react';
 import { useTheme } from '../../../../context/ThemeContext';
 
 interface FAQItem {
@@ -32,7 +32,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 5,
     question: "මට ඇරයුමක් (Interest Request) ලැබුණු බව දැනගන්නේ කෙසේද?",
-    answer: "ඔබගේ Inbox / Notifications කොටස වෙත ක්ෂණික පණිවිඩයක් ලැබෙන අතර ඔබ ලබාදුන් දුරකථන අංකයට SMS දැනුම්දීමක් ද ලැබෙනු ඇත."
+    answer: "ඔබගේ Inbox / Notifications කොටස වෙත ක්ෂණික පණිවිඩයක් ලැබෙනු ඇත."
   },
   {
     id: 6,
@@ -41,12 +41,30 @@ const FAQ_DATA: FAQItem[] = [
   },
   {
     id: 7,
+    question: "සේවාව සඳහා කිසියම් ගාස්තුවක් අය කෙරේද?",
+    answer: "නැත. Uni Porondam මූලික ලියාපදිංචිය, පැතිකඩක් සෑදීම සහ ගැළපෙන යෝජනා සෙවීම (Discover Matches) සියලුම තරුණ තරුණියන්ට සම්පූර්ණයෙන්ම නොමිලේ (100% Free) ලබා දී ඇත."
+  },
+  {
+    id: 8,
+    question: "මා උඩුගත කරන ජාතික හැඳුනුම්පත් (NIC) ඡායාරූප සුරක්ෂිතද?",
+    answer: "ඔව්, 100% සුරක්ෂිතයි. ඔබ උඩුගත කරන හැඳුනුම්පත මත 'UNIGANG VERIFICATION ONLY' ලෙස ස්වයංක්‍රීය ඩිජිටල් Watermark එකක් යෙදේ. එමෙන්ම එය සත්‍යාපනය කරනු ලබන්නේ අපගේ අභ්‍යන්තර Verification Team එක විසින් පමණක් වන අතර වෙනත් කිසිදු සාමාජිකයෙකුට ඔබගේ හැඳුනුම්පත කිසිසේත්ම නොපෙනේ."
+  },
+  {
+    id: 9,
     question: "මගේ යෝජනා විස්තරය පෙනෙන්නෙ නෑ ඇයි ඒ?",
     answer: "ඔබගේ පැතිකඩෙහි මුලික තොරතුරු අසම්පූර්ණ නම් හෝ පරිපාලක පරීක්ෂාව (Admin Verification) සිදුකෙරෙමින් පවතී නම් එය තාවකාලිකව පෙන්වීම නතර විය හැක. පැය 24ක් ඇතුළත එය සක්‍රිය වේ."
   }
 ];
 
-export default function ProposalFAQSection() {
+interface ProposalFAQSectionProps {
+  onViewAllFAQ?: () => void;
+  maxItems?: number;
+}
+
+export default function ProposalFAQSection({
+  onViewAllFAQ,
+  maxItems = 6
+}: ProposalFAQSectionProps = {}) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const [openId, setOpenId] = useState<number | null>(1); // Open 1st by default
@@ -56,9 +74,8 @@ export default function ProposalFAQSection() {
   };
 
   return (
-    <section className={`py-20 relative border-t font-sinhala ${
-      isDark ? 'border-slate-800/80 bg-gradient-to-b from-transparent via-rose-500/5 to-transparent' : 'border-slate-200 bg-gradient-to-b from-transparent via-rose-500/5 to-transparent'
-    }`}>
+    <section id="faq" className={`py-20 relative border-t font-sinhala ${isDark ? 'border-slate-800/80 bg-gradient-to-b from-transparent via-rose-500/5 to-transparent' : 'border-slate-200 bg-gradient-to-b from-transparent via-rose-500/5 to-transparent'
+      }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
         {/* Header Title */}
         <div className="text-center mb-14">
@@ -74,9 +91,8 @@ export default function ProposalFAQSection() {
         <div className="grid lg:grid-cols-12 gap-10 items-start">
           {/* Left Column: Bridal Couple Image Card */}
           <div className="lg:col-span-5 relative group">
-            <div className={`relative rounded-[2.5rem] overflow-hidden shadow-2xl border-4 transition-transform duration-700 hover:scale-[1.01] ${
-              isDark ? 'border-slate-800' : 'border-white'
-            }`}>
+            <div className={`relative rounded-[2.5rem] overflow-hidden shadow-2xl border-4 transition-transform duration-700 hover:scale-[1.01] ${isDark ? 'border-slate-800' : 'border-white'
+              }`}>
               <img
                 src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
                 alt="Sri Lankan Wedding Couple"
@@ -85,9 +101,8 @@ export default function ProposalFAQSection() {
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent pointer-events-none" />
 
               {/* Overlay Badge */}
-              <div className={`absolute bottom-6 left-6 right-6 p-5 rounded-2xl backdrop-blur-xl border shadow-xl ${
-                isDark ? 'bg-slate-900/95 border-slate-800 text-white' : 'bg-white/95 border-slate-200 text-slate-900'
-              }`}>
+              <div className={`absolute bottom-6 left-6 right-6 p-5 rounded-2xl backdrop-blur-xl border shadow-xl ${isDark ? 'bg-slate-900/95 border-slate-800 text-white' : 'bg-white/95 border-slate-200 text-slate-900'
+                }`}>
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-rose-500 flex items-center justify-center text-white shrink-0">
                     <Heart size={20} fill="white" />
@@ -107,20 +122,19 @@ export default function ProposalFAQSection() {
 
           {/* Right Column: Accordion Questions */}
           <div className="lg:col-span-7 space-y-3.5">
-            {FAQ_DATA.map((item) => {
+            {FAQ_DATA.slice(0, maxItems).map((item) => {
               const isOpen = openId === item.id;
               return (
                 <div
                   key={item.id}
-                  className={`rounded-2xl transition-all duration-300 border ${
-                    isDark
+                  className={`rounded-2xl transition-all duration-300 border ${isDark
                       ? isOpen
                         ? "bg-slate-900 border-rose-500/50 shadow-lg shadow-rose-500/10"
                         : "bg-slate-900/60 border-slate-800/80 hover:border-rose-500/30"
                       : isOpen
                         ? "bg-white border-rose-500 shadow-md"
                         : "bg-white/80 border-slate-200 hover:border-rose-300"
-                  }`}
+                    }`}
                 >
                   <button
                     onClick={() => toggleFAQ(item.id)}
@@ -140,15 +154,29 @@ export default function ProposalFAQSection() {
                   </button>
 
                   {isOpen && (
-                    <div className={`px-4 sm:px-5 pb-5 pt-1 text-xs font-medium leading-relaxed border-t mt-1 font-sinhala animate-fade-up ${
-                      isDark ? 'border-slate-800/80 text-slate-300' : 'border-slate-100 text-slate-600'
-                    }`}>
+                    <div className={`px-4 sm:px-5 pb-5 pt-1 text-xs font-medium leading-relaxed border-t mt-1 font-sinhala animate-fade-up ${isDark ? 'border-slate-800/80 text-slate-300' : 'border-slate-100 text-slate-600'
+                      }`}>
                       {item.answer}
                     </div>
                   )}
                 </div>
               );
             })}
+
+            {/* Prominent Deep-Dive FAQ / Knowledge Base Button */}
+            {onViewAllFAQ && (
+              <div className="pt-4 text-center sm:text-left">
+                <button
+                  type="button"
+                  onClick={onViewAllFAQ}
+                  className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-amber-500/10 hover:from-amber-500/20 hover:to-rose-500/20 border border-amber-500/30 dark:border-amber-400/30 text-amber-600 dark:text-amber-400 font-extrabold text-xs tracking-wider uppercase flex items-center justify-center gap-2.5 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer shadow-sm group"
+                >
+                  <HelpCircle size={16} className="text-amber-500 shrink-0" />
+                  <span>සියලුම ප්‍රශ්නෝත්තර 25+ සහ Help Desk එක බලන්න (Open Full FAQ Page)</span>
+                  <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
