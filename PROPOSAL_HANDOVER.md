@@ -107,3 +107,54 @@
 3. **Landing Page Showcase Section (`Website/src/features/proposal/pages/ProposalLandingPage.tsx`):**
    - FAQ එකට ඉහළින් නව **"Transparent Membership Plans"** Teaser Section එකක් එක් කර ඇත. මෙහි පැකේජ 3ම card வடிවෙන් දැක "View Full Pricing Page" ක්ලික් කර dedicated screen එකට යා හැක.
 
+### I. 🎨 Navbar 3-Part Spacing, Dual Light/Dark Mode in Pricing, & Classic Member Badge
+1. **Navbar Multi-Device Responsive Architecture (`Website/src/features/proposal/components/navbar/ProposalNavbar.tsx`):**
+   - 24.5" Monitor එකේ නිවැරදිව පෙනුණද, Laptop screens (1280px-1440px) වලදී rigid `grid-cols-3` layout එක නිසා center navigation pill එක Left Brand ලාංඡනය මතට overlap වී collision එකක් ඇතිවූ ගැටළුව නිරාකරණය කරන ලදී.
+   - **විසඳුම:** Rigid grid වෙනුවට **Adaptive `flex items-center justify-between` layout** එකක් යොදන ලදී:
+     - **Left & Right Zones (`shrink-0`):** කිසිදු අවස්ථාවක හැකිලීමකට හෝ overlap වීමට ලක් නොවේ.
+     - **Adaptive Pill Navigation Capsule (`flex-1 justify-center`):**
+       - Laptops වලදී compact labels (`Discover`, `How It Works`, `Safety`, `FAQ`, `Pricing VIP`) සහ `text-[11px]` යොදා capsule width එක ~360px දක්වා අඩු කර දෙපසට 400px+ නිදහස් breathing space ලබා දෙයි.
+       - 24.5" සහ 2XL monitors වලදී full labels (`Discover Matches`, `Safety & Privacy`, `Plans & Pricing`) ස්වයංක්‍රීයව දිග හැරේ.
+     - Tablets සහ Phones වලදී Mobile Hamburger Drawer එක මගින් සුමටව ක්‍රියාත්මක වේ.
+   - ප්‍රතිඵලයක් ලෙස Laptop, Desktop, සහ Tablet යන සියලුම screens වල කිසිදු overlap එකක් නොමැතිව 100% පරිපූර්ණව දිස්වේ.
+
+2. **Dedicated Pricing Screen Dual Light/Dark Mode (`Website/src/features/proposal/pages/ProposalPremiumPage.tsx`):**
+   - Dark mode එකට පමණක් සීමා වී තිබූ Pricing Screen එකට සම්පූර්ණ **Light Mode** සහය එක් කරන ලදී (`useTheme()` hook හරහා).
+   - Light mode හිදී:
+     - පිරිසිදු Slate-50 background එක මත Radiant Amber & Emerald Ambient Glows.
+     - Basic, Classic, සහ VIP Cards වල backgrounds සහ typography ආලෝකවත්, eye-friendly, high-contrast පෙනුමක් ලබා දේ.
+     - Classic Plan එකේ Gradient Border Card එක සහ VIP Plan එකේ Gold Ring එක Light mode එකේද ඉතා ආකර්ෂණීයව දිස්වේ.
+     - Bank Transfer Slip Upload Modal එකද Dark/Light දෙකටම අනුකූලව dynamic styles වලින් සමන්විතයි.
+
+3. **Classic Plan Member Badge System (`⭐ Classic / 🥈 Classic`):**
+   - VIP සාමාජිකයින්ට පමණක් Crown badge (`👑 VIP`) තිබූ අතර, Classic සාමාජිකයින්ට සුවිශේෂී ගෞරවනීය පිළිගැනීමක් (Recognition) ලබා දීමට **`⭐ CLASSIC`** Sapphire/Silver badge එක නිර්මාණය කරන ලදී:
+     - **Search & Discover Cards (`ProposalSearchResultCard.tsx`):** Classic සාමාජිකයින්ගේ cards වටා `ring-2 ring-blue-500/60 shadow-blue-500/15 border-blue-400/50` නිල් පැහැති Border Glow එකක් සහ නමට ඉහළින් `⭐ CLASSIC` Sapphire Badge එක දිස්වේ. (VIP අයට `👑 VIP` Gold badge & Amber ring).
+     - **Full Profile View (`ProposalFullProfilePage.tsx`):** Profile Header එකේ VIP හෝ Classic තත්ත්වය අනුව අදාළ Badge එක සහ Ring එක විදහා දැක්වේ.
+4. **Single-Line Price Typography Fix (`රු.` සහ ගණන තනි පේළියකට සකස් කිරීම):**
+   - Pricing cards වල (Classic `රු. 2,990` සහ VIP `රු. 4,990`) `රු.` අකුර ඉහළ පේළියටත් ගණන පහළ පේළියටත් කැඩී යාමේ (wrap) ගැටළුව නිරාකරණය කරන ලදී.
+   - `whitespace-nowrap` class එක `රු. 0`, `රු. 2,990`, `රු. 4,990` සහ duration spans වලට යොදා, responsive font size (`text-3xl sm:text-4xl font-black`) සහිතව ඕනෑම screen size එකකදී `රු.` සහ අගය නොකැඩී එකම තනි පේළියක අලංකාරව රැඳෙන පරිදි [ProposalPremiumPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalPremiumPage.tsx), [ProposalLandingPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalLandingPage.tsx), සහ [ProposalPricingCards.tsx](file:///e:/The-Uni-Gang/Website/src/components/proposal/ProposalPricingCards.tsx) update කරන ලදී.
+
+5. **Main Platform Footer Integration (`Website/src/features/proposal/ProposalHubEntry.tsx`):**
+   - The Uni Gang ප්‍රධාන වේදිකාවේ [Footer.tsx](file:///e:/The-Uni-Gang/Website/src/components/layout/Footer.tsx) එක Proposal Sub-Platform එකෙහි master controller එක වන [ProposalHubEntry.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/ProposalHubEntry.tsx) වෙත integrate කරන ලදී.
+   - දැන් Proposal Landing page, Discover, Bio-Data Dashboard, Candidate Profile View, සහ Pricing screen ඇතුළු සියලුම ප්‍රධාන පිටු වල පහළින් Brand info, Ecosystem links, Matchmaking & B2B links, Social links, සහ Help Center අඩංගු Main Platform Footer එක අලංකාරව දිස්වේ. (Chat/Inbox screen එකට පමණක් footer එක සඟවා ඇත).
+
+6. **Dedicated "How It Works" (ක්‍රියාකාරීත්වය) A-to-Z Guide Screen (`ProposalHowItWorksPage.tsx`):**
+   - Plans & Pricing සඳහා වෙනම පිටුවක් හැදූ පරිදිම, "How It Works" සඳහාද සම්පූර්ණ කැපවූ නව Dedicated Screen එකක් නිර්මාණය කරන ලදී:
+     - **Navbar Integration:** Navbar එකෙහි ඇති `How It Works` ටැබ් එක ක්ලික් කළ විට ක්ෂණිකව මෙම Dedicated Guide Screen එක විවෘත වේ.
+     - **Phase 1-6 Interactive Visual Steps:**
+       1. මිනිත්තු 3න් නොමිලේ Bio-Data පැතිකඩක් සකස් කිරීම.
+       2. Admin-Only රහස්‍ය ජාතික හැඳුනුම්පත් (NIC) සත්‍යාපනය.
+       3. ස්මාර්ට් Filters මගින් ගැලපෙන සහකරු/සහකාරිය සෙවීම & Photo privacy.
+       4. Proposal Request යැවීම සහ දෙපාර්ශවයේම අන්‍යෝන්‍ය කැමැත්ත (Mutual Consent).
+       5. කේන්දර සහ නැකත් ගැළපීම (Horoscope & Porondam Verification).
+       6. Safety Shield Chat සහ දෙමාපියන් සම්බන්ධ කරගැනීම.
+     - **4 Pillars of Safety & Privacy:** 100% Admin NIC Vetted, Default Photo Blur, Zero Leakage Guarantee, VIP Ghost Browsing.
+     - **Landing Page Sleek 3-Card Teaser:** කලින් තිබූ අධික දිගු vertical section එක වෙනුවට landing page එකෙහි සංක්ෂිප්ත, modern 3-Card Grid එකක් සහ `සම්පූර්ණ ක්‍රියාකාරීත්වය පියවරෙන් පියවර දැනගන්න (View Full A-Z Guide)` CTA button එකක් යොදා පරිශීලකයින්ව dedicated guide screen එකට navigate කිරීමට සලස්වන ලදී.
+     - **Dual Light/Dark Mode:** Dynamic theme switching, back buttons සහ responsive layouts.
+
+7. **Dedicated Safety & Privacy Center Screen (`ProposalSafetyPage.tsx`):**
+   - Navbar එකෙහි ඇති `Safety & Privacy` ටැබ් එක ක්ලික් කළ විට හෝ Landing Page හි Trust & Safety කොටසින් `View Safety & Privacy Center` ක්ලික් කළ විට විවෘත වන සම්පූර්ණ Dedicated ආරක්ෂක තොරතුරු පද්ධතියක් නිර්මාණය කරන ලදී:
+     - **Core Pillars of Safety:** Admin-Only NIC Verification (100% Confidential), Default Photo Privacy & Blur, Zero Contact Leaks & External Link Shield, Incognito / Ghost Mode (VIP).
+     - **Code of Conduct (ගෞරවනීය සදාචාර ප්‍රතිපත්ති):** 100% Zero Tolerance Anti-Harassment, Instant Report & Block button සහ ගිණුම් අත්හිටුවීමේ නීති.
+     - **Live Direct WhatsApp Helpline:** ගැටළු සඳහා admin support කණ්ඩායම ක්ෂණිකව සම්බන්ධ කර ගැනීමේ WhatsApp Help Desk button.
+     - **Dynamic Back Navigation & Theme Context:** පෙර සිටි පිටුවට (Landing, Discover, Dashboard) සුමටව ආපසු යා හැකි floating back button සහ Light/Dark mode සහය.
