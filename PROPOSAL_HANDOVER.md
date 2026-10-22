@@ -53,3 +53,57 @@
   - Chat එකක් unlock වූ විට Basic සාමාජිකයින්ට අදාළ match එක සමග යැවිය හැක්කේ පණිවිඩ 10ක් පමණි.
   - 10 වන පණිවිඩයෙන් පසු Chat Input එක lock වී, "Message Limit Reached" paywall card එක දිස්වේ. අනෙකුත් matches සඳහා ද වෙන වෙනම 10 බැගින් හිමිවේ.
 
+### F. ✨ Horoscope & Astrological Details & 3-Tier Profile View Gating (Implemented)
+- **1. Backend Database Model (`Backend/internal/model/proposal.go`):**
+  - `Lagna` (ලග්නය), `Nekatha` (නැකත), `DoshaStatus` (ශනි/කුජ දෝෂ), `HoroscopeMatchRequired` (ගැලපීම අත්‍යවශ්‍යද), `BirthTime` (උපන් වේලාව), `BirthCity` (උපන් නගරය), සහ `HoroscopeDocUrl` (කේන්දර කොපිය) fields Database model එකට එක් කරන ලදී.
+- **2. Bio-Data Profile Card 5 & Interactive Edit Modal (`Website/src/features/proposal/pages/ProposalHomePage.tsx`):**
+  - පරිශීලකයාගේ Bio-Data Dashboard එකට නව **Card 5: "🌙 කේන්දර සහ නැකත් විස්තර (Astrological Details)"** එක් කරන ලදී.
+  - Edit Bio-Data Modal එකට නව 5 වන Tab එක ලෙස **"✨ කේන්දර & නැකත්"** එක් කරන ලදී. මෙහිදී ලග්න 12 Dropdown, නැකත්, දෝෂ තත්ත්වයන් සහ උපන් වේලාව ඇතුළත් කළ හැක.
+- **3. 3-Tier Gated "View Details" Page (`Website/src/features/proposal/pages/ProposalFullProfilePage.tsx`):**
+  - **🥉 Basic (Free - රු. 0):**
+    - Personal info, Education, Profession, සහ Bio විවෘතයි.
+    - Family Information: Glassmorphism blur + `🔒 Family Background Protected (Unlock with Classic)` card.
+    - Astrological Info: Glassmorphism blur + `🔒 Astrological Info Protected (Unlock with Classic)` card.
+  - **🥈 Classic (රු. 2,990 / මාස 3):**
+    - Family Information: **100% Unlocked**.
+    - Basic Astrological Info (Lagna, Nekatha, Dosha status, Birth city): **100% Unlocked**.
+    - Full Horoscope Chart & PDF: Locked with `👑 VIP Exclusive` upgrade banner.
+  - **🥇 VIP (රු. 4,990 / මාස 6):**
+    - සියලු තොරතුරු (Family, Astrological attributes, සහ නිවැරදි උපන් වේලාව) සම්පූර්ණයෙන්ම විවෘතයි.
+    - **VIP Horoscope Chart Viewer Modal:** කේන්දර පිටපත zoom කර බැලිය හැකි High-resolution viewer modal එක ක්‍රියාත්මක වේ.
+
+### G. 💎 Classic & VIP Plan Full Deep Architectural & Feature Verification (100% Tested)
+1. **🥈 Classic Plan (රු. 2,990 / මාස 3 - දින 90) Feature Audit:**
+   - **Unlimited Profiles & Proposals:** `isPremium` true බැවින් Basic එකේ ඇති දිනකට profiles 10 සීමාව (11 වන Card Paywall) සහ මසකට proposals 3 සීමාව (`ProposalLimitModal`) ඉවත් වී Unlimited access ලැබේ.
+   - **Unlimited In-App Chat:** Basic එකේ ඇති 10 messages lock එක bypass වී අසීමිතව Chat කළ හැක.
+   - **Read Receipts (Seen ✓✓):** Inbox එකේ sent messages සඳහා `CheckCheck` නිල් පැහැති double ticks සක්‍රීය කර ඇත.
+   - **Who Liked You Unlocked:** Go backend එකේ `GET /api/proposals/liked-me` මගින් `is_premium` පරීක්ෂා කර, Classic & VIP පරිශීලකයින්ට තමන්ට Like කළ සියලු profiles ක්ෂණික match button එකක් සහිතව ලබා දේ.
+   - **Shortlist & Family Notes:** Classic පරිශීලකයින්ට profiles 25ක් දක්වා private notes සමග save කර ගැනීමේ පහසුකම (`ProposalFullProfilePage.tsx`).
+   - **Rewind / Undo Last Skip:** Discover page එකේ skip කළ profiles නැවත ලබා ගැනීමට දිනකට අවස්ථා 5ක් (`ProposalDiscoverPage.tsx` සහ `ProposalSearchResultCard.tsx`).
+   - **2x Visibility Boost:** Backend Go `GetFeed` query එක `ORDER BY is_premium DESC, created_at DESC` ලෙස Classic/VIP profiles ඉහළට ගෙන එයි.
+   - **විස්තරාත්මක කේන්දර ගැලපීම:** Classic පරිශීලකයින්ට candidate කෙනෙකුගේ ලග්නය, නැකත, ශනි/කුජ දෝෂ සහ උපන් නගරය 100% unlock වේ.
+
+2. **🥇 VIP Premium Plan (රු. 4,990 / මාස 6 - දින 180) Feature Audit:**
+   - **180 Days Long-term Validity:** Database `duration_months: 6` ලෙස සටහන් වේ.
+   - **5x Top Search Placement:** Feed සහ Search වල VIP profiles මුලින්ම (Top of Stack) render වේ.
+   - **Exclusive Gold VIP Ring & Crown Badge:** Discover cards වල `ring-2 ring-amber-400 shadow-amber-400/20` gold border එක සහ `👑 VIP` badge එක දිස්වේ.
+   - **🕶️ Ghost / Incognito Browsing:** VIP සාමාජිකයින් candidate profiles නරඹන විට ඔවුන්ගේ footprint එක අනෙක් අයට නොපෙන්වන Ghost Mode Indicator එකක් සහිතව ක්‍රියාත්මක වේ.
+   - **Unlimited Shortlist & Notes:** කිසිදු සීමාවකින් තොරව කැමති තරම් profiles shortlist කර private family notes තැබිය හැක.
+   - **Unlimited Rewinds:** දිනපතා සීමාවකින් තොරව ඕනෑම skip කළ profile එකක් ක්ෂණිකව Undo කළ හැක.
+   - **සම්පූර්ණ කේන්දර සහ පොරොන්දම් පිටපත:** Full High-Resolution Horoscope Document & Chart Viewer Modal එක VIP අයට පමණක් විවෘත වේ.
+   - **Priority VIP WhatsApp Concierge:** Premium page එක තුළින් Uni Gang Admin WhatsApp direct VIP Concierge link එක සක්‍රීයයි.
+
+3. **🔒 Common Security & Payment Safeguards (100% Working):**
+   - **100% Platform Safety Shield:** Chat එක තුළ හෝ bio තුළ Phone numbers (07X, +94), Links (Facebook, Instagram, LinkedIn, TikTok, WhatsApp, Telegram ආදී) යැවීමට තැත් කළ විට Amber alert warning පෙන්වා ක්ෂණිකව Block කෙරේ.
+   - **No Recurring Card Traps (100% Manual Slip Upload):** මාසිකව Auto-debit වන කාඩ් උගුල් නොමැත. BOC සහ Commercial Bank ගිණුම්වලට මුදල් තැන්පත් කර Slip එක upload කළ පසු Admin verification මගින් account upgrade කෙරේ.
+
+### H. 👑 Navbar "Plans & Pricing" Tab & Dedicated Pricing Screen (100% Working)
+1. **Proposal Navigation Bar (`Website/src/features/proposal/components/navbar/ProposalNavbar.tsx`):**
+   - Desktop Navigation එකෙහි සහ Mobile Slide-down menu එකෙහි **`👑 Plans & Pricing` (VIP Badge සහිතව)** නව Tab එකක් එක් කරන ලදී.
+2. **Dedicated Membership & Pricing Screen (`Website/src/features/proposal/pages/ProposalPremiumPage.tsx`):**
+   - ඕනෑම Guest පරිශීලකයෙකුට හෝ Logged-in පරිශීලකයෙකුට Navbar එකෙන් කෙලින්ම මෙම Dedicated පිටුව විවෘත වේ.
+   - මෙහි Basic (රු. 0), Classic (රු. 2,990), සහ VIP (රු. 4,990) පැකේජ 3ෙහිම සවිස්තරාත්මක Feature list, Comparison Table, ආරක්ෂක සහතික සහ BOC / Commercial Bank Manual Transfer Modal එක අන්තර්ගතයි.
+   - පිටුවෙන් පිටවීමට **"Back to Home / Discover / Dashboard"** dynamic back button එක ක්‍රියාත්මක කර ඇත.
+3. **Landing Page Showcase Section (`Website/src/features/proposal/pages/ProposalLandingPage.tsx`):**
+   - FAQ එකට ඉහළින් නව **"Transparent Membership Plans"** Teaser Section එකක් එක් කර ඇත. මෙහි පැකේජ 3ම card வடிවෙන් දැක "View Full Pricing Page" ක්ලික් කර dedicated screen එකට යා හැක.
+
