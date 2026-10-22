@@ -158,3 +158,58 @@
      - **Code of Conduct (ගෞරවනීය සදාචාර ප්‍රතිපත්ති):** 100% Zero Tolerance Anti-Harassment, Instant Report & Block button සහ ගිණුම් අත්හිටුවීමේ නීති.
      - **Live Direct WhatsApp Helpline:** ගැටළු සඳහා admin support කණ්ඩායම ක්ෂණිකව සම්බන්ධ කර ගැනීමේ WhatsApp Help Desk button.
      - **Dynamic Back Navigation & Theme Context:** පෙර සිටි පිටුවට (Landing, Discover, Dashboard) සුමටව ආපසු යා හැකි floating back button සහ Light/Dark mode සහය.
+
+8. **Dedicated FAQ & Knowledge Base Screen (`ProposalFAQPage.tsx`):**
+   - Navbar එකෙහි ඇති `FAQ` ටැබ් එක ක්ලික් කළ විට හෝ Landing Page හි `Open Full FAQ Page` ක්ලික් කළ විට විවෘත වන සම්පූර්ණ ප්‍රශ්නෝත්තර පද්ධතිය (Knowledge Base):
+     - **Interactive Categorized Navigation & Live Search:** "සියල්ල (All)", "Bio-Data & ගිණුම්", "ආරක්ෂාව & රහස්‍යතාව", "යෝජනා & Chat", "කේන්දර & නැකත්", "මිල ගණන් & VIP" ලෙස කාණ්ඩ 5ක් සහ Real-time Search Filter Input.
+     - **Accordion Expand/Collapse UI:** පැහැදිලි, සවිස්තරාත්මක සිංහල පිළිතුරු සහ Highlight tags.
+     - **Support Concierge Help Desk:** WhatsApp Admin Help Desk direct access.
+     - **Landing Page FAQ Section Optimized:** ප්‍රධාන පිටුවේ පළමු ප්‍රශ්න 5ක් පමණක් පෙන්වා, `සියලුම ප්‍රශ්නෝත්තර 25+ සහ Help Desk එක බලන්න (Open Full FAQ Page)` button එකක් මගින් Dedicated පිටුවට සම්බන්ධ කර landing page එකේ clutter එක ඉවත් කරන ලදී.
+
+9. **Direct Checkout Flow (Option 1) & Bank Accounts Update (BOC & NSB Integration):**
+   - **Option 1 (Direct Checkout) Implementation:**
+     - Landing page එකෙහි Classic Card (`Choose Classic - රු. 2,990`) හෝ VIP Card (`Choose VIP - රු. 4,990`) ක්ලික් කළ සැනින්, අදාළ plan එක auto-select වී කෙලින්ම **Bank Transfer Slip Upload Modal** එක popup වන direct checkout flow එක සක්‍රීය කරන ලදී.
+     - [ProposalHubEntry.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/ProposalHubEntry.tsx) හි `selectedPricingPlan` state එක හරහා [ProposalLandingPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalLandingPage.tsx) සහ [ProposalPremiumPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalPremiumPage.tsx) (with `initialPlan` prop & effect) එකිනෙක සුමටව සම්බන්ධ කරන ලදී.
+     - Navbar එකෙන් හෝ "Open Full Pricing Page" බොත්තමෙන් යන අයට modal එක auto-open නොවී මුලින් Comparison Table එක බැලීමට සුපුරුදු පරිදි ඉඩ සලස්වා ඇත.
+   - **BOC & NSB Official Bank Accounts (Real Account Details Integrated):**
+     - Commercial Bank වෙනුවට පරිශීලකයාගේ නිල බැංකු ගිණුම් වන **BOC (Bank of Ceylon)** සහ **NSB (National Savings Bank)** සත්‍ය ගිණුම් විස්තර සහ One-Click Copy Buttons යොදන ලදී:
+       1. **Bank of Ceylon (BOC):** Polgahawela Branch | ගිණුම් අංකය: `89190289` | නම: `P.N.D.M.Bandara`
+       2. **National Savings Bank (NSB):** Polgahawela Branch | ගිණුම් අංකය: `300110194254` | නම: `P.N.D.M.Bandara`
+     - [ProposalPremiumPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalPremiumPage.tsx), [ProposalFAQPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalFAQPage.tsx), සහ [ProposalSafetyPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalSafetyPage.tsx) යන සියලුම පිටු වල බැංකු විස්තර BOC සහ NSB ලෙස යාවත්කාලීන කරන ලදී.
+   - **Direct WhatsApp Slip Submission Alternative:**
+     - Modal එක තුළ `ස්ලිප්පත කෙලින්ම WhatsApp මගින් Admin ට එවන්න` බොත්තම එක් කරන ලද අතර, පරිශීලකයා තෝරාගත් Package එක (Classic හෝ VIP) pre-formatted text සමග WhatsApp Admin Concierge direct chat එකට යොමු වේ.
+
+10. **Backend Automated Lifecycle, Tier Differentiation (VIP vs Classic), and Advance Expiry Notifications:**
+    - **VIP vs Classic Detection on Admin Approval:**
+      - [admin_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/admin_controller.go) හි Admin `Approve & Activate` ක්ලික් කළ විට, Payment එකේ `Plan` සහ `DurationMonths` පරීක්ෂා කෙරේ:
+        - `vip_6m` / 6 Months නම්: `duration = 6`, `membership_tier = "vip"`, `is_vip = true`, `is_classic = false`, සහ *"👑 VIP Premium Membership Activated!"* (5x Placement & Gold Ring) notification එක යැවේ.
+        - `classic_3m` / 3 Months නම්: `duration = 3`, `membership_tier = "classic"`, `is_vip = false`, `is_classic = true`, සහ *"⭐ Classic Membership Activated!"* notification එක යැවේ.
+      - [proposal.go](file:///e:/The-Uni-Gang/Backend/internal/model/proposal.go) හි `ProposalProfile` model එකට `membership_tier`, `is_vip`, `is_classic`, සහ `expiry_warning_sent` fields ස්ථිරව එක් කරන ලදී.
+    - **⏳ 3-Day Advance Expiration Warning Notification:**
+      - [cron_service.go](file:///e:/The-Uni-Gang/Backend/internal/service/cron_service.go) මගින් පැයකට වරක් ධාවනය වන Background Cron Job එකක් හරහා, ඕනෑම සාමාජිකයෙකුගේ වලංගු කාලය තව දින 3කින් (පැය 72කින්) අවසන් වීමට නියමිත නම්:
+        - පරිශීලකයාට *"⏳ ඔබගේ Proposal සාමාජිකත්වය දින 3කින් අවසන් වේ"* යනුවෙන් Renew කරගැනීමේ direct link එකක් සහිත Notification එකක් යවා `expiry_warning_sent = true` කර spam වීම වළක්වයි.
+    - **⚠️ Expiration Auto-Revert & Expired Notification:**
+      - දින 90 හෝ 180 අවසන් වූ සැනින්, Cron Job එක මගින් මෙන්ම පරිශීලකයා App එකට log වන අවස්ථාවේදීම ([proposal_controller.go:GetMyProfile](file:///e:/The-Uni-Gang/Backend/internal/controller/proposal_controller.go)) Real-time lazy check එකක් මගින්:
+        - `is_premium = false`, `membership_tier = "basic"`, `is_vip = false`, `is_classic = false` ලෙස revert වී සියලු paid features ක්ෂණිකව block වේ.
+        - පරිශීලකයාට *"⚠️ ඔබගේ Proposal සාමාජිකත්වය කල් ඉකුත් විය"* යනුවෙන් Upgrade වීමට මඟපෙන්වන Notification එකක් ලැබේ.
+    - **👑 Priority 5x Top Feed Placement Sorting:**
+      - Discover feed එකේදී VIP සාමාජිකයින් සැමවිටම 1 වන ස්ථානයටත්, Classic සාමාජිකයින් 2 වන ස්ථානයටත්, Basic සාමාජිකයින් 3 වන ස්ථානයටත් render වන පරිදි SQL `CASE WHEN membership_tier = 'vip' THEN 1 WHEN membership_tier = 'classic' THEN 2 ELSE 3 END, is_premium DESC, created_at DESC` sorting logic එක සක්‍රීය කරන ලදී.
+
+11. **Full Team Audit 1000% Resolution (All Audit Items Implemented & Synced):**
+    - **1.1 Admin Payment Slip URL Inversion Resolved:**
+      - [api.ts](file:///e:/The-Uni-Gang/Website/src/api.ts) හි inverted URL ගැටලුව නිරාකරණය කර, `${BASE_URL}/api/admin/proposals/payments` සහ `/status` වෙත යොමු කරන ලදී.
+      - [proposal_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/proposal_controller.go) තුළද proxy endpoints සකසා 100% 404-free කරන ලදී.
+    - **1.2 In-App Chat Endpoint Alignment:**
+      - [proposal_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/proposal_controller.go) හි `/inbox`, `/messages/:matchId`, සහ `/messages` (SendMessageDirect payload `{ matchId, content, text }`) සක්‍රීය කර [proposalApi.ts](file:///e:/The-Uni-Gang/Website/src/features/proposal/api/proposalApi.ts) සමග 100% ගැළපෙන සේ සකස් කරන ලදී.
+    - **1.3 Discover Page Real Candidate Feed Integration:**
+      - [ProposalDiscoverPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalDiscoverPage.tsx) හි `useEffect` මගින් `proposalApi.getFeed` call කර real database profiles Discover UI එකට load කරන ලදී. Backend profiles නොමැති අවස්ථාවලදී curated list එක fallback ලෙස යොදා empty screen වීම වැළැක්වීය.
+    - **2.1 & 2.2 Dedicated Admin Proposal ID (NIC) Verification Tab & NICNumber Persistence:**
+      - [model/proposal.go](file:///e:/The-Uni-Gang/Backend/internal/model/proposal.go) සහ controller එකට `NICNumber` column එක එක් කර හැඳුනුම්පත් අංකය database හි ස්ථිරව සුරැකෙන පරිදි සකසන ලදී.
+      - [AdminDashboard.tsx](file:///e:/The-Uni-Gang/Website/src/pages/admin/AdminDashboard.tsx) වෙත `proposals` tab එකක් එක් කර, Admin හට යෝජනා සාමාජිකයින් එවූ NIC Front සහ NIC Back ඡායාරූප සෘජුවම බලා "Verify Citizen ID" හෝ "Reject" කළ හැකි සම්පූර්ණ Moderation UI එකක් සවි කරන ලදී.
+    - **2.3 Dashboard Real Matches & Likes Sync:**
+      - [ProposalHomePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalHomePage.tsx) හි `getMatches()` සහ `getLikedMe()` සක්‍රීයව fetch කර සැබෑ match වූ අය සහ proposal එවූ අය dashboard එකට sync කරන ලදී.
+    - **3.1 Gender-Aware Profile Images Fallback:**
+      - [ProposalFullProfilePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalFullProfilePage.tsx) හි male groom profiles වලට female stock photos වැටීමේ දෝෂය සම්පූර්ණයෙන්ම ඉවත් කර, candidate ගේ gender එක (`Male`/`Female` හෝ `GR`/`BR`) අනුව නිවැරදි professional photos පමණක් fallback ලෙස වැටෙන පරිදි සකස් කරන ලදී.
+    - **3.2 & 3.3 Functional Proposal Dispatch & Admin Payment Plan Badges:**
+      - [ProposalHubEntry.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/ProposalHubEntry.tsx) හි `onSendProposal` functional කර sent ID tracking සක්‍රීය කරන ලදී.
+      - [AdminDashboard.tsx](file:///e:/The-Uni-Gang/Website/src/pages/admin/AdminDashboard.tsx) Payments tab එකෙහි Classic `⭐ Classic (3 Months) · Rs. 2,990` හෝ VIP `👑 VIP (6 Months) · Rs. 4,990` plan badges පැහැදිලිව දිස්වන සේ සකසන ලදී.
