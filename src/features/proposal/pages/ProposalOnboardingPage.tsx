@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { cx, Logo, Card, PrimaryButton, GhostButton } from '../components/ui/ProposalPrimitives';
 import { proposalApi } from '../api/proposalApi';
+import { celebrate } from '../../../utils/celebrate';
+import toast from 'react-hot-toast';
 
 const ONBOARDING_STEPS = [
   "Personal & Identity", 
@@ -44,6 +46,7 @@ export default function ProposalOnboardingPage({
   // Streamlined Form State matching V1 MVP specs
   const [formData, setFormData] = useState({
     // Step 1: Personal & Residency
+    accountCreatedBy: 'Self (මා විසින්ම)',
     name: '',
     age: '26',
     gender: 'Male',
@@ -165,22 +168,34 @@ export default function ProposalOnboardingPage({
         <form onSubmit={async (e) => {
           e.preventDefault();
           if (last) {
+            const validImages = images.filter(Boolean);
+            if (validImages.length === 0) {
+              toast.error("කරුණාකර ඔබගේ අවම වශයෙන් එක් ඡායාරූපයක්වත් (At least 1 Photo) Upload කරන්න.");
+              return;
+            }
             setLoading(true);
             try {
               const payload = {
                 ...formData,
+                managed_by: formData.accountCreatedBy,
+                managedBy: formData.accountCreatedBy,
+                accountCreatedBy: formData.accountCreatedBy,
+                account_created_by: formData.accountCreatedBy,
                 age: parseInt(formData.age) || 26,
                 gender: formData.gender,
                 looking_for: formData.gender === 'Male' ? 'Female' : 'Male',
-                images: images.filter(Boolean),
+                prompt_about_me: formData.bio,
+                prompt_ideal_partner: formData.prompt_ideal_partner,
+                images: validImages,
                 blur_photo: formData.blurPhoto,
                 blurPhoto: formData.blurPhoto
               };
               await proposalApi.submitProfile(payload);
+              celebrate();
               onComplete();
             } catch (error) {
               console.error(error);
-              alert("Failed to submit profile. Please try again.");
+              toast.error("Failed to submit profile. Please try again.");
             } finally {
               setLoading(false);
             }
@@ -215,6 +230,23 @@ export default function ProposalOnboardingPage({
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-5">
+                    <div className="sm:col-span-2">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">
+                        Account Created By (ගිණුම සාදනු ලබන්නේ) *
+                      </label>
+                      <select 
+                        name="accountCreatedBy" 
+                        value={formData.accountCreatedBy} 
+                        onChange={handleChange} 
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50"
+                      >
+                        <option value="Self (මා විසින්ම)">👤 Self (මා විසින්ම)</option>
+                        <option value="Parents (දෙමව්පියන් විසින්)">👨‍👩‍👧 Parents (දෙමව්පියන් විසින්)</option>
+                        <option value="Sibling (සහෝදරයා/සහෝදරිය)">👫 Sibling (සහෝදරයා/සහෝදරිය)</option>
+                        <option value="Relative / Guardian (ඥාතියෙකු/භාරකරුවෙකු)">🤝 Relative / Guardian (ඥාතියෙකු/භාරකරුවෙකු)</option>
+                      </select>
+                    </div>
+
                     <div>
                       <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Full Name (නම) *</label>
                       <input required name="name" value={formData.name} onChange={handleChange} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50" placeholder="e.g. Kasun Perera" />
@@ -274,6 +306,18 @@ export default function ProposalOnboardingPage({
                       <select name="district" value={formData.district} onChange={handleChange} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50">
                         {SRI_LANKA_DISTRICTS.map(d => <option key={d} value={d}>{d}</option>)}
                       </select>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Hometown / City (උපන් ගම / නගරය) *</label>
+                      <input 
+                        required
+                        name="hometown" 
+                        value={formData.hometown} 
+                        onChange={handleChange} 
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50" 
+                        placeholder="e.g. Maharagama, Alawwa, Kandy" 
+                      />
                     </div>
 
                     <div className="sm:col-span-2">
@@ -336,12 +380,17 @@ export default function ProposalOnboardingPage({
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Workplace / Company (සේවා ස්ථානය / ආයතනය)</label>
-                      <input name="workplace" value={formData.workplace} onChange={handleChange} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50" placeholder="e.g. Abans / Private Firm / Govt / Dubai Mall" />
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Workplace / Company (සේවා ස්ථානය / ආයතනය) *</label>
+                      <input required name="workplace" value={formData.workplace} onChange={handleChange} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50" placeholder="e.g. Abans / Private Firm / Govt / Dubai Mall" />
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Highest Education / Course (අධ්‍යාපනය / හැදෑරූ පාඨමාලාව)</label>
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">University / Campus (කැම්පස් එක / ආයතනය) *</label>
+                      <input required name="university" value={formData.university} onChange={handleChange} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50" placeholder="e.g. University of Moratuwa / SLIIT / NSBM" />
+                    </div>
+
+                    <div className="sm:col-span-2">
+                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Highest Education / Course (අධ්‍යාපනය / හැදෑරූ පාඨමාලාව) *</label>
                       <select name="educationCategory" value={formData.educationCategory} onChange={handleChange} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50">
                         <option value="University Degree">University Degree (උපාධිධාරී)</option>
                         <option value="Undergraduate">Campus Undergraduate (විශ්වවිද්‍යාල ශිෂ්‍ය)</option>
@@ -351,11 +400,40 @@ export default function ProposalOnboardingPage({
                       </select>
                     </div>
 
+                    {/* Box 1: About Me */}
                     <div className="sm:col-span-2">
-                      <label className="text-xs font-bold text-rose-500 uppercase tracking-wider mb-2 flex items-center gap-1">
-                        <Sparkles size={14} /> Short Bio / Expectations (කෙටි හැඳින්වීම සහ අපේක්ෂා)
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <User2 size={14} className="text-rose-500" />
+                        <span>මා පිළිබඳ හැඳින්වීමක් (About Me / Bio) *</span>
                       </label>
-                      <textarea name="bio" value={formData.bio} onChange={handleChange} rows={3} className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50" placeholder="e.g. Respectable family background from Kandy. Seeking an understanding, caring partner with genuine moral values..." />
+                      <textarea 
+                        required
+                        minLength={10}
+                        name="bio" 
+                        value={formData.bio} 
+                        onChange={handleChange} 
+                        rows={2} 
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50" 
+                        placeholder="e.g. අවංක, සරල ජීවන රටාවකට ප්‍රිය කරන විශ්වවිද්‍යාල උපාධිධාරියෙක්මි..." 
+                      />
+                    </div>
+
+                    {/* Box 2: What I'm Looking For / Ideal Partner */}
+                    <div className="sm:col-span-2">
+                      <label className="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <Sparkles size={14} className="text-rose-500" />
+                        <span>හොයන සහකරු / සහකාරිය පිළිබඳව සටහනක් (Partner Preferences) *</span>
+                      </label>
+                      <textarea 
+                        required
+                        minLength={10}
+                        name="prompt_ideal_partner" 
+                        value={formData.prompt_ideal_partner} 
+                        onChange={handleChange} 
+                        rows={3} 
+                        className="w-full bg-rose-50/40 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50" 
+                        placeholder="e.g. සමාන අධ්‍යාපන සුදුසුකම් ඇති, යහපත් ගුණධර්ම සහිත ගුණගරුක සහකාරියක් බලාපොරොත්තු වෙමි..." 
+                      />
                     </div>
                   </div>
                 </div>
