@@ -185,7 +185,7 @@ export default function ProposalHomePage({
 
   // Edit Bio-Data Modal state
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editTab, setEditTab] = useState<'personal' | 'career' | 'family' | 'expectations'>('personal');
+  const [editTab, setEditTab] = useState<'personal' | 'career' | 'family' | 'expectations' | 'horoscope'>('personal');
   const [editFormData, setEditFormData] = useState<any>({});
 
   // Verification modal and upload state
