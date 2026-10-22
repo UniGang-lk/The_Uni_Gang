@@ -11,16 +11,20 @@ interface ProposalSearchHeaderProps {
   showingOnlyVIP?: boolean;
   activeGenderTab?: 'All' | 'Bride' | 'Groom';
   onGenderTabChange?: (tab: 'All' | 'Bride' | 'Groom') => void;
+  activeFilterCount?: number;
 }
 
 export default function ProposalSearchHeader({
   totalResults = 4022,
+  currentPage = 1,
+  totalPages = 1,
   layoutMode,
   onLayoutModeChange,
   onToggleMobileFilters,
   showingOnlyVIP = false,
   activeGenderTab = 'All',
   onGenderTabChange,
+  activeFilterCount = 0,
 }: ProposalSearchHeaderProps) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -92,18 +96,30 @@ export default function ProposalSearchHeader({
 
       {/* Second Row: Results Count, Mobile Filter & View Mode Controls */}
       <div className="flex items-center justify-between gap-3 pt-1">
-        <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-          Showing {totalResults.toLocaleString()} verified candidates
-        </span>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+            Showing {totalResults.toLocaleString()} verified candidates
+          </span>
+          {totalPages > 1 && (
+            <span className="text-[10px] font-black uppercase tracking-wider text-rose-500 bg-rose-500/10 px-2.5 py-0.5 rounded-full border border-rose-500/20 font-sans">
+              Page {currentPage} of {totalPages}
+            </span>
+          )}
+        </div>
 
         <div className="flex items-center gap-3">
           {/* Mobile Filter Toggle */}
           <button
             onClick={onToggleMobileFilters}
-            className="lg:hidden flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-500/10 text-rose-500 border border-rose-500/30 hover:bg-rose-500/20 transition-all font-sans"
+            className="lg:hidden flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-500/10 text-rose-500 border border-rose-500/30 hover:bg-rose-500/20 transition-all font-sans relative"
           >
             <Filter size={14} />
-            Filters
+            <span>Filters</span>
+            {activeFilterCount > 0 && (
+              <span className="w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center shadow-sm">
+                {activeFilterCount}
+              </span>
+            )}
           </button>
 
           {/* View Mode Switcher */}
