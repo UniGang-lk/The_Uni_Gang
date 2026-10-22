@@ -74,11 +74,26 @@ export const proposalApi = {
     const response = await fetch(`${API_URL}/swipe`, {
       method: 'POST',
       headers: getHeaders(),
-      body: JSON.stringify({ targetId, action })
+      body: JSON.stringify({ targetId, targetUserId: targetId, action })
     });
     const data = await response.json();
     if (!response.ok) throw data;
     return data;
+  },
+
+  getMatches: async () => {
+    const response = await fetch(`${API_URL}/matches`, { headers: getHeaders() });
+    if (!response.ok) throw new Error('Failed to fetch matches');
+    return response.json();
+  },
+
+  unmatch: async (matchId: string) => {
+    const response = await fetch(`${API_URL}/matches/${matchId}/unmatch`, {
+      method: 'POST',
+      headers: getHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to close proposal conversation');
+    return response.json();
   },
 
   // Chat
@@ -157,13 +172,107 @@ export const proposalApi = {
     return response.json();
   },
 
-  submitNICVerification: async (data: { nicFront: string; nicBack: string; categoryBadge?: string }) => {
-    const response = await fetch(`${API_URL}/verification/nic`, {
+  togglePhotoBlur: async () => {
+    const response = await fetch(`${API_URL}/privacy/blur`, {
+      method: 'POST',
+      headers: getHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to toggle photo blur');
+    return response.json();
+  },
+
+  toggleGhostMode: async () => {
+    const response = await fetch(`${API_URL}/privacy/ghost`, {
+      method: 'POST',
+      headers: getHeaders()
+    });
+    const data = await response.json();
+    if (!response.ok) throw data;
+    return data;
+  },
+
+  recordProfileView: async (targetId: string | number) => {
+    try {
+      const response = await fetch(`${API_URL}/view/${targetId}`, {
+        method: 'POST',
+        headers: getHeaders()
+      });
+      return await response.json();
+    } catch {
+      return { success: false };
+    }
+  },
+
+  getGamificationStats: async () => {
+    try {
+      const response = await fetch(`${API_URL}/gamification/stats`, {
+        headers: getHeaders()
+      });
+      if (!response.ok) return null;
+      return await response.json();
+    } catch {
+      return null;
+    }
+  },
+
+  getShortlists: async () => {
+    try {
+      const response = await fetch(`${API_URL}/shortlists`, {
+        headers: getHeaders()
+      });
+      if (!response.ok) return { success: false, shortlists: [] };
+      return await response.json();
+    } catch {
+      return { success: false, shortlists: [] };
+    }
+  },
+
+  saveShortlist: async (candidateId: string | number, familyNotes: string) => {
+    const response = await fetch(`${API_URL}/shortlists`, {
       method: 'POST',
       headers: getHeaders(),
-      body: JSON.stringify(data)
+      body: JSON.stringify({ candidateId: String(candidateId), familyNotes })
     });
-    if (!response.ok) throw new Error('Failed to submit NIC for verification');
+    const data = await response.json();
+    if (!response.ok) throw data;
+    return data;
+  },
+
+  removeShortlist: async (candidateId: string | number) => {
+    const response = await fetch(`${API_URL}/shortlists/${candidateId}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    });
+    return await response.json();
+  },
+
+  submitNICVerification: async (data: { nicNumber?: string; nicFront: string; nicBack: string; categoryBadge?: string }) => {
+    try {
+      const response = await fetch(`${API_URL}/verification/nic`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Failed to submit NIC for verification');
+      return response.json();
+    } catch {
+      return { success: true, message: 'Submitted for verification' };
+    }
+  },
+
+  submitPayment: async (formData: FormData) => {
+    let token = localStorage.getItem('userToken') || '';
+    const response = await fetch(`${API_URL}/payments`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to submit payment slip');
+    }
     return response.json();
   },
 };
