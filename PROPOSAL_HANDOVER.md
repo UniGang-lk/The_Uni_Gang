@@ -378,3 +378,29 @@
 
 24. **Fourteenth Round List/Compact View Layout Implementation:**
     - **📑 True Compact Row Layout Implemented ([ProposalSearchResultCard.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/components/search/ProposalSearchResultCard.tsx)):**
+      - Discover Search Header එකේ ඇති Grid View (ජාලකය) සහ List View (සංයුක්ත ලැයිස්තුව) switcher එකෙහි List View තෝරාගත් විට (`layoutMode === 'compact'`), පැරණි vertical 4/5 aspect ratio කාඩ්පත වෙනුවට අලංකාර horizontal row card layout එකක් නිර්මාණය කරන ලදී.
+      - Left: Square avatar with tier ring, Middle: Name, Code, Verified Badge, Age, Location, Profession, and AI Compatibility Match, Right: Action buttons ("View Details", "Connect"). පරිශීලකයාට තමන් කැමති view mode එකෙන් profiles බැලීමට 100% පරිපූර්ණ නිදහස ලබා දී ඇත.
+
+25. **Fifteenth Round: Modern 12-Card Responsive Pagination Engine:**
+    - **📑 Intelligent 12-Cards-Per-Page Pagination Controller ([ProposalDiscoverPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalDiscoverPage.tsx) & [ProposalSearchHeader.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/components/search/ProposalSearchHeader.tsx)):**
+      - Responsive 1, 2, 3, සහ 4 column layouts වලට ඉතාම සමබරව බෙදී යන පරිදි එක් පිටුවකට Candidate Profiles 12ක් බැගින් (`PROFILES_PER_PAGE = 12`) පෙන්වන සම්පූර්ණ Pagination Engine එකක් නිර්මාණය කරන ලදී.
+      - Grid View සහ Compact List View දෙකටම `paginatedCandidates` slice වී සුමටව ක්‍රියාත්මක වේ.
+      - Glassmorphic Styling, `◀ පෙර (Prev)` සහ `ඊළඟ (Next) ▶` බොත්තම්, සජීවී පිටු අංක pills, Smart Truncation (`•••`), active gradient glow (`bg-gradient-to-r from-rose-500 via-pink-500 to-rose-600`), සහ පිටුව මාරු වූ සැණින් `#search-results-top` වෙත auto-scroll වන smooth UX එකක් සකස් කරන ලදී.
+      - **Free to Premium Natural Conversion Hook:** Basic Free සාමාජිකයින්ට පිටු 2 සහ ඉන් ඉදිරියට ඇති පිටු අංක මත රන්වන් `👑` Crown badge එකක් දිස්වන අතර, එය ක්ලික් කළ විට Classic/VIP වෙත Upgrade වීමට සුහදව prompt වේ. පිටුව 1 හි daily free 10 profiles paywall guard එක නොවෙනස්ව ආරක්ෂා කර ඇත.
+      - [ProposalSearchHeader.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/components/search/ProposalSearchHeader.tsx) හි සජීවී `Page X of Y` badge එකක් ප්‍රදර්ශනය කර සම්පූර්ණ තොරතුරු ලබා දෙන ලදී.
+
+---
+
+## 🚀 2. ඊළඟ Session එකේදී කළ හැකි ඉදිරි වැඩ (Next Steps / Roadmap)
+1. **SMS / Email Notification Webhooks:** Proposal එකක් accept වූ විට හෝ payment එක verify වූ විට NotifyLK / Twilio SMS alert යැවීම.
+2. **Audio/Video In-App Calling (WebRTC):** VIP සාමාජිකයින් අතර 100% private in-app voice/video calls සක්‍රීය කිරීම.
+3. **Automated Horoscope Match Percentage:** උපන් වේලාව සහ ස්ථානය අනුව පොරොන්දම් 20 auto-calculate වන backend engine එක සම්බන්ධ කිරීම.
+
+---
+
+## 💬 3. ඊළඟ Session එක ආරම්භ කරන විට යොදන Prompt එක (Resume Prompt)
+> **"mcn api PROPOSAL_HANDOVER.md eke liyapu handover eka balala, ethanin issarahata proposal section eke weda tika karagena yamu."**
+
+
+
+
