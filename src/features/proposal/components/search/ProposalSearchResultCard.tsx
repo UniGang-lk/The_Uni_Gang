@@ -13,6 +13,7 @@ export interface CandidateProfile {
   monthlyIncome?: string;
   images: string[];
   blurPhoto?: boolean;
+  blur_photo?: boolean;
   isVIP?: boolean;
   isClassic?: boolean;
   isVerified?: boolean;
