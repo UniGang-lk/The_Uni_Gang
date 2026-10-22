@@ -268,3 +268,63 @@
 16. **Sixth Round Full Team Deep Audit & Airtight Verification:**
     - **Full Profile Shortlist ReferenceError Crash Fix & Match Badge:**
       - [ProposalFullProfilePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalFullProfilePage.tsx) හි `setShowProposalLimitModal` destructure නොවීම නිසා free users ලා shortlist click කිරීමේදී හටගත් ReferenceError crash එක සම්පූර්ණයෙන්ම නිරාකරණය කරන ලදී.
+      - Full Profile Header එකෙහි AI Compatibility Percentage (`✨ {profile.matchPercentage}% Match`) badge එකක් එක් කරන ලදී.
+    - **Hub Entry Sub-Page Navigation Trap Resolution:**
+      - [ProposalHubEntry.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/ProposalHubEntry.tsx) හි `inbox`, `likes`, සහ `settings` පිටුවලින් Premium Plan Upgrade සහ Settings වලට යාමේදී dashboard එකට redirect වන routing trap එක විසඳා, `premium`, `settings`, `discover`, `dashboard`, සහ `landing` වෙත නිවැරදිව route වන සේ සකසන ලදී.
+    - **App-Wide Verification State Sync:**
+      - [useProposalVerification.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/hooks/useProposalVerification.tsx) හි `getIsVerified()` තුළ `userProposalProfile` හි සත්‍යාපන දත්ත (`isVerified`, `verificationStatus === 'verified'`) පරීක්ෂා කර, Dashboard NIC review එකෙන් approved වූ පරිශීලකයින්ට full profile එකෙන් unverified alerts නොපැමිණෙන සේ 100% sync කරන ලදී.
+    - **Onboarding UI Alerts Replaced with Modern Toasts:**
+      - [ProposalOnboardingPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalOnboardingPage.tsx) හි පැරණි browser-blocking `alert(...)` වෙනුවට `react-hot-toast` (`toast.error(...)`) යොදා modern UX එකක් ලබා දෙන ලදී.
+
+17. **Seventh Round Full Team Deep Audit & Airtight Verification:**
+    - **Payment Slip Upload Instant In-App Notification:**
+      - [proposal_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/proposal_controller.go) හි පරිශීලකයෙකු Classic (`Rs. 2,990`) හෝ VIP (`Rs. 4,990`) පැකේජයක් වෙනුවෙන් Bank Transfer Slip එකක් upload කළ සැණින්, database `notifications` table එකට record එකක් සෑදී user හට instant acknowledgment push notification එකක් ලැබෙන සේ තහවුරු කරන ලදී.
+    - **Discover Page Age Filter Full Reactivity:**
+      - [ProposalDiscoverPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalDiscoverPage.tsx) හි `useEffect` dependency array එකට `filters.minAge` සහ `filters.maxAge` එක් කර, වයස් සීමා වෙනස් කළ විට backend query එක ක්ෂණිකව trigger වන සේ සකසන ලදී.
+    - **Astrological Bio-Data Optional Input Guidance:**
+      - [ProposalHomePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalHomePage.tsx) හි Bio-Data Edit Modal එකෙහි උපන් වේලාව (Birth Time) සහ උපන් නගරය (Birth City) සඳහා `(විකල්ප / Optional - නිශ්චිත වේලාව නොදන්නේ නම් හිස්ව තබන්න)` උපදෙස් ලේබල් එක් කරන ලදී.
+    - **NIC Verification Pending Review State Card:**
+      - [ProposalHomePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalHomePage.tsx) හි හැඳුනුම්පත review වෙමින් පවතින විට (`pending_review`), modal එක විවෘත කළ විට නැවත submit කිරීමට ඉඩ නොදී, "Under Review ⏳" informational state එකක් පෙන්වා අනවශ්‍ය duplicate submissions වැළැක්වීය.
+
+18. **Eighth Round Full Team Deep Implementation & High-Security Hardening:**
+    - **🕶️ VIP Ghost / Incognito Mode Toggle in Settings ([ProposalSettingsPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalSettingsPage.tsx) & [proposal_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/proposal_controller.go)):**
+      - Privacy Controls යටතේ VIP සාමාජිකයින්ට `🕶️ VIP Ghost / Incognito Mode` සක්‍රීය/අක්‍රීය කිරීමට dedicated toggle එකක් එක් කරන ලදී.
+      - Free/Classic සාමාජිකයින්ට `👑 VIP Exclusive` badge එක සහ "Unlock VIP" CTA එක පෙන්වා VIP Package එකට වැඩි conversions ලබා ගැනීමට මග පෑදීය.
+      - Backend `is_ghost_mode` field එක සහ `POST /api/proposals/privacy/ghost` endpoint එක මගින් VIP නොවන අයට අවසර නොදෙන paywall security එක තහවුරු කරන ලදී.
+    - **👀 Accurate Profile Views Tracking & Ghost Mode Stealth Shield:**
+      - [ProposalFullProfilePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalFullProfilePage.tsx) mount වන විට `proposalApi.recordProfileView(targetId)` endpoint එක call වේ.
+      - Visitor කෙනෙකු VIP Ghost Mode ON කර ඇත්නම්, Target user ගේ profile view count එක වැඩි නොවන අතර, visitor alert එකක් සටහන් නොවේ (100% Stealth & Footprint-Free).
+      - සාමාන්‍ය/visible සාමාජිකයෙකු profile එකක් නැරඹූ විට database `view_count` increment වී, [ProposalHomePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalHomePage.tsx) dashboard card එකෙහි "Profile Views" (බැලූ වාර ගණන) සැබෑ database count එකට sync වේ.
+      - Card එක click කළ විට විවෘත වන Modal එකෙහි සැබෑ viewers list එක (නම, code, avatar, viewed time) ප්‍රදර්ශනය වේ.
+    - **💾 Cross-Device Shortlists & Family Notes Persistence:**
+      - Backend [model/proposal.go](file:///e:/The-Uni-Gang/Backend/internal/model/proposal.go) හි `ProposalShortlist` table එකක් එක් කර, AutoMigrate සක්‍රීය කරන ලදී.
+      - `GET /api/proposals/shortlists`, `POST /api/proposals/shortlists`, සහ `DELETE /api/proposals/shortlists/:candidateId` endpoints ක්‍රියාත්මක කරන ලදී.
+      - [ProposalFullProfilePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalFullProfilePage.tsx) හි Shortlist එක සහ Family Notes backend database එක සමග real-time sync වන බැවින්, පරිශීලකයා වෙනත් device එකකින් හෝ phone එකෙන් log වූ විටද shortlist එක ස්ථිරවම පවතී.
+    - **🛡️ High Security & PII Protection Hardening:**
+      - [proposal_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/proposal_controller.go) හි `GetFeed` සහ `GetShortlists` queries වලදී සාමාජිකයින්ගේ රහසිගත ජාතික හැඳුනුම්පත් ඡායාරූප (`NICFront`, `NICBack`) සහ අංකය (`NICNumber`) public API responses වලින් ස්වයංක්‍රීයව scrub (nil) කර, data scraping සහ identity theft සම්පූර්ණයෙන්ම වළක්වන ලදී.
+    - **🔒 Public Landing Page Security Registration Gate & Search Continuity:**
+      - [ProposalLandingPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalLandingPage.tsx) හි සාම්පල Cards 4 හි "View Profile" හෝ "View All Verified Profiles" බොත්තම Account එකක් නැති (unregistered) කෙනෙකු ක්ලික් කළ විට, Profiles වල විස්තර විවෘත කිරීම වළක්වා `toast("🔒 සත්‍යාපිත මනාල/මනාලියන්ගේ සම්පූර්ණ විස්තර බැලීමට කරුණාකර පළමුව ඔබගේ Bio-Data ගිණුම නොමිලේ සාදාගන්න.")` alert එකක් සමග කෙලින්ම Onboarding / Register පිටුවට යොමු කෙරේ.
+      - [ProposalHubEntry.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/ProposalHubEntry.tsx) හි Hero Search එකෙන් filter කර search කළ විට, අදාළ search parameters (`lookingFor`, `ageRange`, `religion`, `country`, ආදී) මතක තබාගෙන Registration වෙත යොමු වන අතර, Registration එක සම්පූර්ණ කළ සැණින් ස්වයංක්‍රීයව Discover පිටුවේ එයා සෙවූ Matches ලැයිස්තුවටම redirect වන seamless flow එකක් සකස් කරන ලදී.
+
+19. **Ninth Round Subtle Gaps Polish & Communication Hardening:**
+    - **💬 Inbox Matched Bio-Data Quick Access & Functional Polish ([ProposalInboxPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalInboxPage.tsx)):**
+      - Chat header එකේ තිබූ dummy Phone, Video Call, සහ MoreVertical බොත්තම් සජීවී ක්‍රියාකාරීත්වයකින් (functional) යුක්ත කරන ලදී.
+      - Voice Call ක්ලික් කළ විට VIP Verified සාමාජිකයින් සඳහා වන 100% In-App Private Encrypted Call feature එක පිළිබඳ දැනුම්දීමක් ලැබේ.
+      - Video Call ක්ලික් කළ විට VIP Verified Matrimonial Video Calling feature එක පිළිබඳ දැනුම්දීමක් ලැබේ.
+      - More (⋮) menu එකෙන් "👤 View Matched Bio-Data" සහ "🚨 Report Conversation" ක්ෂණිකව තෝරාගත හැක.
+      - Chat header එකේ Avatar එක හෝ සහකරුගේ නම ක්ලික් කළ විට, Chat පිටුවෙන් ඉවත් නොවී අදාළ Match ගේ Verified ID, Badge සහ Bio-Data Preview එක බලාගත හැකි Quick Partner Bio Modal එකක් එක් කරන ලදී.
+    - **🔍 Discover Mobile Filter Badge & Removable Active Filter Pills ([ProposalSearchHeader.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/components/search/ProposalSearchHeader.tsx) & [ProposalDiscoverPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalDiscoverPage.tsx)):**
+      - Mobile screen වලදී Search Filter button එක මත දැනට සක්‍රීය filter ගණන (උදා: `Filters (3)`) rose badge එකක් ලෙස ප්‍රදර්ශනය වේ.
+      - Search Header එකට පහළින් දැනට තෝරා ඇති filters (උදා: `📍 Colombo ✕`, `Age: 22-28 ✕`, `👑 VIP Only ✕`) removable chips/pills ලෙස දිස්වේ. ඕනෑම filter එකක් තනිවම clear කළ හැකි අතර "Clear All" මගින් සියල්ල එකවර reset කළ හැක.
+    - **🚀 Profile Completion Highlight Direct Jump ([ProposalHomePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalHomePage.tsx)):**
+      - Profile Completion Banner එක (උදා: `60% Complete - Profile එක සම්පූර්ණ නැත`) සෘජුවම Interactive Button එකක් බවට පත් කරන ලදී.
+      - User එය click කළ සැණින්, සම්පූර්ණ කිරීමට අතපසු වූ පළමු tab එක (Family, Horoscope, Expectations, හෝ Personal Details) ස්වයංක්‍රීයව හඳුනාගෙන, Bio-Data Edit Modal එක අදාළ tab එකටම direct විවෘත වේ.
+    - **🛡️ Advanced Contact Sanitizer Leak Protection ([proposal_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/proposal_controller.go)):**
+      - පණිවිඩ හුවමාරුවේදී අංක සැඟවීමට යොදන උපක්‍රම (`0` වෙනුවට `o`, `O` යෙදීම, ඉලක්කම් අතර spaces/dots යෙදීම) හසුකරගැනීමට phone regex එක ශක්තිමත් කරන ලදී.
+      - අංක වචනයෙන් ලියා යවන අවස්ථා (ඉංග්‍රීසි: `zero seven seven...` සහ සිංහල: `බිංදුවයි හතයි හතයි...`) ස්වයංක්‍රීයව හඳුනාගෙන block කර, `[Contact details protected until both parties approve]` යනුවෙන් sanitize කරනු ලැබේ.
+
+20. **Tenth Round Cultural Matrimonial Flow Hardening & Security Sync:**
+    - **🚫 Strict Bio-Data Print Prohibition (Privacy Shield):**
+      - සාමාජිකයින්ගේ රහස්‍යභාවය සුරැකීම වෙනුවෙන් සහ තොරතුරු භෞතිකව පිටතට මුද්‍රණය වීම වැළැක්වීමට [ProposalFullProfilePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalFullProfilePage.tsx) හි කිසිදු Print / PDF export එකකට ඉඩ නොදී 100% In-App Safe Viewing තහවුරු කරන ලදී.
+    - **🔐 Discover Guest & Website Member Exploration Gate ([ProposalNavbar.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/components/navbar/ProposalNavbar.tsx) & [ProposalHubEntry.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/ProposalHubEntry.tsx)):**
+      - The Uni Gang වෙබ් අඩවියට Log In නොවූ (`!isLoggedIn`) සම්පූර්ණයෙන්ම බාහිර guest කෙනෙකු Discover පිටුවට හෝ Hero Search එකට පිවිසීමට උත්සාහ කළ විට, සාමාජිකයින්ගේ ආරක්ෂාව තකා පළමුව වෙබ් අඩවියට Log In වීමට prompt කරනු ලැබේ.
