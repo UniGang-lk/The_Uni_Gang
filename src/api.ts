@@ -866,16 +866,16 @@ export const api = {
   },
 
   getAdminPremiumPayments: async (token: string): Promise<any[]> => {
-    const response = await fetch(`${BASE_URL}/api/proposals/admin/payments`, {
+    const response = await fetch(`${BASE_URL}/api/admin/proposals/payments`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (!response.ok) throw new Error('Failed to fetch payments');
     const data = await response.json();
-    return data.payments || [];
+    return data.payments || data || [];
   },
 
   updateAdminPremiumPaymentStatus: async (paymentId: string, status: string, token: string): Promise<any> => {
-    const response = await fetch(`${BASE_URL}/api/proposals/admin/payments/${paymentId}/status`, {
+    const response = await fetch(`${BASE_URL}/api/admin/proposals/payments/${paymentId}/status`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -884,6 +884,40 @@ export const api = {
       body: JSON.stringify({ status })
     });
     if (!response.ok) throw new Error('Failed to update payment status');
+    return response.json();
+  },
+
+  getAdminProposalProfiles: async (token: string): Promise<any[]> => {
+    const response = await fetch(`${BASE_URL}/api/admin/proposals`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch proposal profiles');
+    const data = await response.json();
+    return data.profiles || data || [];
+  },
+
+  verifyAdminProposalNIC: async (proposalId: string, token: string): Promise<any> => {
+    const response = await fetch(`${BASE_URL}/api/admin/proposals/${proposalId}/verify`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      }
+    });
+    if (!response.ok) throw new Error('Failed to verify proposal NIC');
+    return response.json();
+  },
+
+  updateAdminProposalStatus: async (proposalId: string, status: string, token: string): Promise<any> => {
+    const response = await fetch(`${BASE_URL}/api/admin/proposals/${proposalId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ status })
+    });
+    if (!response.ok) throw new Error('Failed to update proposal status');
     return response.json();
   },
 
