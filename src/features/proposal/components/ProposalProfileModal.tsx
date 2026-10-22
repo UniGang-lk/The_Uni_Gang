@@ -144,7 +144,8 @@ export default function ProposalProfileModal({ profile, onClose }: { profile: an
                           "w-full h-full object-cover transition-transform duration-500",
                           profile.blurPhoto && "blur-2xl brightness-75 scale-110"
                         )} 
-                      </WatermarkOverlay>
+                      />
+                    </WatermarkOverlay>
                     </div>
 
                   {/* 3 Photos Thumbnail Switcher Row */}
