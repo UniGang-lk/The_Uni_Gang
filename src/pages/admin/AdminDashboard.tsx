@@ -5,7 +5,7 @@ import {
   LuMessageSquare, LuCheck, LuX, LuTrash2, LuSearch,
   LuExternalLink, LuUserCheck, LuMail, LuHouse, LuUsers,
   LuLifeBuoy, LuCreditCard, LuRefreshCw, LuFootprints,
-  LuMapPin, LuGraduationCap, LuBriefcase
+  LuMapPin, LuGraduationCap, LuBriefcase, LuHeart
 } from 'react-icons/lu';
 import { FiHome } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +14,7 @@ import { api } from '../../api';
 import SEO from '../../components/SEO';
 import { jwtDecode } from 'jwt-decode';
 
-type AdminTab = 'annexes' | 'market' | 'events' | 'users' | 'feedbacks' | 'problems' | 'payments';
+type AdminTab = 'annexes' | 'market' | 'events' | 'users' | 'feedbacks' | 'problems' | 'payments' | 'proposals';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -30,6 +30,7 @@ const AdminDashboard = () => {
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
   const [problems, setProblems] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
+  const [proposalProfiles, setProposalProfiles] = useState<any[]>([]);
 
   // Reply modal state for problem reports
   const [replyModalOpen, setReplyModalOpen] = useState(false);
@@ -66,14 +67,15 @@ const AdminDashboard = () => {
     if (!token) return;
     setLoading(true);
     try {
-      const [annexData, marketData, eventData, userData, feedbackData, problemData, paymentData] = await Promise.all([
+      const [annexData, marketData, eventData, userData, feedbackData, problemData, paymentData, proposalData] = await Promise.all([
         api.getAdminAnnexes(token).catch(() => []),
         api.getAdminMarketItems(token).catch(() => []),
         api.getAdminEvents(token).catch(() => []),
         api.getAdminUsers(token).catch(() => []),
         api.getAdminFeedbacks(token).catch(() => []),
         api.getAdminProblems(token).catch(() => []),
-        api.getAdminPremiumPayments(token).catch(() => [])
+        api.getAdminPremiumPayments(token).catch(() => []),
+        api.getAdminProposalProfiles(token).catch(() => [])
       ]);
 
       setAnnexes(annexData);
@@ -83,6 +85,7 @@ const AdminDashboard = () => {
       setFeedbacks(feedbackData);
       setProblems(problemData);
       setPayments(paymentData);
+      setProposalProfiles(proposalData);
     } catch (err: any) {
       console.error('Failed to load admin data:', err);
       toast.error('Failed to load some admin data.');
@@ -212,12 +215,35 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleVerifyProposalNIC = async (id: string) => {
+    if (!token) return;
+    try {
+      await api.verifyAdminProposalNIC(id, token);
+      toast.success("Proposal NIC verified successfully! User marked as Verified Student/Professional.");
+      setProposalProfiles(prev => prev.map(p => p.id === id ? { ...p, is_nic_verified: true, verification_status: 'verified' } : p));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to verify proposal NIC');
+    }
+  };
+
+  const handleRejectProposalNIC = async (id: string) => {
+    if (!token) return;
+    try {
+      await api.updateAdminProposalStatus(id, 'REJECTED', token);
+      toast.success("Proposal NIC verification rejected.");
+      setProposalProfiles(prev => prev.map(p => p.id === id ? { ...p, is_nic_verified: false, verification_status: 'rejected' } : p));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to reject proposal NIC');
+    }
+  };
+
   // Metrics summary
   const pendingAnnexesCount = annexes.filter(a => a.status === 'Pending').length;
   const pendingMarketCount = marketItems.filter(m => m.status === 'PENDING_VERIFICATION' || m.status === 'PENDING').length;
   const pendingEventsCount = events.filter(e => e.status === 'Pending' || e.status === 'PENDING').length;
   const pendingProblemsCount = problems.filter(p => p.status === 'PENDING' || p.status === 'IN_PROGRESS').length;
   const pendingPaymentsCount = payments.filter(p => p.status === 'pending').length;
+  const pendingProposalVerificationsCount = proposalProfiles.filter(p => p.verification_status === 'pending_review' || p.verificationStatus === 'pending_review').length;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 py-12 px-4 sm:px-6 lg:px-12 font-sans relative overflow-hidden">
@@ -292,7 +318,8 @@ const AdminDashboard = () => {
             { id: 'users', label: `Users & Badges (${users.length})`, icon: LuUsers },
             { id: 'feedbacks', label: `Client Feedbacks (${feedbacks.length})`, icon: LuMessageSquare },
             { id: 'problems', label: `Support Tickets (${problems.length})`, icon: LuLifeBuoy, count: pendingProblemsCount },
-            { id: 'payments', label: `Premium Payments (${payments.length})`, icon: LuCreditCard, count: pendingPaymentsCount }
+            { id: 'payments', label: `Premium Payments (${payments.length})`, icon: LuCreditCard, count: pendingPaymentsCount },
+            { id: 'proposals', label: `Proposal ID Verifications (${proposalProfiles.length})`, icon: LuHeart, count: pendingProposalVerificationsCount }
           ].map(tab => (
             <button
               key={tab.id}
@@ -666,6 +693,17 @@ const AdminDashboard = () => {
                         </div>
 
                         <h3 className="text-lg font-bold text-white mb-1">User: {payment.user?.name}</h3>
+                        <div className="flex items-center gap-2 mt-1 mb-2">
+                          {payment.plan === 'vip_6m' || payment.duration_months === 6 ? (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                              👑 VIP Membership (6 Months) · Rs. 4,990
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-500/20 text-blue-300 border border-blue-500/30 flex items-center gap-1">
+                              ⭐ Classic Membership (3 Months) · Rs. 2,990
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-slate-400 mb-1">Email: {payment.user?.email}</p>
                         <p className="text-xs text-slate-400 mb-1">WhatsApp: {payment.whatsapp_number}</p>
                         <p className="text-[10px] text-slate-500 mt-2 font-medium">Ref: {payment.reference_number || 'N/A'} · Date: {new Date(payment.payment_date).toLocaleString()}</p>
@@ -697,6 +735,124 @@ const AdminDashboard = () => {
                       </div>
                     </div>
                   ))}
+              </div>
+            )}
+
+            {/* 8. Proposal ID Verifications Tab */}
+            {activeTab === 'proposals' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-xs text-slate-400">
+                    Showing <span className="font-bold text-white">{proposalProfiles.length}</span> Proposal Profiles registered on the platform.
+                  </p>
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                    {pendingProposalVerificationsCount} Pending NIC Review
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {proposalProfiles
+                    .filter(p => !searchQuery || p.nic_number?.toLowerCase().includes(searchQuery.toLowerCase()) || p.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) || p.district?.toLowerCase().includes(searchQuery.toLowerCase()))
+                    .map(profile => (
+                      <div key={profile.id} className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                              profile.is_nic_verified || profile.verification_status === 'verified'
+                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                : profile.verification_status === 'rejected'
+                                ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                                : 'bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse'
+                            }`}>
+                              {profile.verification_status === 'pending_review' ? '⏳ Pending Review' : profile.verification_status || 'unverified'}
+                            </span>
+                            <span className="text-xs font-mono font-bold text-indigo-400">
+                              {profile.category_badge || 'Campus Graduate 🎓'}
+                            </span>
+                          </div>
+
+                          <h3 className="text-lg font-bold text-white mb-1">
+                            {profile.user?.name || 'Candidate Member'} <span className="text-xs font-normal text-slate-400">({profile.age} yrs, {profile.district})</span>
+                          </h3>
+                          <p className="text-xs text-slate-400 mb-1">Profession: <span className="text-white font-semibold">{profile.profession || 'Not Specified'}</span></p>
+                          <p className="text-xs text-slate-400 mb-1">
+                            NIC Number: <span className="text-amber-300 font-mono font-bold">{profile.nic_number || profile.nicNumber || 'Submitted with Photos'}</span>
+                          </p>
+                          <p className="text-xs text-slate-400 mb-1">Email: {profile.user?.email || 'N/A'}</p>
+                        </div>
+
+                        {/* NIC Front & Back Image Previews */}
+                        <div className="pt-4 mt-4 border-t border-slate-800/80">
+                          <p className="text-[11px] font-bold text-slate-300 mb-2">Government ID (NIC) Documents:</p>
+                          <div className="grid grid-cols-2 gap-3 mb-4">
+                            {profile.nic_front ? (
+                              <a
+                                href={profile.nic_front.startsWith('data:') || profile.nic_front.startsWith('http') ? profile.nic_front : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${profile.nic_front}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block rounded-xl overflow-hidden border border-slate-700 bg-slate-950/80 group relative"
+                              >
+                                <img
+                                  src={profile.nic_front.startsWith('data:') || profile.nic_front.startsWith('http') ? profile.nic_front : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${profile.nic_front}`}
+                                  alt="NIC Front"
+                                  className="w-full h-24 object-cover group-hover:scale-105 transition-transform"
+                                />
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-white">
+                                  🔍 View Front
+                                </div>
+                              </a>
+                            ) : (
+                              <div className="h-24 rounded-xl border border-dashed border-slate-800 flex items-center justify-center text-[10px] text-slate-500">
+                                No Front Image
+                              </div>
+                            )}
+
+                            {profile.nic_back ? (
+                              <a
+                                href={profile.nic_back.startsWith('data:') || profile.nic_back.startsWith('http') ? profile.nic_back : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${profile.nic_back}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block rounded-xl overflow-hidden border border-slate-700 bg-slate-950/80 group relative"
+                              >
+                                <img
+                                  src={profile.nic_back.startsWith('data:') || profile.nic_back.startsWith('http') ? profile.nic_back : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${profile.nic_back}`}
+                                  alt="NIC Back"
+                                  className="w-full h-24 object-cover group-hover:scale-105 transition-transform"
+                                />
+                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold text-white">
+                                  🔍 View Back
+                                </div>
+                              </a>
+                            ) : (
+                              <div className="h-24 rounded-xl border border-dashed border-slate-800 flex items-center justify-center text-[10px] text-slate-500">
+                                No Back Image
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="flex items-center justify-end gap-2">
+                            {(!profile.is_nic_verified || profile.verification_status !== 'verified') && (
+                              <button
+                                onClick={() => handleVerifyProposalNIC(profile.id)}
+                                className="px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+                              >
+                                <LuCheck size={14} /> Verify Citizen ID
+                              </button>
+                            )}
+                            {profile.verification_status !== 'rejected' && (
+                              <button
+                                onClick={() => handleRejectProposalNIC(profile.id)}
+                                className="px-3 py-2 rounded-xl bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
+                              >
+                                <LuX size={14} /> Reject
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
               </div>
             )}
           </div>
