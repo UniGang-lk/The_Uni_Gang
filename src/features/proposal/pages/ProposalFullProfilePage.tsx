@@ -282,7 +282,7 @@ export default function ProposalFullProfilePage({
 
             {/* 3 Photos Thumbnail Switcher Row */}
             <div className="flex items-center justify-center gap-3 mt-3">
-              {allImages.map((imgUrl, idx) => (
+              {allImages.map((imgUrl: string, idx: number) => (
                 <button
                   key={idx}
                   onClick={() => setSelectedImageIndex(idx)}
