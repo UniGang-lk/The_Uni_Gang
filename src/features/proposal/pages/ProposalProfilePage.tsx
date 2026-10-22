@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { PrimaryButton, Card, cx } from '../components/ui/ProposalPrimitives';
 import { proposalApi } from '../api/proposalApi';
+import toast from 'react-hot-toast';
 
 const SRI_LANKA_DISTRICTS = [
   "Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya", 
@@ -196,7 +197,7 @@ export default function ProposalProfilePage({ setPage }: { setPage: (p: string) 
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err) {
       console.error(err);
-      alert('Error saving profile changes. Local profile was updated.');
+      toast.error('Error saving profile changes. Local profile was updated.');
     } finally {
       setSaving(false);
     }
