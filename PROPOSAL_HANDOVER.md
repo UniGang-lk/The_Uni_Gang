@@ -328,3 +328,53 @@
       - සාමාජිකයින්ගේ රහස්‍යභාවය සුරැකීම වෙනුවෙන් සහ තොරතුරු භෞතිකව පිටතට මුද්‍රණය වීම වැළැක්වීමට [ProposalFullProfilePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalFullProfilePage.tsx) හි කිසිදු Print / PDF export එකකට ඉඩ නොදී 100% In-App Safe Viewing තහවුරු කරන ලදී.
     - **🔐 Discover Guest & Website Member Exploration Gate ([ProposalNavbar.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/components/navbar/ProposalNavbar.tsx) & [ProposalHubEntry.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/ProposalHubEntry.tsx)):**
       - The Uni Gang වෙබ් අඩවියට Log In නොවූ (`!isLoggedIn`) සම්පූර්ණයෙන්ම බාහිර guest කෙනෙකු Discover පිටුවට හෝ Hero Search එකට පිවිසීමට උත්සාහ කළ විට, සාමාජිකයින්ගේ ආරක්ෂාව තකා පළමුව වෙබ් අඩවියට Log In වීමට prompt කරනු ලැබේ.
+      - වෙබ් අඩවියේ Log In වූ සාමාජිකයින්ට Discover directory එකේ මූලික තොරතුරු (නම, වයස, රැකියාව, දිස්ත්‍රික්කය) නිදහසේ ගවේෂණය කළ හැක.
+      - සම්පූර්ණ Bio-Data විස්තර බැලීමට හෝ Proposal යැවීමට උත්සාහ කරන විට පමණක් Proposal Profile එක සකසා ගැනීමට (`onboarding`) යොමු කෙරේ.
+      - Navbar Discover බොත්තමේ Tooltip එකද මෙම ප්‍රතිපත්තියට අනුකූලව `"ලියාපදිංචි සාමාජිකයින්ට මූලික විස්තර ගවේෂණය කළ හැක"` ලෙස නිවැරදි කරන ලදී.
+    - **💌 Likes Page Mobile Touch Polish, Bio Preview & Pass Option ([ProposalLikesPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalLikesPage.tsx)):**
+      - Desktop hover මත පමණක් රඳා නොපවතින පරිදි Mobile touch screens සඳහා සෑම card එකක් යටතෙන්ම `Bio` (විස්තර බැලීමට), `✕ Pass` (සුහදව ප්‍රතික්ෂේප කිරීමට), සහ `💖 Match` (පිළිගැනීමට) බොත්තම් එක් කරන ලදී.
+      - තීරණයක් ගැනීමට පෙර සහකරුගේ සියලු විස්තර පිරික්සිය හැකි අලංකාර Candidate Bio-Data Preview Modal එකක් එක් කරන ලදී.
+      - Match වූ සැණින් Toast notification එක හරහා `"💬 Open Chat"` මගින් සෘජුවම Inbox වෙත පිවිසීමේ හැකියාව ලබා දී ඇත.
+    - **👨‍👩‍👧‍👦 Onboarding Creator Agency Selector ([ProposalOnboardingPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalOnboardingPage.tsx)):**
+      - Step 1 ("Personal & Identity") හි ආරම්භයේදීම `Account Created By (ගිණුම සාදනු ලබන්නේ)` dropdown එකක් එක් කර, `Self (මා විසින්ම)`, `Parents (දෙමව්පියන් විසින්)`, `Sibling (සහෝදරයා/සහෝදරිය)`, `Relative / Guardian (ඥාතියෙකු/භාරකරුවෙකු)` තෝරාගැනීමට ඉඩ සලස්වා backend `managed_by` / `managedBy` field එකට persist කරන ලදී.
+    - **💔 In-App Chat Polite 'End Proposal / Unmatch' ([ProposalInboxPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalInboxPage.tsx) & [proposal_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/proposal_controller.go)):**
+      - නොගැළපෙන යෝජනාවක් සාකච්ඡා කිරීමෙන් පසු දෙපාර්ශ්වයේම ගෞරවය සුරැකෙන පරිදි සුහදව අවසන් කිරීමට Chat More (⋮) menu එකට `"💔 End Proposal / Unmatch"` විකල්පය එක් කරන ලදී.
+      - Confirm Modal එකක් මගින් තහවුරු කරගත් පසු Backend `POST /api/proposals/matches/:matchId/unmatch` endpoint එක call වී, Match status එක `closed` බවට පත්වී conversation එක Inbox එකෙන් ගෞරවාන්විතව archive වේ.
+
+21. **Eleventh Round Deep Gaps Polish & In-App Experience Hardening:**
+    - **📑 Dashboard Saved Shortlist & Family Notes Hub ([ProposalHomePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalHomePage.tsx)):**
+      - Dashboard Header එකෙහි Quick Action row එකට "Saved Shortlist (කෙටි ලැයිස්තුව)" බොත්තමක් සහ dynamic count badge එකක් එක් කරන ලදී.
+      - එය click කළ විට පරිශීලකයා සහ පවුලේ අය විසින් save කරගත් සියලුම Bio-Data Profiles, Family Notes (සටහන්) සහ saved date එක සහිතව පිරික්සිය හැකි අලංකාර Shortlist Modal එකක් දිස්වේ.
+      - Modal එක තුළින්ම ඕනෑම Candidate කෙනෙකුගේ Full Profile එක වෙත direct පිවිසීමට හෝ ලැයිස්තුවෙන් ඉවත් කිරීමට (`handleRemoveShortlist`) හැකියාව ලබා දී ඇත.
+    - **🛡️ Strict Privacy Policy: WhatsApp Share Deliberately Excluded:**
+      - සාමාජිකයින්ගේ රහස්‍යභාවය, විශ්වසනීයත්වය සහ ඡායාරූප/තොරතුරු බාහිර WhatsApp groups හෝ සමාජ මාධ්‍ය වෙත කාන්දු වීම (Leakage / Viral Forwarding) වැළැක්වීම සඳහා, Profile එක පිටතට WhatsApp share කිරීමේ කිසිදු විකල්පයක් ඇතුළත් නොකර 100% In-Platform Closed Ecosystem එකක් ලෙස පවත්වා ගැනීමට තීරණය කර තහවුරු කරන ලදී.
+    - **🔍 Discover Page "Account Created By" Filter Disconnect Solved ([ProposalDiscoverPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalDiscoverPage.tsx) & [ProposalSearchResultCard.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/components/search/ProposalSearchResultCard.tsx)):**
+      - `CandidateProfile` interface එකට සහ `mapBackendToCandidate` function එකට `managedBy` field එක සම්බන්ධ කරන ලදී.
+      - Discover Filter Sidebar එකේ ඇති "Account Created By" (Self, Parents, Sibling, Relative/Guardian) filter එක සක්‍රීය filtering engine එකට සහ active filter pills/chips වෙත sync කර, දෙමව්පියන් හෝ තමන් විසින්ම සාදන ලද profiles පමණක් තෝරා ගැනීමේ හැකියාව 100% ක්‍රියාත්මක කරන ලදී.
+    - **🔔 Dashboard In-App Notifications Dropdown Bell ([ProposalHomePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalHomePage.tsx)):**
+      - Dashboard Header එකෙහි Quick Action row එකට සජීවී Notification Bell එකක් සහ Unread Badge එකක් එක් කරන ලදී.
+      - Bell එක click කළ විට නව proposals, profile views, verification status updates සහ payment approvals බලාගත හැකි drop-down panel එකක් විවෘත වේ.
+    - **⏸️ Profile Paused Visibility Banner with Instant Resume ([ProposalHomePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalHomePage.tsx)):**
+      - පරිශීලකයෙකු Settings වලින් Profile එක Pause කර ඇති විට, Dashboard එකේ මුදුනතින්ම පැහැදිලි Amber/Orange Warning Banner එකක් දිස්වේ.
+      - වෙනත් අයට profile එක නොපෙනෙන බව පැහැදිලි කරන අතර, Settings වෙත නොගොස් Dashboard එකෙන්ම ක්ෂණිකව Profile එක Live කරගත හැකි `"▶️ Resume Profile"` 1-click button එකක් ලබා දී ඇත.
+
+22. **Twelfth Round Deep Code Audit & Precision Bug Squashing:**
+    - **💥 Full Profile useEffect Missing Import Runtime Crash Fixed ([ProposalFullProfilePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalFullProfilePage.tsx)):**
+      - Full Profile පිටුව mount වීමේදී profile view record කිරීමට සහ backend shortlists fetch කිරීමට භාවිත කළ `useEffect` hook එක `react` වෙතින් import කර නොතිබීම නිසා හටගත් runtime ReferenceError crash එක සම්පූර්ණයෙන්ම වළක්වා `import { useState, useEffect } from 'react';` ලෙස නිවැරදි කරන ලදී.
+    - **📞 Official Uni Gang Admin WhatsApp Number Sync ([ProposalPremiumPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalPremiumPage.tsx)):**
+      - Premium pricing පිටුවේ header එකෙහි සහ Bank Transfer Slip Upload Modal එක තුළ තිබූ dummy `94771234567` WhatsApp අංකය වෙනුවට වෙබ් අඩවියේ නිල admin WhatsApp අංකය වන `94724478148` යොදා, සාමාජිකයින්ට admin වෙත slip එවීමේ සැබෑ සම්බන්ධතාවය 100% තහවුරු කරන ලදී.
+    - **🔔 Legacy Browser Alert Removal ([ProposalProfilePage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalProfilePage.tsx)):**
+      - පැරණි blocking browser `alert()` වෙනුවට `react-hot-toast` (`toast.error(...)`) යොදා platform එක පුරාම modern, non-blocking toast notifications සහතික කරන ලදී.
+    - **📋 FAQ Section Clarity & Full Page Navigation Flow:**
+      - [ProposalFAQSection.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/components/faq/ProposalFAQSection.tsx) හි SMS webhook promise එක ඉවත් කර In-App Notifications වෙත පමණක් සීමා කරමින් සත්‍ය තොරතුරු ලබා දෙන ලදී. Landing Page එකේ සිට සියලුම ප්‍රශ්නෝත්තර 25+ සහිත [ProposalFAQPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalFAQPage.tsx) වෙත direct open වන Action Button එක පරීක්ෂා කර තහවුරු කරන ලදී.
+
+23. **Thirteenth Round Microscopic UX & Responsive Precision Hardening:**
+    - **📱 Mobile Responsive Menu Breakpoint Trap Resolved ([ProposalNavbar.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/components/navbar/ProposalNavbar.tsx)):**
+      - Screen width 1024px සිට 1279px දක්වා වූ tablet/small desktop viewports වලදී Desktop Navbar menu එක hide වුවද Mobile Dropdown එක `lg:hidden` ලෙස තිබීම නිසා hamburger icon එක click කළ විට menu එක open නොවීමේ responsive bug එක හඳුනාගෙන, එය `xl:hidden` බවට පත් කර 100% responsive visibility තහවුරු කරන ලදී.
+    - **⚡ Reactive Account Purge State Sync ([ProposalHubEntry.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/ProposalHubEntry.tsx)):**
+      - පරිශීලකයෙකු Settings පිටුවෙන් Profile එක Delete කළ විට, browser refresh එකකින් තොරව React component tree එක තුළම `hasProfile: false` ක්ෂණිකව trigger වන සේ `onDeleteProposalProfile={() => { setHasProfile(false); navigateTo('landing'); }}` callback එක සම්බන්ධ කරන ලදී.
+    - **💬 In-App Chat Real-time Message Content Fallback ([ProposalInboxPage.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/pages/ProposalInboxPage.tsx)):**
+      - Socket එක හරහා අලුත් message එකක් ලැබුණු විට sidebar එකේ last message preview එක `msg.content || msg.text || 'New message'` ලෙස sanitize කර, message text එක හිස්ව පෙන්වීම සම්පූර්ණයෙන්ම වළක්වන ලදී.
+
+24. **Fourteenth Round List/Compact View Layout Implementation:**
+    - **📑 True Compact Row Layout Implemented ([ProposalSearchResultCard.tsx](file:///e:/The-Uni-Gang/Website/src/features/proposal/components/search/ProposalSearchResultCard.tsx)):**
