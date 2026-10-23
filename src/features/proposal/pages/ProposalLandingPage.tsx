@@ -191,13 +191,7 @@ export default function ProposalLandingPage({
                 isInterestSent={sentInterestIds.includes(String(profile.id))}
                 onSendInterest={handleCardConnect}
                 onViewProfile={(p) => {
-                  if (!hasProposalProfile) {
-                    toast("🔒 සත්‍යාපිත මනාල/මනාලියන්ගේ සම්පූර්ණ විස්තර බැලීමට කරුණාකර පළමුව ඔබගේ Bio-Data ගිණුම නොමිලේ සාදාගන්න.", {
-                      icon: '💍',
-                      duration: 5000
-                    });
-                    onGetStarted();
-                  } else if (onViewProfile) {
+                  if (onViewProfile) {
                     onViewProfile(p);
                   } else {
                     onGetStarted();

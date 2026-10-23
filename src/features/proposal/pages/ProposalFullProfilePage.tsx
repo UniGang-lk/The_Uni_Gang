@@ -34,15 +34,22 @@ export default function ProposalFullProfilePage({
   profile, 
   goBack, 
   onSendProposal,
-  onVerifyNow
+  onVerifyNow,
+  onRegisterNow
 }: { 
   profile: any;
   goBack: () => void;
   onSendProposal?: () => void;
   onVerifyNow?: () => void;
+  onRegisterNow?: () => void;
 }) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const hasProfile = Boolean(
+    localStorage.getItem('userHasProposalProfile') === 'true' || 
+    localStorage.getItem('userProposalProfile')
+  );
+  const [showRegisterPromptModal, setShowRegisterPromptModal] = useState(false);
 
   const [proposalSent, setProposalSent] = useState(() => {
     try {
@@ -143,6 +150,10 @@ export default function ProposalFullProfilePage({
   };
 
   const handleConnectClick = () => {
+    if (!hasProfile) {
+      setShowRegisterPromptModal(true);
+      return;
+    }
     if (!checkCanConnect(onVerifyNow)) return;
     setShowConfirmModal(true);
   };
@@ -242,6 +253,32 @@ export default function ProposalFullProfilePage({
           </button>
         </div>
       </div>
+
+      {/* GUEST PREVIEW MODE NOTICE BANNER */}
+      {!hasProfile && (
+        <div className="bg-gradient-to-r from-rose-500/10 via-pink-500/5 to-amber-500/10 border-b border-rose-500/20 px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-sans">
+          <div className="flex items-center gap-2.5 text-center sm:text-left">
+            <div className="w-8 h-8 rounded-full bg-rose-500/15 text-rose-500 flex items-center justify-center shrink-0">
+              <Sparkles size={16} />
+            </div>
+            <div>
+              <p className="font-bold text-slate-800 dark:text-slate-200">
+                ඔබ අමුත්තෙකු ලෙස මෙම Profile එක නරඹමින් සිටී (Guest Preview Mode)
+              </p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-sinhala">
+                මෙම යෝජනාවට Proposal Request එකක් යැවීමට හෝ In-App Chat සඳහා ඔබගේ නොමිලේ Bio-Data එක සකසා ගන්න.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onRegisterNow}
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-600 text-white font-bold text-xs shrink-0 shadow-md shadow-rose-500/20 cursor-pointer transition-all hover:scale-105"
+          >
+            නොමිලේ Bio-Data සාදන්න 💍
+          </button>
+        </div>
+      )}
 
       {/* Main 2-Column Balanced Dashboard Layout */}
       <div className="flex-1 p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 font-sans">
@@ -861,6 +898,62 @@ export default function ProposalFullProfilePage({
 
       {/* PROPOSAL USAGE LIMIT REACHED MODAL (3/month for free plan) */}
       <ProposalLimitModal onUpgrade={() => onVerifyNow ? onVerifyNow() : null} />
+
+      {/* REGISTER PROMPT MODAL FOR GUESTS */}
+      {showRegisterPromptModal && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in font-sans">
+          <div className={`p-6 sm:p-8 rounded-3xl max-w-md w-full border shadow-2xl text-center relative ${
+            isDark ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
+          }`}>
+            <button
+              onClick={() => setShowRegisterPromptModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-white p-1 rounded-full cursor-pointer"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="w-16 h-16 rounded-full overflow-hidden mx-auto mb-4 bg-rose-500/10 text-rose-500 flex items-center justify-center ring-4 ring-rose-500/20 shadow-lg">
+              <Heart size={32} fill="currentColor" />
+            </div>
+
+            <h3 className="text-xl font-black mb-1">
+              Create Your Free Bio-Data 💍
+            </h3>
+            <p className="text-xs font-bold text-rose-500 mb-3">
+              Connect with {profile.name} ({profile.code || 'BR000158'})
+            </p>
+
+            <p className={`text-xs leading-relaxed mb-6 font-sinhala ${
+              isDark ? 'text-slate-300' : 'text-slate-600'
+            }`}>
+              මෙම මනාල/මනාලිය වෙත Proposal Request එකක් යැවීමට සහ දෙපාර්ශවයම Accept කළ පසු ආරක්ෂිත In-App Chat ආරම්භ කිරීමට, කරුණාකර පළමුව ඔබගේ මූලික Bio-Data ගිණුම මිනිත්තු 2කින් නොමිලේ සකස් කරගන්න.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowRegisterPromptModal(false)}
+                className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-bold border transition-colors cursor-pointer ${
+                  isDark ? 'border-slate-800 bg-slate-800/80 hover:bg-slate-800 text-slate-300' : 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700'
+                }`}
+              >
+                පසුව බලන්න
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowRegisterPromptModal(false);
+                  if (onRegisterNow) onRegisterNow();
+                  else if (onVerifyNow) onVerifyNow();
+                }}
+                className="flex-1 py-2.5 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-600 text-white shadow-md shadow-rose-500/25 flex items-center justify-center gap-1.5 cursor-pointer hover:scale-[1.02] transition-transform"
+              >
+                <span>Bio-Data සාදන්න</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }
