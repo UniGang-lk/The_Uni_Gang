@@ -899,7 +899,7 @@ export default function ProposalDiscoverPage({
 
                   {/* COMPACT PAYWALL GATEKEEPER */}
                   {!isPremium && filteredCandidates.length > 10 && (
-                    <div className={`p-6 rounded-3xl border flex items-center justify-between gap-4 shadow-lg ${
+                    <div className={`p-5 sm:p-6 rounded-3xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg ${
                       isDark ? 'bg-slate-900 border-amber-500/30' : 'bg-white border-amber-300'
                     }`}>
                       <div className="flex items-center gap-3.5">

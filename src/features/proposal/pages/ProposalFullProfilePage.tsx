@@ -207,32 +207,32 @@ export default function ProposalFullProfilePage({
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 15 }}
-      className="w-full max-w-6xl mx-auto min-h-[calc(100vh-80px)] bg-slate-50 dark:bg-slate-950 flex flex-col relative rounded-[2.5rem] overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 my-4 font-sans"
+      className="w-full max-w-6xl mx-auto min-h-[calc(100vh-80px)] bg-slate-50 dark:bg-slate-950 flex flex-col relative rounded-2xl sm:rounded-[2.5rem] overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 my-1 sm:my-4 font-sans"
     >
       {/* Top Header inside Profile Card */}
-      <div className="flex items-center justify-between px-6 py-3.5 bg-white/95 dark:bg-slate-900/95 border-b border-slate-200 dark:border-slate-800 font-sans">
+      <div className="flex items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 bg-white/95 dark:bg-slate-900/95 border-b border-slate-200 dark:border-slate-800 font-sans gap-2">
         <button 
           onClick={goBack}
-          className="w-9 h-9 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer"
+          className="w-9 h-9 rounded-full flex items-center justify-center bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer shrink-0"
         >
           <ChevronLeft size={20} />
         </button>
         
-        <div className="font-extrabold text-slate-900 dark:text-white flex items-center gap-2 text-sm font-sans flex-wrap">
-          <span>{profile.name}</span>
-          <span className="text-xs font-black text-rose-500 bg-rose-500/10 px-2.5 py-0.5 rounded-full border border-rose-500/20">
+        <div className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-sans flex-wrap min-w-0">
+          <span className="truncate max-w-[130px] sm:max-w-none">{profile.name}</span>
+          <span className="text-[11px] sm:text-xs font-black text-rose-500 bg-rose-500/10 px-2 sm:px-2.5 py-0.5 rounded-full border border-rose-500/20 shrink-0">
             {profile.code || 'BR000158'}
           </span>
-          {profile.isVerified && <ShieldCheck size={16} className="text-blue-500" />}
+          {profile.isVerified && <ShieldCheck size={16} className="text-blue-500 shrink-0" />}
           {Boolean(profile.matchPercentage && profile.matchPercentage > 0) && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold">
+            <span className="hidden xs:inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold shrink-0">
               <Sparkles size={12} className="text-emerald-500" />
               <span>{profile.matchPercentage}% Match</span>
             </span>
           )}
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {membershipPlan === 'vip' && (
             <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900 border border-amber-400/40 text-amber-300 text-[11px] font-bold shadow-xs">
               <span>🕶️ Ghost Mode Active</span>
@@ -242,21 +242,21 @@ export default function ProposalFullProfilePage({
           <button
             type="button"
             onClick={handleToggleShortlist}
-            className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border ${
+            className={`px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border ${
               isShortlisted
                 ? 'bg-amber-500/15 text-amber-500 border-amber-500/30 shadow-xs'
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-amber-500 border-slate-200 dark:border-slate-700'
             }`}
           >
             <Bookmark size={14} fill={isShortlisted ? "currentColor" : "none"} />
-            <span>{isShortlisted ? 'Shortlisted' : 'Shortlist & Notes'}</span>
+            <span>{isShortlisted ? 'Shortlisted' : <span>Shortlist<span className="hidden sm:inline"> & Notes</span></span>}</span>
           </button>
         </div>
       </div>
 
       {/* GUEST PREVIEW MODE NOTICE BANNER */}
       {!hasProfile && (
-        <div className="bg-gradient-to-r from-rose-500/10 via-pink-500/5 to-amber-500/10 border-b border-rose-500/20 px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-sans">
+        <div className="bg-gradient-to-r from-rose-500/10 via-pink-500/5 to-amber-500/10 border-b border-rose-500/20 px-4 sm:px-6 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-sans">
           <div className="flex items-center gap-2.5 text-center sm:text-left">
             <div className="w-8 h-8 rounded-full bg-rose-500/15 text-rose-500 flex items-center justify-center shrink-0">
               <Sparkles size={16} />
@@ -281,7 +281,7 @@ export default function ProposalFullProfilePage({
       )}
 
       {/* Main 2-Column Balanced Dashboard Layout */}
-      <div className="flex-1 p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8 font-sans">
+      <div className="flex-1 p-3.5 sm:p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 font-sans">
 
         {/* ── LEFT COLUMN (4 Cols): Compact Photo Showcase + Candidate Highlights ── */}
         <div className="lg:col-span-5 space-y-6">
@@ -462,9 +462,9 @@ export default function ProposalFullProfilePage({
                   { label: 'Smoking Habits', value: (profile.smokingStatus || 'Non-smoker').replace(/[^\w\s\/-]/g, '').trim() },
                   { label: 'Food / Diet Preference', value: (profile.dietaryPreference || profile.diet || 'Non-Vegetarian').replace(/[^\w\s\/-]/g, '').trim() },
                 ].map((row, i) => (
-                  <div key={i} className="flex justify-between items-center px-5 py-2.5 font-sans">
-                    <span className="font-semibold text-slate-500">{row.label}</span>
-                    <span className={`font-bold ${row.value === 'Not Specified' ? 'text-slate-400 italic font-normal' : 'text-slate-900 dark:text-white'}`}>{row.value}</span>
+                  <div key={i} className="flex justify-between items-center gap-3 px-5 py-2.5 font-sans">
+                    <span className="font-semibold text-slate-500 shrink-0">{row.label}</span>
+                    <span className={`font-bold text-right ${row.value === 'Not Specified' ? 'text-slate-400 italic font-normal' : 'text-slate-900 dark:text-white'}`}>{row.value}</span>
                   </div>
                 ))}
               </div>

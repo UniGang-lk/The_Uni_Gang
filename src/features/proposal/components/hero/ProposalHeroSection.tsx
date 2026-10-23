@@ -183,19 +183,19 @@ export default function ProposalHeroSection({ onGetStarted, onSearch, hasProposa
                 initial={{ opacity: 0, x: -20 }} 
                 animate={{ opacity: 1, x: 0 }} 
                 transition={{ delay: 0.5, duration: 0.6 }}
-                className="absolute -left-6 sm:-left-12 top-8 w-56 p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-950/15 z-20"
+                className="absolute -left-2 sm:-left-12 top-6 sm:top-8 w-44 sm:w-56 p-2.5 sm:p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-950/15 z-20"
                 style={{ animation: 'heroFloat 6s ease-in-out infinite' }}
               >
-                <div className="flex items-center gap-3">
-                  <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-rose-500/30 shrink-0">
-                    <Heart size={20} fill="currentColor" />
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-rose-500/30 shrink-0">
+                    <Heart size={18} fill="currentColor" />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-wider text-rose-600 dark:text-rose-400">It's a Match</p>
-                    <p className="text-sm font-black text-slate-900 dark:text-white">96% Compatible</p>
+                    <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-rose-600 dark:text-rose-400">It's a Match</p>
+                    <p className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">96% Compatible</p>
                   </div>
                 </div>
-                <div className="mt-2.5 h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                <div className="mt-2 sm:mt-2.5 h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                   <div className="h-full w-[96%] rounded-full bg-gradient-to-r from-rose-500 to-amber-400" />
                 </div>
               </motion.div>
@@ -205,15 +205,15 @@ export default function ProposalHeroSection({ onGetStarted, onSearch, hasProposa
                 initial={{ opacity: 0, x: 20 }} 
                 animate={{ opacity: 1, x: 0 }} 
                 transition={{ delay: 0.65, duration: 0.6 }}
-                className="absolute -right-4 sm:-right-10 top-1/2 px-4 py-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-950/15 flex items-center gap-3 z-20"
+                className="absolute -right-2 sm:-right-10 top-1/2 px-3 py-2 sm:px-4 sm:py-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-950/15 flex items-center gap-2 sm:gap-3 z-20"
                 style={{ animation: 'heroFloat 7s ease-in-out infinite reverse' }}
               >
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                  <ShieldCheck size={20} />
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                  <ShieldCheck size={18} />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">NIC Verified</p>
-                  <p className="text-xs font-black text-slate-900 dark:text-white">100% Real profiles</p>
+                  <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">NIC Verified</p>
+                  <p className="text-[11px] sm:text-xs font-black text-slate-900 dark:text-white">100% Real profiles</p>
                 </div>
               </motion.div>
 
@@ -222,10 +222,10 @@ export default function ProposalHeroSection({ onGetStarted, onSearch, hasProposa
                 initial={{ opacity: 0, y: 20 }} 
                 animate={{ opacity: 1, y: 0 }} 
                 transition={{ delay: 0.8, duration: 0.6 }}
-                className="absolute -left-4 sm:-left-8 -bottom-6 px-4 py-3 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 border border-slate-800 dark:border-slate-200 shadow-2xl shadow-slate-950/20 flex items-center gap-2.5 z-20"
+                className="absolute left-2 sm:-left-8 -bottom-5 sm:-bottom-6 px-3 py-2 sm:px-4 sm:py-3 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 border border-slate-800 dark:border-slate-200 shadow-2xl shadow-slate-950/20 flex items-center gap-2 sm:gap-2.5 z-20"
               >
-                <Lock size={16} className="text-amber-400 dark:text-rose-500 shrink-0" />
-                <p className="text-xs font-black">Photos blurred until you accept</p>
+                <Lock size={15} className="text-amber-400 dark:text-rose-500 shrink-0" />
+                <p className="text-[11px] sm:text-xs font-black">Photos blurred until you accept</p>
               </motion.div>
             </motion.div>
           </div>

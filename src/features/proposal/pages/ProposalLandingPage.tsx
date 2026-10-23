@@ -159,8 +159,8 @@ export default function ProposalLandingPage({
               </p>
             </div>
 
-            {/* Filter Switcher */}
-            <div className={`flex items-center p-1 rounded-2xl border shadow-sm shrink-0 ${
+            {/* Filter Switcher (Mobile Responsive) */}
+            <div className={`w-full sm:w-auto flex items-center p-1 rounded-2xl border shadow-sm shrink-0 overflow-x-auto no-scrollbar ${
               isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200'
             }`}>
               {(['All', 'Groom', 'Bride'] as const).map(tab => (
@@ -168,7 +168,7 @@ export default function ProposalLandingPage({
                   key={tab}
                   type="button"
                   onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                  className={`px-3 sm:px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer shrink-0 whitespace-nowrap ${
                     activeTab === tab
                       ? tab === 'Groom'
                         ? 'bg-blue-600 text-white shadow-md'
@@ -176,7 +176,13 @@ export default function ProposalLandingPage({
                       : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  {tab === 'All' ? 'All' : tab === 'Groom' ? 'Grooms (මනාලයන්)' : 'Brides (මනාලියන්)'}
+                  {tab === 'All' ? (
+                    <span>All <span className="hidden sm:inline">Profiles</span></span>
+                  ) : tab === 'Groom' ? (
+                    <span>Grooms <span className="hidden sm:inline">(මනාලයන්)</span></span>
+                  ) : (
+                    <span>Brides <span className="hidden sm:inline">(මනාලියන්)</span></span>
+                  )}
                 </button>
               ))}
             </div>

@@ -50,45 +50,45 @@ export default function ProposalSearchHeader({
           </p>
         </div>
 
-        {/* Brides / Grooms / All Pill Switcher (Matching screenshot emphasis) */}
+        {/* Brides / Grooms / All Pill Switcher (Responsive for all mobile screens) */}
         {onGenderTabChange && (
-          <div className={`flex items-center p-1.5 rounded-2xl border shadow-sm backdrop-blur-xl ${
+          <div className={`w-full sm:w-auto flex items-center p-1 sm:p-1.5 rounded-2xl border shadow-sm backdrop-blur-xl overflow-x-auto no-scrollbar shrink-0 ${
             isDark ? 'bg-slate-900/90 border-slate-800' : 'bg-slate-100/90 border-slate-200'
           }`}>
             <button
               onClick={() => onGenderTabChange('All')}
-              className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3 sm:px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
                 activeGenderTab === 'All'
                   ? 'bg-rose-500 text-white shadow-md'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <Users size={14} />
-              All Profiles
+              <span>All <span className="hidden sm:inline">Profiles</span></span>
             </button>
 
             <button
               onClick={() => onGenderTabChange('Groom')}
-              className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3 sm:px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
                 activeGenderTab === 'Groom'
                   ? 'bg-blue-600 text-white shadow-md'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <UserCheck size={14} />
-              Grooms (මනාලයන්)
+              <span>Grooms <span className="hidden sm:inline">(මනාලයන්)</span></span>
             </button>
 
             <button
               onClick={() => onGenderTabChange('Bride')}
-              className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3 sm:px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
                 activeGenderTab === 'Bride'
                   ? 'bg-rose-500 text-white shadow-md'
                   : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               <UserCheck size={14} />
-              Brides (මනාලියන්)
+              <span>Brides <span className="hidden sm:inline">(මනාලියන්)</span></span>
             </button>
           </div>
         )}

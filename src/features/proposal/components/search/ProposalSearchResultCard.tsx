@@ -110,9 +110,9 @@ export default function ProposalSearchResultCard({
           </div>
 
           {/* Center Details */}
-          <div className="space-y-1 min-w-0">
+          <div className="space-y-1 min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">
+              <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight truncate max-w-[160px] sm:max-w-none">
                 {name || `User ${code}`}
               </h3>
               <span className="text-xs font-bold text-slate-400">({code})</span>

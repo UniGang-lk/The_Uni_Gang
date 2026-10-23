@@ -224,7 +224,7 @@ export default function ProposalPremiumPage({
         <div className="grid lg:grid-cols-3 gap-8 max-w-7xl mx-auto items-stretch">
           
           {/* TIER 1: BASIC (FREE FOREVER) */}
-          <div className={`p-8 rounded-[2.2rem] backdrop-blur-md border flex flex-col justify-between relative transition-all ${
+          <div className={`p-5 sm:p-8 rounded-[1.8rem] sm:rounded-[2.2rem] backdrop-blur-md border flex flex-col justify-between relative transition-all ${
             isDark 
               ? 'bg-slate-900/60 border-slate-800 text-white hover:border-slate-700' 
               : 'bg-white border-slate-200 text-slate-900 shadow-xl hover:border-slate-300'
@@ -281,11 +281,11 @@ export default function ProposalPremiumPage({
           </div>
 
           {/* TIER 2: CLASSIC (MOST POPULAR - 3 MONTHS) */}
-          <div className="relative p-1 rounded-[2.3rem] group">
+          <div className="relative p-0.5 sm:p-1 rounded-[1.9rem] sm:rounded-[2.3rem] group">
             {/* Glowing Accent Border */}
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 rounded-[2.3rem] opacity-90 blur-[1px] transition-opacity" />
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 rounded-[1.9rem] sm:rounded-[2.3rem] opacity-90 blur-[1px] transition-opacity" />
             
-            <div className={`relative p-8 rounded-[2.2rem] flex flex-col justify-between h-full overflow-hidden transition-all ${
+            <div className={`relative p-5 sm:p-8 rounded-[1.8rem] sm:rounded-[2.2rem] flex flex-col justify-between h-full overflow-hidden transition-all ${
               isDark ? 'bg-slate-950 text-white' : 'bg-white text-slate-900 shadow-2xl'
             }`}>
               <div className="absolute inset-0 bg-gradient-to-b from-amber-500/10 via-transparent to-transparent pointer-events-none" />
@@ -342,7 +342,7 @@ export default function ProposalPremiumPage({
           </div>
 
           {/* TIER 3: VIP PREMIUM (BEST VALUE - 6 MONTHS) */}
-          <div className={`p-8 rounded-[2.2rem] border flex flex-col justify-between relative transition-all shadow-xl ${
+          <div className={`p-5 sm:p-8 rounded-[1.8rem] sm:rounded-[2.2rem] border flex flex-col justify-between relative transition-all shadow-xl ${
             isDark 
               ? 'bg-gradient-to-b from-slate-900/90 to-slate-950 border-amber-500/30 text-white shadow-amber-950/20 hover:border-amber-500/60' 
               : 'bg-gradient-to-b from-amber-50/40 via-white to-white border-2 border-amber-400/80 text-slate-900 shadow-amber-500/10 hover:border-amber-500'
@@ -496,7 +496,7 @@ export default function ProposalPremiumPage({
                   <label className={`block text-xs font-bold uppercase tracking-wider mb-2 ${
                     isDark ? 'text-slate-300' : 'text-slate-700'
                   }`}>තෝරාගත් Package එක</label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button
                       type="button"
                       onClick={() => setSelectedPlan('classic_3m')}

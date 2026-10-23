@@ -179,7 +179,7 @@ export default function ProposalInboxPage({ setPage }: { setPage: (p: any) => vo
   const activeChat = chats.find(c => c.id === activeChatId);
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto h-[calc(100vh-80px)] flex flex-col p-0 sm:p-4">
+    <div className="w-full max-w-[1600px] mx-auto h-[calc(100dvh-70px)] sm:h-[calc(100vh-80px)] flex flex-col p-0 sm:p-4 font-sans">
       
       {/* Split Pane Layout */}
       <div className="flex-1 flex overflow-hidden sm:rounded-[2rem] sm:border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 shadow-2xl backdrop-blur-xl">

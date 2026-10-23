@@ -797,48 +797,48 @@ export default function ProposalHomePage({
         <div className="border-t border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/50 px-6 sm:px-10 py-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             
-            {/* Left: 3 Core Profile Tabs (Segmented Control - Fits perfectly on all screens without scrolling) */}
-            <div className="inline-flex items-center p-1 bg-slate-200/70 dark:bg-slate-800/80 rounded-2xl w-full sm:w-auto">
+            {/* Left: 3 Core Profile Tabs (Segmented Control - Responsive on mobile) */}
+            <div className="inline-flex items-center p-1 bg-slate-200/70 dark:bg-slate-800/80 rounded-2xl w-full sm:w-auto overflow-x-auto no-scrollbar">
               {/* Tab 1: Overview */}
               <button
                 onClick={() => setActiveTab('overview')}
                 className={cx(
-                  "flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer",
+                  "flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap",
                   activeTab === 'overview'
                     ? "bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-sm"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 )}
               >
                 <FileText size={15} />
-                <span>මගේ Bio-Data (Overview)</span>
+                <span>Bio-Data<span className="hidden sm:inline"> (Overview)</span></span>
               </button>
 
               {/* Tab 2: Photos */}
               <button
                 onClick={() => setActiveTab('photos')}
                 className={cx(
-                  "flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer",
+                  "flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap",
                   activeTab === 'photos'
                     ? "bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-sm"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 )}
               >
                 <Camera size={15} />
-                <span>ඡායාරූප (Photos)</span>
+                <span>ඡායාරූප<span className="hidden sm:inline"> (Photos)</span></span>
               </button>
 
               {/* Tab 3: Verification */}
               <button
                 onClick={() => setActiveTab('verification')}
                 className={cx(
-                  "flex-1 sm:flex-initial px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer",
+                  "flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap",
                   activeTab === 'verification'
                     ? "bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 )}
               >
                 <ShieldCheck size={15} />
-                <span>NIC Verification</span>
+                <span>NIC<span className="hidden sm:inline"> Verification</span></span>
               </button>
             </div>
 
@@ -1065,7 +1065,7 @@ export default function ProposalHomePage({
             </div>
 
             {/* Card 1: පුද්ගලික තොරතුරු (Personal Details & Habits) */}
-            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-md">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-4 sm:p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-md">
               <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100 dark:border-slate-800">
                 <h3 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2.5">
                   <User2 size={20} className="text-rose-500" />
@@ -1195,7 +1195,7 @@ export default function ProposalHomePage({
             </div>
 
             {/* Card 2: අධ්‍යාපනය සහ රැකියාව (Education & Career) */}
-            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-md">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-4 sm:p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-md">
               <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100 dark:border-slate-800">
                 <h3 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2.5">
                   <Briefcase size={20} className="text-indigo-500" />
@@ -1257,7 +1257,7 @@ export default function ProposalHomePage({
             </div>
 
             {/* Card 3: පවුලේ තොරතුරු (Family Information) */}
-            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-md">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-4 sm:p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-md">
               <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100 dark:border-slate-800">
                 <h3 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2.5">
                   <Users size={20} className="text-amber-500" />
@@ -1305,7 +1305,7 @@ export default function ProposalHomePage({
             </div>
 
             {/* Card 4: සහකරු පිළිබඳ අපේක්ෂා & Bio (About Candidate & Partner Expectations) */}
-            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-md">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-4 sm:p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-md">
               <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100 dark:border-slate-800">
                 <h3 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2.5">
                   <Sparkles size={20} className="text-pink-500" />
@@ -1347,7 +1347,7 @@ export default function ProposalHomePage({
             </div>
 
             {/* Card 5: කේන්දර සහ නැකත් විස්තර (Astrological & Horoscope Information) */}
-            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-md">
+            <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-4 sm:p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-md">
               <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100 dark:border-slate-800">
                 <h3 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2.5">
                   <Moon size={20} className="text-purple-500" />

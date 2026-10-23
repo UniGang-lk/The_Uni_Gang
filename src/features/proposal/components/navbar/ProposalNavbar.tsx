@@ -160,34 +160,34 @@ export default function ProposalNavbar({
         </div>
 
         {/* 3. Right Part: Action Buttons + Mobile Toggle (Pushed Right) */}
-        <div className="flex items-center justify-end gap-2 sm:gap-3 shrink-0 font-sans">
+        <div className="flex items-center justify-end gap-1.5 sm:gap-3 shrink-0 font-sans">
           {!isLoggedIn ? (
             <>
-              {/* 🔘 ඇතුල් වන්න (Log In) */}
+              {/* 🔘 ඇතුල් වන්න (Log In) - Hidden on extra small phones to prevent overflow, accessible in mobile drawer */}
               <button
                 onClick={onSignIn}
-                className="px-2.5 sm:px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-rose-500 transition-all cursor-pointer whitespace-nowrap"
+                className="hidden sm:inline-flex px-2.5 sm:px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-rose-500 transition-all cursor-pointer whitespace-nowrap"
               >
-                ඇතුල් වන්න <span className="hidden sm:inline font-normal text-slate-400">(Log In)</span>
+                ඇතුල් වන්න <span className="hidden md:inline font-normal text-slate-400">(Log In)</span>
               </button>
 
               {/* 🔴 නොමිලේ ලියාපදිංචි වන්න (Register Free / Get Started) */}
               <button
                 onClick={onGetStarted}
-                className="px-3.5 sm:px-5 py-2.5 rounded-2xl bg-gradient-to-r from-rose-500 via-pink-500 to-rose-600 hover:from-rose-600 hover:to-pink-600 text-white font-extrabold text-xs tracking-wide shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap font-sans"
+                className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-2xl bg-gradient-to-r from-rose-500 via-pink-500 to-rose-600 hover:from-rose-600 hover:to-pink-600 text-white font-extrabold text-xs tracking-wide shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap font-sans"
               >
                 <Sparkles size={14} />
-                <span>නොමිලේ ලියාපදිංචි වන්න</span>
+                <span><span className="hidden sm:inline">නොමිලේ </span>ලියාපදිංචිය</span>
               </button>
             </>
           ) : (
             /* 👤 Logged-In User Action: Dashboard (Account) */
             <button
               onClick={() => handleNavClick('dashboard')}
-              className="px-3.5 sm:px-5 py-2.5 rounded-2xl bg-gradient-to-r from-rose-500 via-pink-500 to-rose-600 hover:from-rose-600 hover:to-pink-600 text-white font-extrabold text-xs tracking-wide shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap font-sans"
+              className="px-3 sm:px-5 py-2 sm:py-2.5 rounded-2xl bg-gradient-to-r from-rose-500 via-pink-500 to-rose-600 hover:from-rose-600 hover:to-pink-600 text-white font-extrabold text-xs tracking-wide shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:scale-[1.03] active:scale-[0.98] transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap font-sans"
             >
               <User size={15} />
-              <span>මගේ Bio-Data<span className="hidden sm:inline"> (Dashboard)</span></span>
+              <span>Bio-Data<span className="hidden sm:inline"> (Dashboard)</span></span>
             </button>
           )}
 
@@ -206,7 +206,30 @@ export default function ProposalNavbar({
       {/* Mobile Slide-down Menu */}
       {mobileMenuOpen && (
         <div className="xl:hidden px-6 pt-3 pb-6 border-t border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl space-y-2 animate-fade-in font-sans">
-          {isLoggedIn && (
+          {!isLoggedIn ? (
+            <div className="sm:hidden grid grid-cols-2 gap-2 pb-2 mb-2 border-b border-slate-200/60 dark:border-slate-800/60">
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onSignIn?.();
+                }}
+                className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs border border-slate-200 dark:border-slate-700 cursor-pointer"
+              >
+                <User size={15} />
+                <span>ඇතුල් වන්න (Log In)</span>
+              </button>
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onGetStarted?.();
+                }}
+                className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold text-xs shadow-sm cursor-pointer"
+              >
+                <Sparkles size={14} />
+                <span>ලියාපදිංචි වන්න</span>
+              </button>
+            </div>
+          ) : (
             <div className="grid grid-cols-2 gap-2 pb-2 mb-2 border-b border-slate-200/60 dark:border-slate-800/60">
               <button
                 onClick={() => handleNavClick('dashboard')}
