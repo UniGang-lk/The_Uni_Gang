@@ -33,12 +33,25 @@ export default function ProposalProfileModal({ profile, onClose }: { profile: an
     }, 1500);
   };
 
-  // Guarantee 3 candidate photos
-  const allImages = [
-    ...(profile.images || []),
+  // Gender-aware candidate photos fallback
+  const isMaleCandidate = profile?.gender?.toLowerCase() === 'male' || String(profile?.code || '').startsWith('GR');
+  const malePlaceholders = [
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+  ];
+  const femalePlaceholders = [
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
     'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-  ].slice(0, 3);
+    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+  ];
+  const relevantPlaceholders: string[] = isMaleCandidate ? malePlaceholders : femalePlaceholders;
+  const validImages: string[] = Array.isArray(profile.images) ? profile.images.filter(Boolean) : [];
+  const allImages: string[] = (
+    validImages.length >= 3 
+      ? validImages 
+      : [...validImages, ...relevantPlaceholders]
+  ).slice(0, 3);
 
   return (
     <AnimatePresence>
@@ -150,7 +163,7 @@ export default function ProposalProfileModal({ profile, onClose }: { profile: an
 
                   {/* 3 Photos Thumbnail Switcher Row */}
                   <div className="flex items-center justify-center gap-2.5 mt-3">
-                    {allImages.map((img, idx) => (
+                    {allImages.map((img: string, idx: number) => (
                       <button
                         key={idx}
                         onClick={() => setActivePhotoIndex(idx)}

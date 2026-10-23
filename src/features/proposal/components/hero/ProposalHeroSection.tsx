@@ -272,7 +272,7 @@ export default function ProposalHeroSection({ onGetStarted, onSearch, hasProposa
                   className="w-full bg-transparent text-sm font-extrabold text-slate-900 dark:text-white focus:outline-none cursor-pointer"
                 >
                   {f.options.map(([v, l]) => (
-                    <option key={v} value={v} className="text-slate-900">{l}</option>
+                    <option key={v} value={v} className="text-slate-900 dark:text-white dark:bg-slate-900 bg-white">{l}</option>
                   ))}
                 </select>
               </label>

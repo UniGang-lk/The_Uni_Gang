@@ -81,7 +81,13 @@ export default function ProposalSettingsPage({ setPage, onDeleteProposalProfile 
     }
   };
 
-  const isVip = profile?.membership_tier === 'vip' || profile?.is_vip || profile?.isVIP;
+  const isVip = 
+    profile?.membership_tier === 'vip' || 
+    profile?.is_vip || 
+    profile?.isVIP ||
+    localStorage.getItem('userProposalPlan') === 'vip' ||
+    localStorage.getItem('userIsProposalVIP') === 'true' ||
+    localStorage.getItem('userRole') === 'admin';
 
   const handleToggleGhostMode = async () => {
     if (!isVip) {
