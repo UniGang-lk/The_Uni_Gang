@@ -272,9 +272,9 @@ const ProposalTeaserSection = () => {
                   <LuMessageSquare size={20} />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-0.5">💬 Encrypted In-App Chat & Free Teaser</h4>
+                  <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-0.5">💬 Encrypted In-App Chat & Free Trial</h4>
                   <p className="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
-                    Messages 3ක් නොමිලේ යවා Chat කිරීමට සහ VIP Upgrade එක ලබාගැනීමට ඇති පහසුකම.
+                    Proposals 3ක් & Messages 10ක් නොමිලේ ලබාදී සීමාවකින් තොරව සම්බන්ධ වීමට VIP Upgrade පහසුකම.
                   </p>
                 </div>
               </div>

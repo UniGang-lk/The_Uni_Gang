@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Sparkles, MapPin, Briefcase, Lock, Eye, X, MessageCircle, ShieldCheck, GraduationCap } from 'lucide-react';
+import { Heart, Sparkles, MapPin, Briefcase, Lock, Eye, X, MessageCircle, ShieldCheck, GraduationCap, ChevronLeft } from 'lucide-react';
 import { proposalApi } from '../api/proposalApi';
 import toast from 'react-hot-toast';
 import VerifiedBadge from '../../../components/ui/VerifiedBadge';
@@ -91,7 +91,17 @@ const ProposalLikesPage: React.FC<ProposalLikesPageProps> = ({ setPage }) => {
 
   if (!isPremium) {
     return (
-      <div className="w-full min-h-[60vh] flex items-center justify-center p-6 my-8">
+      <div className="w-full min-h-[60vh] flex flex-col items-center justify-center p-6 my-8 font-sans">
+        <div className="max-w-xl w-full flex justify-start mb-4">
+          <button
+            onClick={() => setPage('dashboard')}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-800 border border-slate-700 transition-colors cursor-pointer"
+          >
+            <ChevronLeft size={16} />
+            <span>Back to Dashboard</span>
+          </button>
+        </div>
+
         <div className="max-w-xl w-full bg-slate-900/90 border border-amber-500/20 rounded-3xl p-8 md:p-12 text-center shadow-2xl backdrop-blur-xl flex flex-col items-center justify-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="w-20 h-20 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(245,158,11,0.5)]">
@@ -114,16 +124,26 @@ const ProposalLikesPage: React.FC<ProposalLikesPageProps> = ({ setPage }) => {
   }
 
   return (
-    <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar">
+    <div className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar font-sans">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-lg">
-            <Heart className="text-white" fill="white" size={24} />
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-lg">
+              <Heart className="text-white" fill="white" size={24} />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black text-slate-900 dark:text-white">Likes You</h1>
+              <p className="text-slate-500 text-sm">People who swiped right on your profile</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-black text-slate-900 dark:text-white">Likes You</h1>
-            <p className="text-slate-500 text-sm">People who swiped right on your profile</p>
-          </div>
+
+          <button
+            onClick={() => setPage('dashboard')}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-rose-500 transition-colors shadow-sm cursor-pointer"
+          >
+            <ChevronLeft size={16} />
+            <span className="hidden sm:inline">Back to Dashboard</span>
+          </button>
         </div>
 
         {likes.length === 0 ? (

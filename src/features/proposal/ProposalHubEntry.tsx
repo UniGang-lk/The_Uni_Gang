@@ -261,6 +261,7 @@ export default function ProposalHubEntry() {
                 }}
                 onVerifyNow={() => navigateTo('premium')}
                 onRegisterNow={() => navigateTo('onboarding')}
+                onVerifyIdentity={() => navigateTo('dashboard')}
               />
             </div>
           )}

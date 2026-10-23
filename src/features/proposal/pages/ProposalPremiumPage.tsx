@@ -156,19 +156,31 @@ export default function ProposalPremiumPage({
         
         {/* Navigation Bar */}
         <div className="flex items-center justify-between mb-10">
-          <button 
-            onClick={() => {
-              if (previousView === 'landing' || previousView === 'home') setPage('landing');
-              else if (previousView === 'discover') setPage('discover');
-              else setPage('dashboard');
-            }} 
-            className={`flex items-center gap-2 text-sm font-bold transition-colors group cursor-pointer ${
-              isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-950'
-            }`}
-          >
-            <ChevronLeft size={20} className="transition-transform group-hover:-translate-x-1" />
-            <span>Back to {previousView === 'landing' || previousView === 'home' ? 'Home' : previousView === 'discover' ? 'Discover' : 'Dashboard'}</span>
-          </button>
+          {(() => {
+            const getBackInfo = () => {
+              if (previousView === 'profile') return { label: 'Candidate Profile', view: 'profile' };
+              if (previousView === 'discover') return { label: 'Discover', view: 'discover' };
+              if (previousView === 'landing' || previousView === 'home') return { label: 'Home', view: 'landing' };
+              if (previousView === 'how-it-works') return { label: 'Guide', view: 'how-it-works' };
+              if (previousView === 'safety') return { label: 'Safety & Trust', view: 'safety' };
+              if (previousView === 'faq') return { label: 'FAQ', view: 'faq' };
+              if (previousView === 'inbox') return { label: 'Messages', view: 'inbox' };
+              if (previousView === 'likes') return { label: 'Likes', view: 'likes' };
+              return { label: 'Dashboard', view: 'dashboard' };
+            };
+            const backInfo = getBackInfo();
+            return (
+              <button 
+                onClick={() => setPage(backInfo.view)} 
+                className={`flex items-center gap-2 text-sm font-bold transition-colors group cursor-pointer ${
+                  isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-950'
+                }`}
+              >
+                <ChevronLeft size={20} className="transition-transform group-hover:-translate-x-1" />
+                <span>Back to {backInfo.label}</span>
+              </button>
+            );
+          })()}
 
           <a 
             href="https://wa.me/94724478148?text=Hello%20Uni%20Gang%20Admin,%20I%20have%20a%20question%20about%20Proposal%20Membership"

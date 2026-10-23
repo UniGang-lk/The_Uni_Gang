@@ -35,13 +35,15 @@ export default function ProposalFullProfilePage({
   goBack, 
   onSendProposal,
   onVerifyNow,
-  onRegisterNow
+  onRegisterNow,
+  onVerifyIdentity
 }: { 
   profile: any;
   goBack: () => void;
   onSendProposal?: () => void;
   onVerifyNow?: () => void;
   onRegisterNow?: () => void;
+  onVerifyIdentity?: () => void;
 }) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -154,7 +156,7 @@ export default function ProposalFullProfilePage({
       setShowRegisterPromptModal(true);
       return;
     }
-    if (!checkCanConnect(onVerifyNow)) return;
+    if (!checkCanConnect(onRegisterNow, onVerifyNow)) return;
     setShowConfirmModal(true);
   };
 
@@ -207,7 +209,7 @@ export default function ProposalFullProfilePage({
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 15 }}
-      className="w-full max-w-6xl mx-auto min-h-[calc(100vh-80px)] bg-slate-50 dark:bg-slate-950 flex flex-col relative rounded-2xl sm:rounded-[2.5rem] overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 my-1 sm:my-4 font-sans"
+      className="w-full max-w-6xl mx-auto min-h-[calc(100vh-80px)] bg-slate-50 dark:bg-slate-950 flex flex-col relative rounded-2xl sm:rounded-[2.5rem] overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800 my-1 sm:my-4 font-sans pb-24 lg:pb-0"
     >
       {/* Top Header inside Profile Card */}
       <div className="flex items-center justify-between px-3.5 sm:px-6 py-3 sm:py-3.5 bg-white/95 dark:bg-slate-900/95 border-b border-slate-200 dark:border-slate-800 font-sans gap-2">
@@ -893,11 +895,45 @@ export default function ProposalFullProfilePage({
         </div>
       )}
 
+      {/* Sticky Bottom Action Bar for Mobile Screens */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-3 bg-white/95 dark:bg-slate-900/95 border-t border-slate-200 dark:border-slate-800 shadow-2xl z-40 backdrop-blur-xl flex items-center gap-2.5">
+        <button
+          type="button"
+          onClick={handleToggleShortlist}
+          className={`p-3 rounded-2xl border text-xs font-bold flex items-center justify-center transition-all cursor-pointer shrink-0 ${
+            isShortlisted
+              ? 'bg-amber-500/15 text-amber-500 border-amber-500/30'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+          }`}
+          title="Shortlist Profile"
+        >
+          <Bookmark size={18} fill={isShortlisted ? "currentColor" : "none"} />
+        </button>
+
+        <div className="flex-1">
+          {!proposalSent ? (
+            <button
+              type="button"
+              onClick={handleConnectClick}
+              className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-rose-500 via-pink-500 to-rose-600 hover:from-rose-600 hover:to-pink-600 text-white font-black text-xs shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 cursor-pointer transition-transform active:scale-95"
+            >
+              <MessageCircle size={16} />
+              <span>Send Proposal Request</span>
+            </button>
+          ) : (
+            <div className="w-full py-3 px-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-black text-xs flex items-center justify-center gap-2">
+              <Check size={16} />
+              <span>Proposal Sent! 💕</span>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* REUSABLE IDENTITY VERIFICATION REQUIRED MODAL */}
-      <VerificationModal onVerifyNow={onVerifyNow} />
+      <VerificationModal onVerifyNow={onVerifyIdentity || onRegisterNow || onVerifyNow} />
 
       {/* PROPOSAL USAGE LIMIT REACHED MODAL (3/month for free plan) */}
-      <ProposalLimitModal onUpgrade={() => onVerifyNow ? onVerifyNow() : null} />
+      <ProposalLimitModal onUpgrade={onVerifyNow} />
 
       {/* REGISTER PROMPT MODAL FOR GUESTS */}
       {showRegisterPromptModal && (
