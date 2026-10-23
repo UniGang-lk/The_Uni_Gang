@@ -507,8 +507,10 @@ export default function ProposalDiscoverPage({
 
     // 2. Looking for (Bride / Groom / All)
     if (filters.lookingFor && filters.lookingFor !== 'All') {
-      if (filters.lookingFor === 'Bride' && !item.code.startsWith('BR')) return false;
-      if (filters.lookingFor === 'Groom' && !item.code.startsWith('GR')) return false;
+      const isCandidateFemale = item.gender?.toLowerCase() === 'female' || item.code.startsWith('BR');
+      const isCandidateMale = item.gender?.toLowerCase() === 'male' || item.code.startsWith('GR');
+      if (filters.lookingFor === 'Bride' && !isCandidateFemale) return false;
+      if (filters.lookingFor === 'Groom' && !isCandidateMale) return false;
     }
 
     // 3. Search query (matches code, name, profession, or district)

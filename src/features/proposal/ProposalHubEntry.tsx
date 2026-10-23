@@ -108,15 +108,6 @@ export default function ProposalHubEntry() {
   };
 
   const handleViewProfile = (profile: any) => {
-    if (!hasProfile) {
-      toast("🔒 සත්‍යාපිත මනාල/මනාලියන්ගේ සම්පූර්ණ විස්තර බැලීමට කරුණාකර පළමුව ඔබගේ Bio-Data ගිණුම නොමිලේ සාදාගන්න.", {
-        icon: '💍',
-        duration: 5000
-      });
-      navigateTo('onboarding');
-      return;
-    }
-
     setSelectedProfile(profile);
     setPreviousView(activeView);
     setActiveView('profile');
@@ -268,7 +259,8 @@ export default function ProposalHubEntry() {
                     // ignore
                   }
                 }}
-                onVerifyNow={() => navigateTo('onboarding')}
+                onVerifyNow={() => navigateTo('premium')}
+                onRegisterNow={() => navigateTo('onboarding')}
               />
             </div>
           )}
