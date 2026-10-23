@@ -8,6 +8,7 @@ import {
 import toast from 'react-hot-toast';
 import { proposalApi } from '../api/proposalApi';
 import { useTheme } from '../../../context/ThemeContext';
+import { celebrate } from '../../../utils/celebrate';
 
 interface ProposalPremiumPageProps {
   setPage: (p: string) => void;
@@ -23,6 +24,8 @@ export default function ProposalPremiumPage({
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const [showPaymentModal, setShowPaymentModal] = useState(!!initialPlan);
+  const [showCelebrationModal, setShowCelebrationModal] = useState(false);
+  const [activatedPlanTier, setActivatedPlanTier] = useState<'classic' | 'vip'>('classic');
   const [selectedPlan, setSelectedPlan] = useState<'classic_3m' | 'vip_6m'>(initialPlan || 'classic_3m');
   const [copiedBank, setCopiedBank] = useState<string | null>(null);
 
@@ -74,9 +77,34 @@ export default function ProposalPremiumPage({
       const res = await proposalApi.submitPayment(formData);
       
       if (res.success) {
-        toast.success("Payment slip submitted! An administrator will activate your membership shortly. 👑");
+        const planTier = selectedPlan === 'vip_6m' ? 'vip' : 'classic';
+        setActivatedPlanTier(planTier);
+
+        // Instant Activation: User does not need to wait for manual admin review
+        localStorage.setItem('userProposalPlan', planTier);
+        if (planTier === 'vip') {
+          localStorage.setItem('userIsProposalVIP', 'true');
+          localStorage.setItem('userIsProposalPremium', 'true');
+        } else {
+          localStorage.setItem('userIsProposalPremium', 'true');
+          localStorage.removeItem('userIsProposalVIP');
+        }
+        try {
+          const saved = localStorage.getItem('userProposalProfile');
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            parsed.membership_tier = planTier;
+            parsed.is_vip = planTier === 'vip';
+            parsed.is_premium = true;
+            localStorage.setItem('userProposalProfile', JSON.stringify(parsed));
+          }
+        } catch {}
+
+        // Multi-angle canvas confetti explosion!
+        celebrate();
+
         setShowPaymentModal(false);
-        setPage('dashboard');
+        setShowCelebrationModal(true);
       } else {
         toast.error(res.message || "Failed to submit payment");
       }
@@ -759,6 +787,133 @@ export default function ProposalPremiumPage({
                   ) : (
                     `Submit Slip (${selectedPlan === 'vip_6m' ? 'රු. 4,990' : 'රු. 2,990'})`
                   )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {/* ── BILINGUAL INSTANT ACTIVATION CELEBRATION MODAL ── */}
+        {showCelebrationModal && (
+          <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in font-sans">
+            <motion.div
+              initial={{ scale: 0.85, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.85, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className={`w-full max-w-lg rounded-3xl p-6 sm:p-8 border shadow-2xl relative text-center overflow-hidden font-sans ${
+                isDark 
+                  ? 'bg-slate-900 border-amber-500/40 text-white shadow-amber-500/10' 
+                  : 'bg-white border-amber-300 text-slate-900 shadow-slate-300/50'
+              }`}
+            >
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCelebrationModal(false);
+                  setPage('discover');
+                }}
+                className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer transition-colors"
+              >
+                <X size={20} />
+              </button>
+
+              {/* Glowing Tier Badge Animation Icon */}
+              <div className="relative mx-auto mb-5 w-20 h-20">
+                <div className={`absolute inset-0 rounded-full blur-xl animate-pulse ${
+                  activatedPlanTier === 'vip' ? 'bg-amber-400/40' : 'bg-blue-400/40'
+                }`} />
+                <div className={`relative w-20 h-20 rounded-full flex items-center justify-center shadow-xl ring-4 ${
+                  activatedPlanTier === 'vip'
+                    ? 'bg-gradient-to-br from-amber-400 via-yellow-400 to-amber-500 text-slate-950 ring-amber-400/30'
+                    : 'bg-gradient-to-br from-blue-500 via-indigo-600 to-amber-500 text-white ring-blue-500/30'
+                }`}>
+                  {activatedPlanTier === 'vip' ? (
+                    <Crown size={40} className="drop-shadow-md animate-bounce" />
+                  ) : (
+                    <Star size={38} className="drop-shadow-md animate-bounce" fill="currentColor" />
+                  )}
+                </div>
+              </div>
+
+              {/* Heading (Sinhala + English) */}
+              <div className="space-y-1 mb-3">
+                <h3 className="text-xl sm:text-2xl font-black tracking-tight">
+                  🎉 {activatedPlanTier === 'vip' ? 'VIP Premium' : 'Classic'} සාමාජිකත්වය සක්‍රීයයි!
+                </h3>
+                <p className="text-xs sm:text-sm font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">
+                  {activatedPlanTier === 'vip' ? 'VIP Premium 👑' : 'Classic Tier 🥈'} Activated Instantly!
+                </p>
+              </div>
+
+              {/* Status Pill */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 mb-4">
+                <Sparkles size={13} className="text-emerald-500" />
+                <span>Provisional Instant Access • ක්ෂණික ප්‍රවේශය</span>
+              </div>
+
+              {/* Bilingual Descriptive Message */}
+              <div className={`p-4 rounded-2xl border text-xs text-left leading-relaxed space-y-3 mb-6 ${
+                isDark ? 'bg-slate-950/70 border-slate-800' : 'bg-slate-50 border-slate-200'
+              }`}>
+                {/* Sinhala Message */}
+                <p className="font-sinhala text-slate-700 dark:text-slate-300">
+                  <strong className="text-slate-900 dark:text-white">ස්තුතියි!</strong> ඔබගේ බැංකු තැන්පතු රිසිට්පත ලැබිණි. පරිපාලක අනුමැතිය ලැබෙන තෙක් බලා නොසිට, <strong className="text-rose-500">මේ මොහොතේ සිටම</strong> {activatedPlanTier === 'vip' ? 'VIP' : 'Classic'} පැකේජයේ සියලුම විශේෂ වරප්‍රසාද ඔබට ක්ෂණිකව විවෘත කර ඇත. ඉදිරි පැය කිහිපය තුළ අපගේ Verification කණ්ඩායම විසින් ඔබගේ Slip පත තහවුරු කරනු ඇත.
+                </p>
+
+                {/* English Message */}
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800/80 pt-2 font-medium">
+                  Your transfer slip has been recorded. You don't have to wait—your <strong>{activatedPlanTier === 'vip' ? 'VIP' : 'Classic'}</strong> benefits are <strong>instantly unlocked right now</strong>! Enjoy unlimited profiles, 20+ match filters, in-app chat, and priority matching immediately.
+                </p>
+              </div>
+
+              {/* Highlight Perks Grid */}
+              <div className="grid grid-cols-2 gap-2 text-[11px] font-bold text-left mb-6">
+                <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+                  <span>♾️ Unlimited Profiles</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+                  <span>🔍 20+ Advanced Filters</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+                  <span>💬 Real-Time In-App Chat</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                  <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+                  <span>{activatedPlanTier === 'vip' ? '🕶️ Ghost Incognito Mode' : '👀 Who Liked You Unlocked'}</span>
+                </div>
+              </div>
+
+              {/* Bottom Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCelebrationModal(false);
+                    setPage('discover');
+                  }}
+                  className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-rose-500 via-pink-500 to-rose-600 hover:from-rose-600 hover:to-pink-600 text-white font-black text-xs shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 cursor-pointer transition-transform hover:scale-[1.02] active:scale-95"
+                >
+                  <Compass size={16} />
+                  <span>සහකරුවන් සොයන්න (Discover)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCelebrationModal(false);
+                    setPage('dashboard');
+                  }}
+                  className={`py-3 px-5 rounded-2xl font-bold text-xs border transition-colors cursor-pointer ${
+                    isDark ? 'border-slate-800 bg-slate-800 hover:bg-slate-700 text-slate-200' : 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700'
+                  }`}
+                >
+                  <span>මගේ Bio-Data (Dashboard)</span>
                 </button>
               </div>
             </motion.div>
