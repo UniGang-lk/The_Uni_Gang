@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   LuHeart,
@@ -17,15 +17,28 @@ import PremiumPageLoader from '../ui/PremiumPageLoader';
 
 const ProposalTeaserSection = () => {
   const navigate = useNavigate();
-  const [isNavigating] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  // Background bundle preloading: when user views home page, prefetch proposal bundle so navigation is instantaneous
+  useEffect(() => {
+    const preloader = setTimeout(() => {
+      import('../../features/proposal/ProposalHubEntry');
+    }, 1000);
+    return () => clearTimeout(preloader);
+  }, []);
 
   const handleOpenHub = () => {
+    setIsNavigating(true);
+    // Instant navigate to /proposals without smoothly scrolling the home page to the hero
     navigate('/proposals');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <section id="proposals" className="relative py-32 bg-white dark:bg-[#020617] text-slate-900 dark:text-white transition-colors duration-500 overflow-hidden">
+    <section 
+      id="proposals" 
+      onMouseEnter={() => import('../../features/proposal/ProposalHubEntry')}
+      className="relative py-32 bg-white dark:bg-[#020617] text-slate-900 dark:text-white transition-colors duration-500 overflow-hidden"
+    >
       {/* Smooth Section Blend Overlays */}
       <div className="absolute top-0 left-0 right-0 h-48 bg-gradient-to-b from-white via-white dark:from-[#020617] dark:via-[#020617] to-transparent pointer-events-none z-10" />
       <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white dark:from-[#020617] dark:via-[#020617] to-transparent pointer-events-none z-10" />

@@ -20,7 +20,8 @@ const ScrollHandler = () => {
         }
       }, 100);
     } else {
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      // Instant jump to top on route navigation so the previous page does not smoothly roll up through the Hero
+      window.scrollTo(0, 0);
     }
   }, [pathname, hash]);
 
