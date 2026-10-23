@@ -673,6 +673,18 @@ export default function ProposalDiscoverPage({
     return list;
   }, [filters]);
 
+  const handleToggleVipOnly = () => {
+    if (membershipPlan !== 'vip') {
+      toast.error("👑 VIP Profiles Only filter එක භාවිතා කිරීමට VIP Plan එකට Upgrade වන්න.", {
+        icon: '👑',
+        duration: 4500
+      });
+      setPage('premium');
+      return;
+    }
+    setFilters(prev => ({ ...prev, vipOnly: !prev.vipOnly }));
+  };
+
   const handleSendInterest = (profile: CandidateProfile) => {
     if (!checkCanConnect(() => setPage('onboarding'))) return;
     setSelectedInterestProfile(profile);
@@ -798,6 +810,8 @@ export default function ProposalDiscoverPage({
               onFilterChange={setFilters}
               onResetFilters={() => setFilters(DEFAULT_FILTERS)}
               onOpenAdvancedDrawer={() => setIsAdvancedDrawerOpen(true)}
+              membershipPlan={membershipPlan}
+              onToggleVipOnly={handleToggleVipOnly}
             />
           </div>
 
@@ -1111,6 +1125,8 @@ export default function ProposalDiscoverPage({
                     setIsMobileFilterOpen(false);
                     setIsAdvancedDrawerOpen(true);
                   }}
+                  membershipPlan={membershipPlan}
+                  onToggleVipOnly={handleToggleVipOnly}
                 />
               </div>
 
@@ -1134,7 +1150,9 @@ export default function ProposalDiscoverPage({
         filters={filters}
         onFilterChange={setFilters}
         onResetFilters={() => setFilters(DEFAULT_FILTERS)}
-        onApplyFilters={() => toast.success('Advanced search filters applied!')}
+        onApplyFilters={() => toast.success('Advanced search filters applied! ✨')}
+        membershipPlan={membershipPlan}
+        onUpgrade={() => setPage('premium')}
       />
 
       {/* CONFIRM PROPOSAL INTEREST MODAL */}

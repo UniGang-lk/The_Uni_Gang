@@ -511,6 +511,7 @@ export default function ProposalLandingPage({
                   <li className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400"><CheckCircle2 size={15} /> සම්පූර්ණ Bio-Data සාදාගැනීම</li>
                   <li className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400"><CheckCircle2 size={15} /> Admin-Only NIC Verification</li>
                   <li className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400"><CheckCircle2 size={15} /> දිනකට Profiles 10ක් නැරඹීම</li>
+                  <li className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400"><CheckCircle2 size={15} /> මූලික Filters (දිස්ත්‍රික්කය, වයස, ආගම)</li>
                   <li className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400"><CheckCircle2 size={15} /> මසකට Proposals 3ක් යැවීම</li>
                   <li className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400"><CheckCircle2 size={15} /> Match වූ පසු In-App Messages 10ක්</li>
                 </ul>
@@ -545,6 +546,7 @@ export default function ProposalLandingPage({
                 </div>
                 <ul className="space-y-2.5 text-xs text-slate-200 mb-6 font-medium">
                   <li className="flex items-center gap-2 text-amber-300 font-bold"><Sparkles size={15} /> Unlimited Profiles & Proposals</li>
+                  <li className="flex items-center gap-2 text-amber-300 font-bold"><Sparkles size={15} /> 20+ Advanced Match Filters (උස, ආදායම, රැකියාව)</li>
                   <li className="flex items-center gap-2 text-amber-300 font-bold"><Sparkles size={15} /> Unlimited In-App Real-time Chat</li>
                   <li className="flex items-center gap-2 text-emerald-400"><CheckCircle2 size={15} /> Who Liked You Unlocked</li>
                   <li className="flex items-center gap-2 text-emerald-400"><CheckCircle2 size={15} /> Read Receipts (Seen ✓✓ Status)</li>
@@ -582,6 +584,8 @@ export default function ProposalLandingPage({
                 </div>
                 <ul className={`space-y-2.5 text-xs mb-6 font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                   <li className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold"><Crown size={15} /> Classic හි සියලුම පහසුකම්</li>
+                  <li className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold"><Crown size={15} /> 👑 VIP Profiles Only Exclusive Filter</li>
+                  <li className="flex items-center gap-2"><CheckCircle2 size={15} className="text-amber-500 shrink-0" /> 20+ Advanced Match Filters Unlocked</li>
                   <li className="flex items-center gap-2"><CheckCircle2 size={15} className="text-amber-500 shrink-0" /> 5x Top Search & Feed Placement</li>
                   <li className="flex items-center gap-2"><CheckCircle2 size={15} className="text-amber-500 shrink-0" /> Gold VIP Ring & Crown Badge</li>
                   <li className="flex items-center gap-2"><CheckCircle2 size={15} className="text-amber-500 shrink-0" /> 🕶️ Ghost / Incognito Browsing</li>

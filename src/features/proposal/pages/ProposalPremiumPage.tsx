@@ -94,10 +94,13 @@ export default function ProposalPremiumPage({
     { text: "Managed By Badge (🎓 Self හෝ 👨‍👩‍👧‍👦 By Parents)", included: true },
     { text: "පෙරනිමි Blurred ඡායාරූප & Screenshot Guard", included: true },
     { text: "දිනකට Profiles 10ක් දක්වා සෙවීම", included: true },
+    { text: "මූලික සෙවුම් Filters (දිස්ත්‍රික්කය, වයස් කාණ්ඩ, ආගම, මනාල/මනාලිය)", included: true },
     { text: "මසකට Proposals 3ක් යැවීම", included: true },
     { text: "අන් අය එවන Proposals නොමිලේම ලැබීම & Accept කිරීම", included: true },
     { text: "Mutual Match වූ පසු මූලික In-App Messages 10ක්", included: true },
     { text: "ආචාරශීලී සිංහල Icebreaker Presets භාවිතය", included: true },
+    { text: "20+ Advanced Match Filters (උස, ආදායම, රැකියාව, පවුල් තත්ත්වය, NIC)", included: false },
+    { text: "VIP Profiles Only Exclusive Filter", included: false },
     { text: "Who Liked You (තමන්ට කැමති වූ අය බැලීම)", included: false },
     { text: "Shortlist & Private Family Notes", included: false },
     { text: "Read Receipts (Seen ✓✓ Status)", included: false },
@@ -107,6 +110,7 @@ export default function ProposalPremiumPage({
   const classicFeatures = [
     { text: "Basic හි සියලු පහසුකම්", included: true },
     { text: "Unlimited Profiles & Proposals (කිසිදු දෛනික සීමාවක් නැත)", included: true },
+    { text: "20+ Advanced Match Filters Unlocked (උස, ආදායම, රැකියාව, අධ්‍යාපනය, NIC)", included: true },
     { text: "Unlimited Real-Time In-App Chat (Match වූ පසු)", included: true },
     { text: "Who Liked You Unlocked (කැමති වූ අය දැක ක්ෂණික Match)", included: true },
     { text: "Read Receipts (Seen ✓✓ නිල් හරි සලකුණු)", included: true },
@@ -114,12 +118,15 @@ export default function ProposalPremiumPage({
     { text: "Rewind / Undo Last Pass (දිනකට 5ක්)", included: true },
     { text: "විස්තරාත්මක කේන්දර ගැලපීම් (Horoscope Insights)", included: true },
     { text: "2x Profile Visibility Boost (Discover Feed හි කැපී පෙනීම)", included: true },
+    { text: "VIP Profiles Only Exclusive Filter", included: false },
     { text: "Zero External Leakage (Personal Phone ආරක්ෂිතව රඳවා තැබීම)", included: true }
   ];
 
   const vipFeatures = [
     { text: "Classic හි සියලුම පහසුකම්", included: true },
     { text: "මාස 6ක දීර්ඝ වලංගු කාලය (දින 180 - නිදහසේ සහකරු සෙවීම)", included: true },
+    { text: "👑 VIP Profiles Only Exclusive Filter (VIP මනාල / මනාලියන් පමණක් ක්ෂණිකව සෙවීම)", included: true },
+    { text: "20+ Advanced Match Filters Unlocked (සියලුම Filters නිදහසේ භාවිතය)", included: true },
     { text: "5x Top Search Placement (සැමවිටම Discover Feed හි ඉහළින්ම)", included: true },
     { text: "Exclusive Gold VIP Ring & Verified Badge", included: true },
     { text: "🕶️ Incognito / Ghost Mode (අන් අයට නොපෙනී Profiles නැරඹීම)", included: true },

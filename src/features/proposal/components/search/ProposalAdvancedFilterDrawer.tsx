@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { X, RotateCcw, Check, SlidersHorizontal } from 'lucide-react';
+import { X, RotateCcw, Check, SlidersHorizontal, Crown, Lock, Sparkles } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useTheme } from '../../../../context/ThemeContext';
 import { SearchFilterState } from './ProposalSearchSidebar';
 
@@ -10,6 +11,8 @@ interface ProposalAdvancedFilterDrawerProps {
   onFilterChange: (filters: SearchFilterState) => void;
   onResetFilters: () => void;
   onApplyFilters: () => void;
+  membershipPlan?: 'free' | 'classic' | 'vip';
+  onUpgrade?: () => void;
 }
 
 export default function ProposalAdvancedFilterDrawer({
@@ -19,6 +22,8 @@ export default function ProposalAdvancedFilterDrawer({
   onFilterChange,
   onResetFilters,
   onApplyFilters,
+  membershipPlan = 'free',
+  onUpgrade,
 }: ProposalAdvancedFilterDrawerProps) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -65,6 +70,31 @@ export default function ProposalAdvancedFilterDrawer({
 
         {/* Drawer Scrollable Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6 font-sans">
+
+          {/* Tier Notice for Free Members */}
+          {membershipPlan === 'free' && (
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-rose-500/10 to-amber-500/15 border border-amber-500/30">
+              <div className="flex items-center gap-2 mb-1.5">
+                <Crown size={16} className="text-amber-500" />
+                <span className="text-xs font-black text-amber-500 uppercase tracking-wider">
+                  Classic & VIP Exclusive Filters
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600 dark:text-slate-300 font-sinhala leading-relaxed mb-3">
+                උස, ආදායම, රැකියාව, අධ්‍යාපනය, දික්කසාද/අවිවාහක තත්ත්වය සහ NIC Verification ඇතුළු සියලුම Filters 20+ සක්‍රීය වන්නේ Classic සහ VIP සාමාජිකයින්ට පමණි.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  if (onUpgrade) onUpgrade();
+                }}
+                className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20 cursor-pointer transition-transform hover:scale-[1.02]"
+              >
+                <Crown size={14} /> Upgrade to Unlock 20+ Filters
+              </button>
+            </div>
+          )}
 
           {/* Section 1: Demographics */}
           <div className="space-y-4 font-sans">
@@ -300,12 +330,31 @@ export default function ProposalAdvancedFilterDrawer({
           <button
             type="button"
             onClick={() => {
+              if (membershipPlan === 'free') {
+                toast.error("🔒 20+ Advanced Filters භාවිතයෙන් සෙවීමට කරුණාකර Classic හෝ VIP සාමාජිකත්වය ලබාගන්න.", {
+                  icon: '👑',
+                  duration: 4500
+                });
+                onClose();
+                if (onUpgrade) onUpgrade();
+                return;
+              }
               onApplyFilters();
               onClose();
             }}
-            className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-extrabold text-xs shadow-lg shadow-rose-500/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 font-sans"
+            className="flex-1 py-3 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-extrabold text-xs shadow-lg shadow-rose-500/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 font-sans cursor-pointer"
           >
-            <Check size={16} strokeWidth={3} /> Apply Filters
+            {membershipPlan === 'free' ? (
+              <>
+                <Crown size={15} />
+                <span>Unlock with Classic / VIP</span>
+              </>
+            ) : (
+              <>
+                <Check size={16} strokeWidth={3} />
+                <span>Apply Filters</span>
+              </>
+            )}
           </button>
         </div>
       </motion.div>

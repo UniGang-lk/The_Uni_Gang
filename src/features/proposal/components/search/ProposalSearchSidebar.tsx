@@ -75,6 +75,8 @@ interface ProposalSearchSidebarProps {
   onFilterChange: (filters: SearchFilterState) => void;
   onResetFilters: () => void;
   onOpenAdvancedDrawer?: () => void;
+  membershipPlan?: 'free' | 'classic' | 'vip';
+  onToggleVipOnly?: () => void;
   className?: string;
 }
 
@@ -83,6 +85,8 @@ export default function ProposalSearchSidebar({
   onFilterChange,
   onResetFilters,
   onOpenAdvancedDrawer,
+  membershipPlan = 'free',
+  onToggleVipOnly,
   className = '',
 }: ProposalSearchSidebarProps) {
   const { theme } = useTheme();
@@ -292,18 +296,29 @@ export default function ProposalSearchSidebar({
         {/* ── 6. VIP PROFILES ONLY ── */}
         <div className="pt-2">
           <label
-            onClick={() => handleChange('vipOnly', !filters.vipOnly)}
+            onClick={() => {
+              if (onToggleVipOnly) {
+                onToggleVipOnly();
+              } else {
+                handleChange('vipOnly', !filters.vipOnly);
+              }
+            }}
             className={`flex items-center justify-between p-3 rounded-2xl border cursor-pointer transition-all ${
               filters.vipOnly
-                ? 'bg-amber-500/10 border-amber-500/40 text-amber-500 font-extrabold'
+                ? 'bg-amber-500/10 border-amber-500/40 text-amber-500 font-extrabold shadow-xs ring-1 ring-amber-500/20'
                 : isDark
                 ? 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
                 : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
             }`}
           >
             <span className="flex items-center gap-2 text-xs font-bold">
-              <Crown size={15} className="text-amber-500 fill-amber-500" />
+              <Crown size={15} className="text-amber-500 fill-amber-500 shrink-0" />
               <span>VIP Profiles Only</span>
+              {membershipPlan !== 'vip' && (
+                <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/30">
+                  VIP 👑
+                </span>
+              )}
             </span>
             <div
               className={`w-4 h-4 rounded-md border flex items-center justify-center transition-all ${
@@ -323,14 +338,25 @@ export default function ProposalSearchSidebar({
             <button
               type="button"
               onClick={onOpenAdvancedDrawer}
-              className={`w-full py-2.5 px-4 rounded-xl border text-xs font-extrabold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              className={`w-full py-2.5 px-4 rounded-xl border text-xs font-extrabold flex items-center justify-between gap-2 transition-all cursor-pointer ${
                 isDark
                   ? 'border-slate-800 bg-slate-950 hover:bg-slate-800 text-slate-300 hover:text-white'
                   : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900'
               }`}
             >
-              <SlidersHorizontal size={14} className="text-rose-500" />
-              <span>More Filters (20+)</span>
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal size={14} className="text-rose-500" />
+                <span>More Filters (20+)</span>
+              </div>
+              <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                membershipPlan === 'vip' 
+                  ? 'bg-amber-500/15 text-amber-500 border border-amber-500/30' 
+                  : membershipPlan === 'classic'
+                  ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20'
+                  : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+              }`}>
+                {membershipPlan === 'vip' ? 'VIP' : membershipPlan === 'classic' ? 'Classic' : 'Classic/VIP 👑'}
+              </span>
             </button>
           </div>
         )}
