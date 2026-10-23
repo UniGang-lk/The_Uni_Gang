@@ -650,24 +650,24 @@ export default function ProposalHomePage({
   };
 
   return (
-    <div className="w-full max-w-[1550px] mx-auto px-4 sm:px-8 lg:px-12 py-8 font-sans transition-colors duration-300">
+    <div className="w-full max-w-[1550px] mx-auto px-2.5 sm:px-8 lg:px-12 py-3 sm:py-8 pb-24 sm:pb-12 font-sans transition-colors duration-300">
       
       {/* ============================================================== */}
       {/* 1. TOP PROFILE HEADER BANNER (PORONDU LANKA STYLE) */}
       {/* ============================================================== */}
-      <div className="rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-rose-950/5 mb-8">
+      <div className="rounded-2xl sm:rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-rose-950/5 mb-6 sm:mb-8">
         
         {/* Colorful Gradient Cover Banner */}
-        <div className="relative h-44 sm:h-56 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 overflow-hidden">
+        <div className="relative h-36 sm:h-56 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-500 overflow-hidden">
           <div className="absolute inset-0 bg-black/10" />
           <div className="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-white/20 blur-2xl pointer-events-none" />
           <div className="absolute left-1/3 -bottom-10 w-64 h-64 rounded-full bg-amber-300/20 blur-xl pointer-events-none" />
           
           {/* Top Cover Banner Navigation: Back to Landing on Left, Status + Reset on Right */}
-          <div className="absolute top-4 left-6 right-6 flex items-center justify-between z-10">
+          <div className="absolute top-3 sm:top-4 left-3 sm:left-6 right-3 sm:right-6 flex items-center justify-between z-10">
             <button
               onClick={() => setPage('landing')}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-white text-xs font-bold transition-all cursor-pointer shadow-sm hover:scale-105"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/20 text-white text-[11px] sm:text-xs font-bold transition-all cursor-pointer shadow-sm hover:scale-105"
             >
               <ArrowLeft size={13} />
               <span>Back to Landing</span>
@@ -683,17 +683,18 @@ export default function ProposalHomePage({
                 type="button"
                 onClick={handleResetProfile}
                 title="Reset test profile to test onboarding from scratch"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 hover:bg-rose-950/80 backdrop-blur-md border border-white/20 text-white/90 hover:text-white text-xs font-bold transition-all cursor-pointer shadow-sm"
+                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-black/40 hover:bg-rose-950/80 backdrop-blur-md border border-white/20 text-white/90 hover:text-white text-[11px] sm:text-xs font-bold transition-all cursor-pointer shadow-sm"
               >
                 <RefreshCw size={12} />
-                <span>Reset Test Profile</span>
+                <span className="hidden xs:inline">Reset Test Profile</span>
+                <span className="xs:hidden">Reset</span>
               </button>
             </div>
           </div>
         </div>
 
         {/* Profile Info Bar with Overlapping Avatar */}
-        <div className="relative px-6 sm:px-10 pb-6 pt-0">
+        <div className="relative px-3.5 sm:px-10 pb-5 sm:pb-6 pt-0">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             
             {/* Left: Overlapping Circular Avatar + Name + Location */}
@@ -794,61 +795,61 @@ export default function ProposalHomePage({
         {/* ============================================================== */}
         {/* 2. PORONDU LANKA QUICK TABS NAVIGATION (DIRECTLY BELOW BANNER) */}
         {/* ============================================================== */}
-        <div className="border-t border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/50 px-6 sm:px-10 py-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="border-t border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/50 px-2.5 sm:px-6 md:px-10 py-2.5 sm:py-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3">
             
-            {/* Left: 3 Core Profile Tabs (Segmented Control - Responsive on mobile) */}
-            <div className="inline-flex items-center p-1 bg-slate-200/70 dark:bg-slate-800/80 rounded-2xl w-full sm:w-auto overflow-x-auto no-scrollbar">
+            {/* Left: 3 Core Profile Tabs (Segmented Control - Responsive 3-col on mobile) */}
+            <div className="w-full sm:w-auto grid grid-cols-3 sm:inline-flex items-center p-1 bg-slate-200/70 dark:bg-slate-800/80 rounded-xl sm:rounded-2xl gap-1 shrink-0">
               {/* Tab 1: Overview */}
               <button
                 onClick={() => setActiveTab('overview')}
                 className={cx(
-                  "flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap",
+                  "py-2 px-1.5 sm:px-4 rounded-lg sm:rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1 sm:gap-2 cursor-pointer whitespace-nowrap",
                   activeTab === 'overview'
                     ? "bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-sm"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 )}
               >
-                <FileText size={15} />
-                <span>Bio-Data<span className="hidden sm:inline"> (Overview)</span></span>
+                <FileText size={14} className="shrink-0" />
+                <span>Overview</span>
               </button>
 
               {/* Tab 2: Photos */}
               <button
                 onClick={() => setActiveTab('photos')}
                 className={cx(
-                  "flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap",
+                  "py-2 px-1.5 sm:px-4 rounded-lg sm:rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1 sm:gap-2 cursor-pointer whitespace-nowrap",
                   activeTab === 'photos'
                     ? "bg-white dark:bg-slate-700 text-rose-600 dark:text-rose-400 shadow-sm"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 )}
               >
-                <Camera size={15} />
-                <span>ඡායාරූප<span className="hidden sm:inline"> (Photos)</span></span>
+                <Camera size={14} className="shrink-0" />
+                <span>Photos</span>
               </button>
 
               {/* Tab 3: Verification */}
               <button
                 onClick={() => setActiveTab('verification')}
                 className={cx(
-                  "flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer shrink-0 whitespace-nowrap",
+                  "py-2 px-1.5 sm:px-4 rounded-lg sm:rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1 sm:gap-2 cursor-pointer whitespace-nowrap",
                   activeTab === 'verification'
                     ? "bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm"
                     : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                 )}
               >
-                <ShieldCheck size={15} />
-                <span>NIC<span className="hidden sm:inline"> Verification</span></span>
+                <ShieldCheck size={14} className="shrink-0" />
+                <span>NIC</span>
               </button>
             </div>
 
             {/* Right: Hub Actions (Discover Candidates, Shortlists, Chat, Notifications & Settings) */}
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-start pt-1 sm:pt-0">
               <button
                 onClick={() => setPage('discover')}
-                className="px-4 py-2 rounded-xl text-xs font-black bg-rose-500 hover:bg-rose-600 text-white shadow-sm shadow-rose-500/20 transition-all flex items-center gap-2 cursor-pointer"
+                className="flex-1 sm:flex-initial px-3 sm:px-4 py-2 rounded-xl text-xs font-black bg-rose-500 hover:bg-rose-600 text-white shadow-sm shadow-rose-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
               >
-                <Compass size={15} />
+                <Compass size={14} />
                 <span className="hidden sm:inline">මනාලියන් / මනාලයන් සොයන්න (Discover)</span>
                 <span className="sm:hidden">Discover</span>
               </button>
@@ -857,7 +858,7 @@ export default function ProposalHomePage({
               <button
                 onClick={() => setIsShortlistModalOpen(true)}
                 title="View Saved Shortlisted Profiles & Family Notes"
-                className="px-3 py-2 rounded-xl text-xs font-black bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-amber-500 border border-slate-200 dark:border-slate-700 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer relative"
+                className="p-2 sm:px-3 sm:py-2 rounded-xl text-xs font-black bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-amber-500 border border-slate-200 dark:border-slate-700 shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer relative shrink-0"
               >
                 <Bookmark size={15} className="text-amber-500" />
                 <span className="hidden md:inline">කෙටි ලැයිස්තුව</span>
@@ -870,7 +871,8 @@ export default function ProposalHomePage({
 
               <button
                 onClick={() => setPage('inbox')}
-                className="px-3.5 py-2 rounded-xl text-xs font-black bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-pink-600 border border-slate-200 dark:border-slate-700 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer relative"
+                title="In-App Chat Messages"
+                className="p-2 sm:px-3.5 sm:py-2 rounded-xl text-xs font-black bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-pink-600 border border-slate-200 dark:border-slate-700 shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer relative shrink-0"
               >
                 <MessageCircle size={15} className="text-pink-500" />
                 <span className="hidden md:inline">සාකච්ඡා (Chat)</span>
@@ -880,12 +882,12 @@ export default function ProposalHomePage({
               </button>
 
               {/* In-App Notifications Bell Dropdown */}
-              <div className="relative">
+              <div className="relative shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                   title="Proposal Notifications & System Alerts"
-                  className="p-2 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-rose-500 border border-slate-200 dark:border-slate-700 shadow-sm transition-all cursor-pointer relative"
+                  className="p-2 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-rose-500 border border-slate-200 dark:border-slate-700 shadow-sm transition-all cursor-pointer relative flex items-center justify-center"
                 >
                   <Bell size={15} />
                   <span className="w-2 h-2 rounded-full bg-rose-500 absolute top-1 right-1" />
