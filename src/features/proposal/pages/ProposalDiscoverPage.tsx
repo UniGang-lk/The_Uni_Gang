@@ -21,6 +21,7 @@ const mapBackendToCandidate = (p: any): CandidateProfile => {
     id: p.id || p.ID,
     code: code,
     name: p.user?.name || (isFemale ? 'Candidate B.' : 'Candidate G.'),
+    gender: isFemale ? 'Female' : 'Male',
     age: p.age || 26,
     district: p.district || 'Colombo',
     profession: p.profession || 'Professional',
@@ -33,7 +34,7 @@ const mapBackendToCandidate = (p: any): CandidateProfile => {
     isVIP: p.is_vip || p.isVIP || p.membership_tier === 'vip',
     isClassic: p.is_classic || p.isClassic || p.membership_tier === 'classic',
     isVerified: p.is_nic_verified || p.isNicVerified || p.verification_status === 'verified',
-    civilStatus: p.civil_status || 'Never Married (අවිවාහක)',
+    civilStatus: p.civil_status || p.civilStatus || 'Never Married (අවිවාහක)',
     ethnicity: p.ethnicity || 'Sinhalese',
     religion: p.religion || 'Buddhist',
     caste: p.caste || 'Govigama',
@@ -509,8 +510,9 @@ export default function ProposalDiscoverPage({
 
     // 2. Looking for (Bride / Groom / All)
     if (filters.lookingFor && filters.lookingFor !== 'All') {
-      const isCandidateFemale = item.gender?.toLowerCase() === 'female' || item.code.startsWith('BR');
-      const isCandidateMale = item.gender?.toLowerCase() === 'male' || item.code.startsWith('GR');
+      const itemCode = String(item.code || '');
+      const isCandidateFemale = item.gender?.toLowerCase() === 'female' || itemCode.startsWith('BR');
+      const isCandidateMale = item.gender?.toLowerCase() === 'male' || itemCode.startsWith('GR');
       if (filters.lookingFor === 'Bride' && !isCandidateFemale) return false;
       if (filters.lookingFor === 'Groom' && !isCandidateMale) return false;
     }
@@ -518,21 +520,21 @@ export default function ProposalDiscoverPage({
     // 3. Search query (matches code, name, profession, or district)
     if (filters.codeSearch && filters.codeSearch.trim() !== '') {
       const q = filters.codeSearch.toLowerCase().trim();
-      const matchCode = item.code.toLowerCase().includes(q);
-      const matchName = item.name.toLowerCase().includes(q);
-      const matchJob = item.profession.toLowerCase().includes(q);
-      const matchDist = item.district.toLowerCase().includes(q);
+      const matchCode = String(item.code || '').toLowerCase().includes(q);
+      const matchName = String(item.name || '').toLowerCase().includes(q);
+      const matchJob = String(item.profession || '').toLowerCase().includes(q);
+      const matchDist = String(item.district || '').toLowerCase().includes(q);
       if (!matchCode && !matchName && !matchJob && !matchDist) return false;
     }
 
     // 4. District
     if (filters.district && filters.district !== 'All' && filters.district !== 'Any') {
-      if (!item.district.toLowerCase().includes(filters.district.toLowerCase())) return false;
+      if (!String(item.district || '').toLowerCase().includes(filters.district.toLowerCase())) return false;
     }
 
     // 5. Religion
     if (filters.religion && filters.religion !== 'All' && filters.religion !== 'Any') {
-      if (item.religion && !item.religion.toLowerCase().includes(filters.religion.toLowerCase())) return false;
+      if (item.religion && !String(item.religion).toLowerCase().includes(filters.religion.toLowerCase())) return false;
     }
 
     // 6. Age Range (18-25, 26-30, 31-35, 36-40, 41-50, 50+ or custom range e.g. "22-30")
@@ -574,10 +576,10 @@ export default function ProposalDiscoverPage({
 
     // 7. Advanced parameters if set
     if (filters.profession && filters.profession !== 'Any' && item.profession !== filters.profession) return false;
-    if (filters.civilStatus && filters.civilStatus !== 'Any' && item.civilStatus && !item.civilStatus.includes(filters.civilStatus)) return false;
-    if (filters.ethnicity && filters.ethnicity !== 'Any' && item.ethnicity && !item.ethnicity.toLowerCase().includes(filters.ethnicity.toLowerCase())) return false;
-    if (filters.caste && filters.caste !== 'Any' && item.caste && !item.caste.toLowerCase().includes(filters.caste.toLowerCase())) return false;
-    if (filters.country && filters.country !== 'Any' && filters.country !== 'Anywhere' && item.country && !item.country.toLowerCase().includes(filters.country.toLowerCase())) return false;
+    if (filters.civilStatus && filters.civilStatus !== 'Any' && item.civilStatus && !String(item.civilStatus).includes(filters.civilStatus)) return false;
+    if (filters.ethnicity && filters.ethnicity !== 'Any' && item.ethnicity && !String(item.ethnicity).toLowerCase().includes(filters.ethnicity.toLowerCase())) return false;
+    if (filters.caste && filters.caste !== 'Any' && item.caste && !String(item.caste).toLowerCase().includes(filters.caste.toLowerCase())) return false;
+    if (filters.country && filters.country !== 'Any' && filters.country !== 'Anywhere' && item.country && !String(item.country).toLowerCase().includes(filters.country.toLowerCase())) return false;
     if (filters.monthlyIncome && filters.monthlyIncome !== 'Any' && item.monthlyIncome && !item.monthlyIncome.includes(filters.monthlyIncome)) return false;
     if (filters.nicVerified && filters.nicVerified === 'Verified Only' && !item.isVerified) return false;
     if (filters.education && filters.education !== 'Any' && filters.education !== 'All') {

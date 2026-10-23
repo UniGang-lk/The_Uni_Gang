@@ -63,9 +63,9 @@ const ProposalSearchFilterBar = ({ onSearch }: ProposalSearchFilterBarProps) => 
               onChange={(e) => setLookingFor(e.target.value)}
               className="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-white outline-none cursor-pointer"
             >
-              <option value="Any">Any Gender</option>
-              <option value="Female">Bride / Female</option>
-              <option value="Male">Groom / Male</option>
+              <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Any Gender</option>
+              <option value="Female" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Bride / Female</option>
+              <option value="Male" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Groom / Male</option>
             </select>
           </div>
 
@@ -105,11 +105,11 @@ const ProposalSearchFilterBar = ({ onSearch }: ProposalSearchFilterBarProps) => 
               onChange={(e) => setReligion(e.target.value)}
               className="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-white outline-none cursor-pointer"
             >
-              <option value="Any">Any Religion</option>
-              <option value="Buddhism">Buddhism</option>
-              <option value="Christianity">Christianity</option>
-              <option value="Hinduism">Hinduism</option>
-              <option value="Islam">Islam</option>
+              <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Any Religion</option>
+              <option value="Buddhism" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Buddhism</option>
+              <option value="Christianity" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Christianity</option>
+              <option value="Hinduism" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Hinduism</option>
+              <option value="Islam" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Islam</option>
             </select>
           </div>
 
@@ -123,11 +123,11 @@ const ProposalSearchFilterBar = ({ onSearch }: ProposalSearchFilterBarProps) => 
               onChange={(e) => setDistrict(e.target.value)}
               className="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-white outline-none cursor-pointer"
             >
-              <option value="Any">Any District</option>
-              <option value="Colombo">Colombo</option>
-              <option value="Kandy">Kandy</option>
-              <option value="Gampaha">Gampaha</option>
-              <option value="Galle">Galle</option>
+              <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Any District</option>
+              <option value="Colombo" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Colombo</option>
+              <option value="Kandy" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Kandy</option>
+              <option value="Gampaha" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Gampaha</option>
+              <option value="Galle" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Galle</option>
             </select>
           </div>
 
@@ -141,11 +141,11 @@ const ProposalSearchFilterBar = ({ onSearch }: ProposalSearchFilterBarProps) => 
               onChange={(e) => setUniversity(e.target.value)}
               className="w-full bg-transparent text-xs font-bold text-slate-900 dark:text-white outline-none cursor-pointer"
             >
-              <option value="Any">All Unis</option>
-              <option value="Moratuwa">Moratuwa</option>
-              <option value="Peradeniya">Peradeniya</option>
-              <option value="Jayewardenepura">USJ / Japura</option>
-              <option value="SLIIT">SLIIT</option>
+              <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">All Unis</option>
+              <option value="Moratuwa" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Moratuwa</option>
+              <option value="Peradeniya" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Peradeniya</option>
+              <option value="Jayewardenepura" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">USJ / Japura</option>
+              <option value="SLIIT" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">SLIIT</option>
             </select>
           </div>
 

@@ -568,10 +568,15 @@ export default function ProposalHomePage({
     }
 
     // 3. Deduplication Check against registered NICs
-    const registeredNicsRaw = localStorage.getItem('unigang_registered_nics');
-    const registeredNics: { nicNumber: string; userCode: string; userName: string }[] = registeredNicsRaw ? JSON.parse(registeredNicsRaw) : [
+    let registeredNics: { nicNumber: string; userCode: string; userName: string }[] = [
       { nicNumber: '199512345678', userCode: 'UG-999', userName: 'Sample Profile' }
     ];
+    try {
+      const registeredNicsRaw = localStorage.getItem('unigang_registered_nics');
+      if (registeredNicsRaw) {
+        registeredNics = JSON.parse(registeredNicsRaw);
+      }
+    } catch {}
 
     const duplicateAccount = registeredNics.find(item => item.nicNumber === cleanNic && item.userCode !== currentUser.code);
     if (duplicateAccount) {
@@ -1000,13 +1005,15 @@ export default function ProposalHomePage({
                 await proposalApi.togglePauseProfile();
               } catch {}
               setCurrentUser((prev: any) => ({ ...prev, isPaused: false, is_paused: false }));
-              const saved = localStorage.getItem('userProposalProfile');
-              if (saved) {
-                const parsed = JSON.parse(saved);
-                parsed.isPaused = false;
-                parsed.is_paused = false;
-                localStorage.setItem('userProposalProfile', JSON.stringify(parsed));
-              }
+              try {
+                const saved = localStorage.getItem('userProposalProfile');
+                if (saved) {
+                  const parsed = JSON.parse(saved);
+                  parsed.isPaused = false;
+                  parsed.is_paused = false;
+                  localStorage.setItem('userProposalProfile', JSON.stringify(parsed));
+                }
+              } catch {}
               toast.success("Profile යළි සක්‍රීය කරන ලදී! සෙවුම් වලදී ඔබගේ Bio-Data දැන් දිස්වේ. 🎉");
             }}
             className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-black text-xs shadow-md transition-all cursor-pointer whitespace-nowrap"

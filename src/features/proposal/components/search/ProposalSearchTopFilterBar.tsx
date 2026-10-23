@@ -173,13 +173,13 @@ export default function ProposalSearchTopFilterBar({
                   : isDark ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
               }`}
             >
-              <option value="Any">District: Any</option>
-              <option value="Colombo">Colombo</option>
-              <option value="Gampaha">Gampaha</option>
-              <option value="Kandy">Kandy</option>
-              <option value="Galle">Galle</option>
-              <option value="Kurunegala">Kurunegala</option>
-              <option value="Matale">Matale</option>
+              <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">District: Any</option>
+              <option value="Colombo" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Colombo</option>
+              <option value="Gampaha" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Gampaha</option>
+              <option value="Kandy" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Kandy</option>
+              <option value="Galle" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Galle</option>
+              <option value="Kurunegala" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Kurunegala</option>
+              <option value="Matale" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Matale</option>
             </select>
             <MapPin size={12} className="absolute left-3 top-2.5 text-rose-500 pointer-events-none" />
             <ChevronDown size={12} className="absolute right-2.5 top-2.5 text-slate-400 pointer-events-none" />
@@ -195,12 +195,12 @@ export default function ProposalSearchTopFilterBar({
                   : isDark ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
               }`}
             >
-              <option value="Any">Profession: Any</option>
-              <option value="Doctor">Doctor</option>
-              <option value="Engineer">Engineer</option>
-              <option value="Lecturer">Lecturer</option>
-              <option value="Accountant">Accountant</option>
-              <option value="Teacher">Teacher</option>
+              <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Profession: Any</option>
+              <option value="Doctor" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Doctor</option>
+              <option value="Engineer" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Engineer</option>
+              <option value="Lecturer" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Lecturer</option>
+              <option value="Accountant" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Accountant</option>
+              <option value="Teacher" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Teacher</option>
             </select>
             <Briefcase size={12} className="absolute left-3 top-2.5 text-indigo-500 pointer-events-none" />
             <ChevronDown size={12} className="absolute right-2.5 top-2.5 text-slate-400 pointer-events-none" />
@@ -216,11 +216,11 @@ export default function ProposalSearchTopFilterBar({
                   : isDark ? 'bg-slate-900 border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
               }`}
             >
-              <option value="Any">Religion: Any</option>
-              <option value="Buddhist">Buddhist</option>
-              <option value="Hindu">Hindu</option>
-              <option value="Muslim">Muslim</option>
-              <option value="Catholic">Catholic</option>
+              <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Religion: Any</option>
+              <option value="Buddhist" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Buddhist</option>
+              <option value="Hindu" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Hindu</option>
+              <option value="Muslim" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Muslim</option>
+              <option value="Catholic" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Catholic</option>
             </select>
             <ChevronDown size={12} className="absolute right-2.5 top-2.5 text-slate-400 pointer-events-none" />
           </div>

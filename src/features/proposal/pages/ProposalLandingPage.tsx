@@ -121,9 +121,14 @@ export default function ProposalLandingPage({
     } catch {
       // fallback smoothly
     }
-    const updated = [...sentInterestIds, String(selectedInterestProfile.id)];
-    setSentInterestIds(updated);
-    localStorage.setItem('sentProposalInterestIds', JSON.stringify(updated));
+    const targetId = String(selectedInterestProfile.id);
+    if (!sentInterestIds.includes(targetId)) {
+      const updated = [...sentInterestIds, targetId];
+      setSentInterestIds(updated);
+      try {
+        localStorage.setItem('sentProposalInterestIds', JSON.stringify(updated));
+      } catch {}
+    }
     toast.success(`Proposal Request sent to ${selectedInterestProfile.name || selectedInterestProfile.code}! 💕`);
     setSelectedInterestProfile(null);
   };

@@ -43,7 +43,7 @@ export function useProposalVerification(): UseProposalVerificationReturn {
       const savedProfile = localStorage.getItem('userProposalProfile');
       if (savedProfile) {
         const parsed = JSON.parse(savedProfile);
-        if (parsed.isVerified || parsed.is_nic_verified || parsed.verificationStatus === 'verified' || parsed.verification_status === 'verified') {
+        if (parsed && typeof parsed === 'object' && (parsed.isVerified || parsed.is_nic_verified || parsed.verificationStatus === 'verified' || parsed.verification_status === 'verified')) {
           return true;
         }
       }

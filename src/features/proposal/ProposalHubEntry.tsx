@@ -155,6 +155,15 @@ export default function ProposalHubEntry() {
     }
   };
 
+  const getSavedProfile = () => {
+    try {
+      const raw = localStorage.getItem('userProposalProfile');
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  };
+
   return (
     <ErrorBoundary>
       <div className={`min-h-screen flex flex-col font-sans selection:bg-rose-500/30 transition-colors duration-300 ${
@@ -239,7 +248,7 @@ export default function ProposalHubEntry() {
           {activeView === 'profile' && (
             <div className="py-6 px-4">
               <ProposalFullProfilePage
-                profile={selectedProfile || JSON.parse(localStorage.getItem('userProposalProfile') || 'null') || {
+                profile={selectedProfile || getSavedProfile() || {
                   name: 'Kasun Bandara',
                   code: 'UG-101',
                   age: 26,

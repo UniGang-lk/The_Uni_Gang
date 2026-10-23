@@ -164,10 +164,10 @@ export default function ProposalAdvancedFilterDrawer({
                   isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                 }`}
               >
-                <option value="Any">Any</option>
-                <option value="Never Married">Never Married (අවිවාහක)</option>
-                <option value="Divorced">Divorced (දික්කසාද වූ)</option>
-                <option value="Widowed">Widowed (වැන්දඹු)</option>
+                <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Any</option>
+                <option value="Never Married" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Never Married (අවිවාහක)</option>
+                <option value="Divorced" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Divorced (දික්කසාද වූ)</option>
+                <option value="Widowed" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Widowed (වැන්දඹු)</option>
               </select>
             </div>
 
@@ -182,11 +182,11 @@ export default function ProposalAdvancedFilterDrawer({
                     isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                   }`}
                 >
-                  <option value="Any">Any</option>
-                  <option value="Sinhalese">Sinhalese</option>
-                  <option value="Tamil">Tamil</option>
-                  <option value="Muslim">Muslim</option>
-                  <option value="Burger">Burger</option>
+                  <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Any</option>
+                  <option value="Sinhalese" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Sinhalese</option>
+                  <option value="Tamil" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Tamil</option>
+                  <option value="Muslim" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Muslim</option>
+                  <option value="Burger" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Burger</option>
                 </select>
               </div>
 
@@ -199,11 +199,11 @@ export default function ProposalAdvancedFilterDrawer({
                     isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                   }`}
                 >
-                  <option value="Any">Any</option>
-                  <option value="Buddhist">Buddhist</option>
-                  <option value="Catholic">Catholic</option>
-                  <option value="Hindu">Hindu</option>
-                  <option value="Islam">Islam</option>
+                  <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Any</option>
+                  <option value="Buddhist" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Buddhist</option>
+                  <option value="Catholic" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Catholic</option>
+                  <option value="Hindu" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Hindu</option>
+                  <option value="Islam" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Islam</option>
                 </select>
               </div>
             </div>
@@ -225,9 +225,9 @@ export default function ProposalAdvancedFilterDrawer({
                     isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                   }`}
                 >
-                  <option value="Any">Any</option>
-                  <option value="Sri Lanka">Sri Lanka</option>
-                  <option value="Abroad">Abroad</option>
+                  <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Any</option>
+                  <option value="Sri Lanka" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Sri Lanka</option>
+                  <option value="Abroad" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Abroad</option>
                 </select>
               </div>
 
@@ -240,12 +240,12 @@ export default function ProposalAdvancedFilterDrawer({
                     isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                   }`}
                 >
-                  <option value="Any">Any</option>
-                  <option value="Colombo">Colombo</option>
-                  <option value="Gampaha">Gampaha</option>
-                  <option value="Kandy">Kandy</option>
-                  <option value="Galle">Galle</option>
-                  <option value="Kurunegala">Kurunegala</option>
+                  <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Any</option>
+                  <option value="Colombo" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Colombo</option>
+                  <option value="Gampaha" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Gampaha</option>
+                  <option value="Kandy" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Kandy</option>
+                  <option value="Galle" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Galle</option>
+                  <option value="Kurunegala" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Kurunegala</option>
                 </select>
               </div>
             </div>
@@ -266,13 +266,13 @@ export default function ProposalAdvancedFilterDrawer({
                   isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                 }`}
               >
-                <option value="Any">Any</option>
-                <option value="Doctor">Doctor</option>
-                <option value="Engineer">Engineer</option>
-                <option value="Lecturer">Lecturer</option>
-                <option value="Accountant">Accountant</option>
-                <option value="Teacher">Teacher</option>
-                <option value="Government Servant">Government Servant</option>
+                <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Any</option>
+                <option value="Doctor" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Doctor</option>
+                <option value="Engineer" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Engineer</option>
+                <option value="Lecturer" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Lecturer</option>
+                <option value="Accountant" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Accountant</option>
+                <option value="Teacher" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Teacher</option>
+                <option value="Government Servant" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Government Servant</option>
               </select>
             </div>
 
@@ -285,11 +285,11 @@ export default function ProposalAdvancedFilterDrawer({
                   isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                 }`}
               >
-                <option value="Any">Any</option>
-                <option value="Rs 50,000 - Rs 100,000">Rs 50,000 - Rs 100,000</option>
-                <option value="Rs 100,000 - Rs 200,000">Rs 100,000 - Rs 200,000</option>
-                <option value="Rs 200,000 - Rs 300,000">Rs 200,000 - Rs 300,000</option>
-                <option value="Rs 300,000+">Rs 300,000+</option>
+                <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Any</option>
+                <option value="Rs 50,000 - Rs 100,000" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Rs 50,000 - Rs 100,000</option>
+                <option value="Rs 100,000 - Rs 200,000" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Rs 100,000 - Rs 200,000</option>
+                <option value="Rs 200,000 - Rs 300,000" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Rs 200,000 - Rs 300,000</option>
+                <option value="Rs 300,000+" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Rs 300,000+</option>
               </select>
             </div>
           </div>
@@ -309,8 +309,8 @@ export default function ProposalAdvancedFilterDrawer({
                   isDark ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
                 }`}
               >
-                <option value="Any">Any</option>
-                <option value="Verified Only">Verified Only</option>
+                <option value="Any" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Any</option>
+                <option value="Verified Only" className="dark:bg-slate-900 dark:text-white bg-white text-slate-900">Verified Only</option>
               </select>
             </div>
           </div>
