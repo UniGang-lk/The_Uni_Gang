@@ -459,9 +459,11 @@ export default function ProposalDiscoverPage({
       try {
         const queryParams: any = {};
         if (filters.lookingFor && filters.lookingFor !== 'All') queryParams.gender = filters.lookingFor === 'Bride' ? 'Female' : 'Male';
-        if (filters.district && filters.district !== 'All') queryParams.district = filters.district;
-        if (filters.religion && filters.religion !== 'All') queryParams.religion = filters.religion;
-        if (filters.education && filters.education !== 'Any') queryParams.education = filters.education;
+        if (filters.district && filters.district !== 'All' && filters.district !== 'Any') queryParams.district = filters.district;
+        if (filters.religion && filters.religion !== 'All' && filters.religion !== 'Any') queryParams.religion = filters.religion;
+        if (filters.education && filters.education !== 'Any' && filters.education !== 'All') queryParams.education = filters.education;
+        if (filters.country && filters.country !== 'Any' && filters.country !== 'Anywhere') queryParams.country = filters.country;
+        if (filters.profession && filters.profession !== 'Any') queryParams.profession = filters.profession;
         if (filters.minAge) queryParams.minAge = filters.minAge;
         if (filters.maxAge) queryParams.maxAge = filters.maxAge;
 
@@ -481,7 +483,7 @@ export default function ProposalDiscoverPage({
     };
     fetchFeed();
     return () => { isMounted = false; };
-  }, [filters.lookingFor, filters.vipOnly, filters.district, filters.religion, filters.education, filters.minAge, filters.maxAge]);
+  }, [filters.lookingFor, filters.vipOnly, filters.district, filters.religion, filters.education, filters.country, filters.profession, filters.minAge, filters.maxAge]);
 
   const [isAdvancedDrawerOpen, setIsAdvancedDrawerOpen] = useState(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
@@ -533,7 +535,7 @@ export default function ProposalDiscoverPage({
       if (item.religion && !item.religion.toLowerCase().includes(filters.religion.toLowerCase())) return false;
     }
 
-    // 6. Age Range (18-25, 26-30, 31-35, 36-40, 41-50, 50+)
+    // 6. Age Range (18-25, 26-30, 31-35, 36-40, 41-50, 50+ or custom range e.g. "22-30")
     if (filters.ageRange && filters.ageRange !== 'All') {
       const age = item.age;
       if (filters.ageRange === '18-25' && (age < 18 || age > 25)) return false;
@@ -542,11 +544,46 @@ export default function ProposalDiscoverPage({
       if (filters.ageRange === '36-40' && (age < 36 || age > 40)) return false;
       if (filters.ageRange === '41-50' && (age < 41 || age > 50)) return false;
       if (filters.ageRange === '50+' && age < 50) return false;
+      if (filters.ageRange.includes('-') && !['18-25', '26-30', '31-35', '36-40', '41-50'].includes(filters.ageRange)) {
+        const [rMin, rMax] = filters.ageRange.split('-').map(Number);
+        if (!isNaN(rMin) && !isNaN(rMax) && (age < rMin || age > rMax)) return false;
+      }
+    }
+
+    // 6.1 Custom minAge & maxAge
+    if (filters.minAge && filters.minAge.trim() !== '') {
+      const min = parseInt(filters.minAge, 10);
+      if (!isNaN(min) && item.age < min) return false;
+    }
+    if (filters.maxAge && filters.maxAge.trim() !== '') {
+      const max = parseInt(filters.maxAge, 10);
+      if (!isNaN(max) && item.age > max) return false;
+    }
+
+    // 6.2 Height Range (minHeight & maxHeight in Ft, e.g. "5.4 ft")
+    if (filters.minHeight && filters.minHeight.trim() !== '') {
+      const minH = parseFloat(filters.minHeight);
+      const itemH = parseFloat((item.height || '').replace(/[^0-9.]/g, ''));
+      if (!isNaN(minH) && !isNaN(itemH) && itemH < minH) return false;
+    }
+    if (filters.maxHeight && filters.maxHeight.trim() !== '') {
+      const maxH = parseFloat(filters.maxHeight);
+      const itemH = parseFloat((item.height || '').replace(/[^0-9.]/g, ''));
+      if (!isNaN(maxH) && !isNaN(itemH) && itemH > maxH) return false;
     }
 
     // 7. Advanced parameters if set
     if (filters.profession && filters.profession !== 'Any' && item.profession !== filters.profession) return false;
     if (filters.civilStatus && filters.civilStatus !== 'Any' && item.civilStatus && !item.civilStatus.includes(filters.civilStatus)) return false;
+    if (filters.ethnicity && filters.ethnicity !== 'Any' && item.ethnicity && !item.ethnicity.toLowerCase().includes(filters.ethnicity.toLowerCase())) return false;
+    if (filters.caste && filters.caste !== 'Any' && item.caste && !item.caste.toLowerCase().includes(filters.caste.toLowerCase())) return false;
+    if (filters.country && filters.country !== 'Any' && filters.country !== 'Anywhere' && item.country && !item.country.toLowerCase().includes(filters.country.toLowerCase())) return false;
+    if (filters.monthlyIncome && filters.monthlyIncome !== 'Any' && item.monthlyIncome && !item.monthlyIncome.includes(filters.monthlyIncome)) return false;
+    if (filters.nicVerified && filters.nicVerified === 'Verified Only' && !item.isVerified) return false;
+    if (filters.education && filters.education !== 'Any' && filters.education !== 'All') {
+      const edu = (item.educationCategory || '').toLowerCase();
+      if (!edu.includes(filters.education.toLowerCase())) return false;
+    }
 
     // 8. Official Category filter
     if (filters.category && filters.category !== 'All') {
@@ -602,14 +639,30 @@ export default function ProposalDiscoverPage({
     if (filters.civilStatus && filters.civilStatus !== 'Any') {
       list.push({ id: 'civilStatus', label: `Status: ${filters.civilStatus}`, onRemove: () => setFilters(f => ({ ...f, civilStatus: 'Any' })) });
     }
+    if (filters.ethnicity && filters.ethnicity !== 'Any') {
+      list.push({ id: 'ethnicity', label: `Ethnicity: ${filters.ethnicity}`, onRemove: () => setFilters(f => ({ ...f, ethnicity: 'Any' })) });
+    }
     if (filters.caste && filters.caste !== 'Any') {
       list.push({ id: 'caste', label: `Caste: ${filters.caste}`, onRemove: () => setFilters(f => ({ ...f, caste: 'Any' })) });
     }
-    if (filters.education && filters.education !== 'Any') {
+    if (filters.education && filters.education !== 'Any' && filters.education !== 'All') {
       list.push({ id: 'education', label: `🎓 ${filters.education}`, onRemove: () => setFilters(f => ({ ...f, education: 'Any' })) });
     }
-    if (filters.country && filters.country !== 'Any') {
+    if (filters.country && filters.country !== 'Any' && filters.country !== 'Anywhere') {
       list.push({ id: 'country', label: `🌍 ${filters.country}`, onRemove: () => setFilters(f => ({ ...f, country: 'Any' })) });
+    }
+    if (filters.monthlyIncome && filters.monthlyIncome !== 'Any') {
+      list.push({ id: 'monthlyIncome', label: `Income: ${filters.monthlyIncome}`, onRemove: () => setFilters(f => ({ ...f, monthlyIncome: 'Any' })) });
+    }
+    if (filters.nicVerified && filters.nicVerified === 'Verified Only') {
+      list.push({ id: 'nicVerified', label: `✓ NIC Verified`, onRemove: () => setFilters(f => ({ ...f, nicVerified: 'Any' })) });
+    }
+    if (filters.minHeight || filters.maxHeight) {
+      list.push({ 
+        id: 'customHeight', 
+        label: `Height: ${filters.minHeight || '4.5'} - ${filters.maxHeight || '6.5'} ft`, 
+        onRemove: () => setFilters(f => ({ ...f, minHeight: '', maxHeight: '' })) 
+      });
     }
     if (filters.accountCreatedBy && filters.accountCreatedBy !== 'Any') {
       list.push({ id: 'accountCreatedBy', label: `Managed: ${filters.accountCreatedBy}`, onRemove: () => setFilters(f => ({ ...f, accountCreatedBy: 'Any' })) });
