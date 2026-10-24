@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   LuUser, LuMail, LuPhone, LuBuilding, LuLock, LuCamera, LuPencil, LuSave,
   LuEye, LuEyeOff, LuFacebook, LuLinkedin,
@@ -8,6 +9,8 @@ import {
 } from 'react-icons/lu';
 import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../../firebase';
 import SEO from '../../components/SEO';
 import VerifiedBadge from '../../components/ui/VerifiedBadge';
 import toast from 'react-hot-toast';
@@ -16,6 +19,30 @@ import { celebrate } from '../../utils/celebrate';
 import { playNotificationSound, requestNotificationPermission, triggerPushNotification } from '../../utils/sound';
 
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
+
+const SRI_LANKAN_UNIVERSITIES = [
+  'University of Moratuwa',
+  'University of Colombo',
+  'University of Peradeniya',
+  'University of Sri Jayewardenepura',
+  'University of Kelaniya',
+  'University of Ruhuna',
+  'University of Jaffna',
+  'Sabaragamuwa University of Sri Lanka',
+  'Rajarata University of Sri Lanka',
+  'Wayamba University of Sri Lanka',
+  'South Eastern University of Sri Lanka',
+  'Eastern University, Sri Lanka',
+  'Uva Wellassa University',
+  'General Sir John Kotelawala Defence University (KDU)',
+  'SLIIT',
+  'NSBM Green University',
+  'Informatics Institute of Technology (IIT)',
+  'CINEC Campus',
+  'Horizon Campus',
+  'Open University of Sri Lanka (OUSL)',
+  'Other / Institute'
+];
 
 const getInputClasses = (isEditing: boolean, focusTheme: 'blue' | 'purple' | 'indigo' | 'brand', isPassword = false) => {
   const base = `w-full pl-12 ${isPassword ? 'pr-12' : 'pr-4'} py-3 rounded-xl text-sm font-semibold transition-all duration-300 focus:outline-none`;
@@ -55,6 +82,7 @@ const getIconClasses = (isEditing: boolean, theme: 'blue' | 'purple' | 'indigo' 
 };
 
 const Profile = () => {
+  const navigate = useNavigate();
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -65,6 +93,44 @@ const Profile = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [sendingResetEmail, setSendingResetEmail] = useState(false);
+
+  // Logout handler
+  const handleLogout = () => {
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userFirstName');
+    localStorage.removeItem('userLastName');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userPhoneNumber');
+    localStorage.removeItem('userUniversity');
+    localStorage.removeItem('userProfilePicture');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userIsVerifiedStudent');
+    localStorage.removeItem('userIsLandlord');
+    window.dispatchEvent(new Event('auth-update'));
+    toast.success('Logged out successfully');
+    navigate('/');
+  };
+
+  // Secure Password Reset via Firebase Auth
+  const handleSendPasswordReset = async () => {
+    if (!email) {
+      toast.error('No registered email address found for this account.');
+      return;
+    }
+    setSendingResetEmail(true);
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast.success(`Password reset link sent to ${email}! Please check your email inbox.`);
+      celebrate();
+    } catch (err: any) {
+      console.error('Password reset error:', err);
+      toast.error(err.message || 'Failed to send password reset email.');
+    } finally {
+      setSendingResetEmail(false);
+    }
+  };
 
   // Expanded Social & Stats State
   const [fbHandle, setFbHandle] = useState('');
@@ -483,6 +549,55 @@ const Profile = () => {
           setIsVerificationPending(!data.user.is_verified_student && (!!data.user.campus_email || !!data.user.verification_id_url));
           // Sync with navbar
           localStorage.setItem('userIsVerifiedStudent', String(!!data.user.is_verified_student));
+
+          // Real User Data Synchronization
+          if (data.user.name) {
+            const parts = data.user.name.trim().split(' ');
+            const fn = parts[0] || '';
+            const ln = parts.slice(1).join(' ') || '';
+            setFirstName(fn);
+            setLastName(ln);
+            localStorage.setItem('userName', data.user.name);
+            localStorage.setItem('userFirstName', fn);
+            localStorage.setItem('userLastName', ln);
+          }
+          if (data.user.email) {
+            setEmail(data.user.email);
+            localStorage.setItem('userEmail', data.user.email);
+          }
+          if (data.user.phone) {
+            setPhoneNumber(data.user.phone);
+            localStorage.setItem('userPhoneNumber', data.user.phone);
+          }
+          if (data.user.profile_pic) {
+            setProfilePicture(data.user.profile_pic);
+            localStorage.setItem('userProfilePicture', data.user.profile_pic);
+          }
+          if (data.user.campus_email && !localStorage.getItem('userUniversity')) {
+            const cEmail = data.user.campus_email.toLowerCase();
+            let detectedUni = '';
+            if (cEmail.includes('mrt.ac.lk')) detectedUni = 'University of Moratuwa';
+            else if (cEmail.includes('cmb.ac.lk')) detectedUni = 'University of Colombo';
+            else if (cEmail.includes('pdn.ac.lk')) detectedUni = 'University of Peradeniya';
+            else if (cEmail.includes('kln.ac.lk')) detectedUni = 'University of Kelaniya';
+            else if (cEmail.includes('sjp.ac.lk')) detectedUni = 'University of Sri Jayewardenepura';
+            else if (cEmail.includes('ruh.ac.lk')) detectedUni = 'University of Ruhuna';
+            else if (cEmail.includes('jfn.ac.lk')) detectedUni = 'University of Jaffna';
+            else if (cEmail.includes('sliit.lk')) detectedUni = 'SLIIT';
+            else if (cEmail.includes('nsbm.ac.lk')) detectedUni = 'NSBM Green University';
+            else if (cEmail.includes('iit.ac.lk')) detectedUni = 'Informatics Institute of Technology (IIT)';
+            if (detectedUni) {
+              setUniversity(detectedUni);
+              localStorage.setItem('userUniversity', detectedUni);
+            }
+          }
+          if (Array.isArray(data.user.followers)) {
+            setStats(prev => ({ ...prev, followers: data.user.followers.length }));
+          }
+          if (Array.isArray(data.user.following)) {
+            setStats(prev => ({ ...prev, following: data.user.following.length }));
+          }
+
           window.dispatchEvent(new Event('auth-update'));
         }
       }
@@ -521,6 +636,11 @@ const Profile = () => {
     const tab = params.get('tab');
     const chatId = params.get('chatId');
     const type = params.get('type') || 'marketplace';
+
+    if (tab && ['overview', 'annexes', 'marketplace', 'events', 'security'].includes(tab)) {
+      setActiveProfileTab(tab as any);
+    }
+
     if (tab === 'orders') {
       setShowOrdersModal(true);
       fetchMyOrders();
@@ -727,12 +847,14 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    const storedFirstName = localStorage.getItem('userFirstName') || 'John';
-    const storedLastName = localStorage.getItem('userLastName') || 'Doe';
-    const storedEmail = localStorage.getItem('userEmail') || 'john.doe@example.com';
-    const storedPhoneNumber = localStorage.getItem('userPhoneNumber') || '0712345678';
+    const storedFullName = localStorage.getItem('userName') || '';
+    const nameParts = storedFullName ? storedFullName.split(' ') : [];
+    const storedFirstName = localStorage.getItem('userFirstName') || nameParts[0] || '';
+    const storedLastName = localStorage.getItem('userLastName') || nameParts.slice(1).join(' ') || '';
+    const storedEmail = localStorage.getItem('userEmail') || '';
+    const storedPhoneNumber = localStorage.getItem('userPhoneNumber') || '';
     const storedUniversity = localStorage.getItem('userUniversity') || '';
-    const storedPassword = localStorage.getItem('userPassword') || 'dummy_password';
+    const storedPassword = localStorage.getItem('userPassword') || '';
     const storedProfilePic = localStorage.getItem('userProfilePicture');
     const storedFb = localStorage.getItem('userFbHandle') || '';
     const storedLinkedin = localStorage.getItem('userLinkedinHandle') || '';
@@ -881,10 +1003,22 @@ const Profile = () => {
                       style={{ backgroundImage: 'radial-gradient(at 20% 20%, rgba(255,255,255,0.4) 0, transparent 50%)' }}
                     />
                     <div className="absolute top-3 right-3 flex gap-1.5">
-                      <button type="button" aria-label="Settings" className="p-2 rounded-lg bg-white/15 hover:bg-white/25 border border-white/20 text-white transition-all cursor-pointer">
+                      <button
+                        type="button"
+                        aria-label="Settings"
+                        title="Security & Settings"
+                        onClick={() => setActiveProfileTab('security')}
+                        className="p-2 rounded-lg bg-white/15 hover:bg-white/25 border border-white/20 text-white transition-all cursor-pointer"
+                      >
                         <LuSettings className="w-4 h-4" />
                       </button>
-                      <button type="button" aria-label="Log out" className="p-2 rounded-lg bg-white/15 hover:bg-red-500/70 border border-white/20 text-white transition-all cursor-pointer">
+                      <button
+                        type="button"
+                        aria-label="Log out"
+                        title="Log Out"
+                        onClick={handleLogout}
+                        className="p-2 rounded-lg bg-white/15 hover:bg-red-500/70 border border-white/20 text-white transition-all cursor-pointer"
+                      >
                         <LuLogOut className="w-4 h-4" />
                       </button>
                     </div>
@@ -1054,7 +1188,19 @@ const Profile = () => {
                 {/* Quick access */}
                 <div className="flex gap-2 overflow-x-auto custom-scrollbar pb-1">
                   {[
-                    { label: 'Inbox', value: marketplaceChats.length + eventChats.length + supportProblems.length, icon: LuMessageSquare, color: 'text-blue-500', onClick: () => { setShowInboxModal(true); fetchSupportProblems(); fetchChats(); fetchEventChats(); } },
+                    {
+                      label: 'Inbox',
+                      value: annexChats.length + marketplaceChats.length + eventChats.length + supportProblems.length,
+                      icon: LuMessageSquare,
+                      color: 'text-blue-500',
+                      onClick: () => {
+                        setShowInboxModal(true);
+                        fetchAnnexChats();
+                        fetchSupportProblems();
+                        fetchChats();
+                        fetchEventChats();
+                      }
+                    },
                     { label: 'Listings', value: myListings.length, icon: LuLayoutGrid, color: 'text-orange-500', onClick: () => setShowListingsModal(true) },
                     { label: 'Ads', value: myAds.length, icon: LuMegaphone, color: 'text-rose-500', onClick: () => setShowAdsModal(true) },
                     { label: 'Orders', value: myOrders.length, icon: LuShoppingBag, color: 'text-amber-500', onClick: () => { setShowOrdersModal(true); fetchMyOrders(); } },
@@ -1140,12 +1286,22 @@ const Profile = () => {
                           <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 group-focus-within:text-blue-500 transition-colors">Contact Number</label>
                           <div className="relative flex items-center">
                             <div className={getIconClasses(isEditing, 'blue')}><LuPhone className="w-4 h-4" /></div>
-                            <input type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} disabled={!isEditing} className={getInputClasses(isEditing, 'blue')} />
+                            <input
+                              type="tel"
+                              value={phoneNumber}
+                              onChange={(e) => setPhoneNumber(e.target.value)}
+                              disabled={!isEditing}
+                              placeholder="e.g. 077 123 4567"
+                              className={getInputClasses(isEditing, 'blue')}
+                            />
                           </div>
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Email Address</label>
+                          <div className="flex items-center justify-between">
+                            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Email Address</label>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Primary Login ID</span>
+                          </div>
                           <div className="relative flex items-center">
                             <div className="absolute left-3 p-2 rounded-lg bg-slate-500/5 text-slate-400 dark:text-slate-500"><LuMail className="w-4 h-4" /></div>
                             <input
@@ -1168,7 +1324,20 @@ const Profile = () => {
                           <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 group-focus-within:text-purple-500 transition-colors">University</label>
                           <div className="relative flex items-center">
                             <div className={getIconClasses(isEditing, 'purple')}><LuBuilding className="w-4 h-4" /></div>
-                            <input type="text" value={university} onChange={(e) => setUniversity(e.target.value)} disabled={!isEditing} placeholder="e.g. University of Moratuwa" className={getInputClasses(isEditing, 'purple')} />
+                            <input
+                              type="text"
+                              list="sl-universities-list"
+                              value={university}
+                              onChange={(e) => setUniversity(e.target.value)}
+                              disabled={!isEditing}
+                              placeholder="Select or type your university (e.g. University of Moratuwa)"
+                              className={getInputClasses(isEditing, 'purple')}
+                            />
+                            <datalist id="sl-universities-list">
+                              {SRI_LANKAN_UNIVERSITIES.map((uni) => (
+                                <option key={uni} value={uni} />
+                              ))}
+                            </datalist>
                           </div>
                         </div>
 
@@ -1176,7 +1345,14 @@ const Profile = () => {
                           <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 group-focus-within:text-blue-600 transition-colors">Facebook</label>
                           <div className="relative flex items-center">
                             <div className={getIconClasses(isEditing, 'blue')}><LuFacebook className="w-4 h-4" /></div>
-                            <input type="text" value={fbHandle} placeholder="@username" onChange={(e) => setFbHandle(e.target.value)} disabled={!isEditing} className={getInputClasses(isEditing, 'blue')} />
+                            <input
+                              type="text"
+                              value={fbHandle}
+                              placeholder="Facebook username or link (e.g. dulaj.mithun)"
+                              onChange={(e) => setFbHandle(e.target.value)}
+                              disabled={!isEditing}
+                              className={getInputClasses(isEditing, 'blue')}
+                            />
                           </div>
                         </div>
 
@@ -1184,7 +1360,14 @@ const Profile = () => {
                           <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 group-focus-within:text-indigo-600 transition-colors">LinkedIn</label>
                           <div className="relative flex items-center">
                             <div className={getIconClasses(isEditing, 'indigo')}><LuLinkedin className="w-4 h-4" /></div>
-                            <input type="text" value={linkedinHandle} placeholder="profile-id" onChange={(e) => setLinkedinHandle(e.target.value)} disabled={!isEditing} className={getInputClasses(isEditing, 'indigo')} />
+                            <input
+                              type="text"
+                              value={linkedinHandle}
+                              placeholder="LinkedIn profile ID or link (e.g. dulaj-mithun)"
+                              onChange={(e) => setLinkedinHandle(e.target.value)}
+                              disabled={!isEditing}
+                              className={getInputClasses(isEditing, 'indigo')}
+                            />
                           </div>
                         </div>
                       </div>
@@ -1349,37 +1532,34 @@ const Profile = () => {
                       <p className="text-xs text-slate-500 dark:text-slate-400">Manage your password and notification options</p>
                     </div>
 
-                    <form onSubmit={handleSave} className="p-6 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm space-y-5">
+                    <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm space-y-5">
                       <div className="flex items-center gap-3 pb-3 border-b border-slate-100 dark:border-slate-800/60">
                         <div className="p-2 bg-red-500/10 rounded-xl text-red-500"><LuLock className="w-5 h-5" /></div>
-                        <h3 className="text-base font-bold text-slate-900 dark:text-white">Password</h3>
-                      </div>
-                      <div className="group space-y-1.5 max-w-lg">
-                        <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Security Key</label>
-                        <div className="relative flex items-center">
-                          <div className={getIconClasses(isEditing, 'brand')}><LuLock className="w-4 h-4" /></div>
-                          <input
-                            type={showPassword ? 'text' : 'password'}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            disabled={!isEditing}
-                            className={getInputClasses(isEditing, 'brand', true)}
-                          />
-                          {isEditing && (
-                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 text-slate-400 hover:text-red-500 transition-colors bg-transparent border-none cursor-pointer">
-                              {showPassword ? <LuEyeOff size={18} /> : <LuEye size={18} />}
-                            </button>
-                          )}
+                        <div>
+                          <h3 className="text-base font-bold text-slate-900 dark:text-white">Account Password & Security</h3>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Manage login credentials and secure access</p>
                         </div>
                       </div>
-                      {isEditing ? (
-                        <button type="submit" className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs border-none cursor-pointer">
-                          Update Security Credentials
-                        </button>
-                      ) : (
-                        <p className="text-xs text-slate-400">Click “Edit Profile” in the sidebar to change your password.</p>
-                      )}
-                    </form>
+                      <div className="space-y-4 max-w-lg">
+                        <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/70 dark:border-white/5 flex items-start gap-3">
+                          <LuShieldCheck className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
+                          <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Your account is protected by <strong>The Uni Gang Security & Firebase Authentication</strong>. For maximum safety, password changes are processed via a verified email reset link sent directly to your primary email address.
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={handleSendPasswordReset}
+                            disabled={sendingResetEmail}
+                            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold rounded-xl text-xs transition-all cursor-pointer border-none shadow-md shadow-blue-600/20"
+                          >
+                            <LuMail className="w-4 h-4" />
+                            {sendingResetEmail ? 'Sending Reset Email...' : 'Send Password Reset Email'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
 
                     <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
