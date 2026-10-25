@@ -522,12 +522,38 @@ const Profile = () => {
       });
       if (response.ok) {
         const data = await response.json();
-        setMyAnnexes(data || []);
+        const list = Array.isArray(data) ? data : (data.data || []);
+        setMyAnnexes(list);
       }
     } catch (err) {
       console.error('Failed to load my annexes:', err);
     } finally {
       setLoadingAnnexes(false);
+    }
+  };
+
+  const handleDeleteAnnex = async (annexId: string) => {
+    const token = localStorage.getItem('userToken');
+    if (!token) return;
+
+    if (window.confirm('Are you sure you want to delete this annex advertisement? This action cannot be undone.')) {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/annexes/${annexId}`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        if (response.ok) {
+          toast.success('Annex advertisement deleted successfully!');
+          await fetchMyAnnexes();
+        } else {
+          toast.error('Failed to delete annex.');
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error('Error deleting annex.');
+      }
     }
   };
 
@@ -1405,6 +1431,9 @@ const Profile = () => {
                         >
                           <LuMessageSquare className="w-4 h-4" /> Inquiries ({annexChats.length})
                         </button>
+                        <a href="/post-ad?tab=myAds" className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:border-blue-400 transition-all no-underline">
+                          <LuLayoutGrid className="w-4 h-4" /> Manage Ads
+                        </a>
                         <a href="/post-ad" className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all no-underline">
                           <LuBuilding className="w-4 h-4" /> Post New Annex
                         </a>
@@ -1425,9 +1454,22 @@ const Profile = () => {
                               <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">{annexItem.title}</h4>
                               <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">{annexItem.address}</p>
                             </div>
-                            <a href={`/annex/${annexItem.id}`} className="w-full py-2 bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl text-center transition-all block no-underline">
-                              View Listing
-                            </a>
+                            <div className="flex items-center gap-2">
+                              <a href={`/annex/${annexItem.id}`} className="flex-1 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl text-center transition-all block no-underline">
+                                View
+                              </a>
+                              <a href="/post-ad?tab=myAds" className="p-2 bg-blue-50 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-blue-600 dark:text-blue-400 rounded-xl transition-all" title="Edit in Portal">
+                                <LuPencil className="w-4 h-4" />
+                              </a>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteAnnex(annexItem.id)}
+                                className="p-2 bg-red-50 dark:bg-red-950/20 hover:bg-red-600 hover:text-white text-red-600 dark:text-red-400 rounded-xl transition-all cursor-pointer border-none"
+                                title="Delete Advertisement"
+                              >
+                                <LuTrash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>

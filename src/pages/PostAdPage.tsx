@@ -32,7 +32,7 @@ const PostAdPage = () => {
       });
       if (response.ok) {
         const data = await response.json();
-        setMyAds(data);
+        setMyAds(Array.isArray(data) ? data : (data.data || []));
       }
     } catch (err) {
       console.error('Failed to load my ads:', err);
