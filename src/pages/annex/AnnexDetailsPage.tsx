@@ -518,10 +518,20 @@ const AnnexDetailsPage = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
-                  <LuPhone size={14} className="text-blue-600" />
-                  <span>Direct Booking</span>
-                </div>
+                {(annex.owner?.phone || annex.contactPhone) ? (
+                  <a
+                    href={`tel:${annex.owner?.phone || annex.contactPhone}`}
+                    className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors no-underline cursor-pointer"
+                  >
+                    <LuPhone size={14} className="text-blue-600" />
+                    <span>Call Landlord</span>
+                  </a>
+                ) : (
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <LuPhone size={14} className="text-blue-600" />
+                    <span>Direct Booking</span>
+                  </div>
+                )}
               </div>
 
             </div>
@@ -561,9 +571,9 @@ const AnnexDetailsPage = () => {
                       {annex.university.name}
                     </span>
                   )}
-                  {annex.distance_to_uni && (
+                  {(annex.distance_to_uni || annex.distanceToUni) && (
                     <span className="font-bold text-blue-600 dark:text-blue-400">
-                      📍 ~{annex.distance_to_uni} km from main gate
+                      📍 ~{annex.distance_to_uni || annex.distanceToUni} km from main gate
                     </span>
                   )}
                 </div>

@@ -101,7 +101,19 @@ const PostAdPage = () => {
         formData.append('customInstitution', adData.customInstitution);
       }
 
-      const features = adData.amenities || [];
+      const features = (adData.amenities as string[]) || [];
+      const hasPowerBackup = features.includes('Power Backup') || features.includes('Power');
+      const isCookingAllowed = features.includes('Kitchen');
+      const hasSeparateEntrance = features.includes('Separate Entrance');
+      formData.append('hasPowerBackup', String(hasPowerBackup));
+      formData.append('isCookingAllowed', String(isCookingAllowed));
+      formData.append('hasSeparateEntrance', String(hasSeparateEntrance));
+
+      let genderPolicy = 'ANY';
+      const hr = ((adData.houseRules as string) || '').toLowerCase();
+      if (hr.includes('girl') || hr.includes('female')) genderPolicy = 'GIRLS_ONLY';
+      else if (hr.includes('boy') || hr.includes('male')) genderPolicy = 'BOYS_ONLY';
+      formData.append('genderPolicy', genderPolicy);
       formData.append('features', JSON.stringify(features));
 
       if (adData.newImages && adData.newImages.length > 0) {

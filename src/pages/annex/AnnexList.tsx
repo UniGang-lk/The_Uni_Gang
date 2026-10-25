@@ -88,7 +88,8 @@ const LeafletListMap = ({ items, centerUniId, maxDistance }: { items: any[], cen
                 if (item.latitude && item.longitude) {
                     const price = parseFloat(item.price || 0).toLocaleString();
                     const walkTime = item.walk_time_mins || item.walkTimeMins || 5;
-                    const distanceStr = item.distanceToUni ? `${walkTime} mins walk (${item.distanceToUni} km)` : `${walkTime} mins walk to gate`;
+                    const distVal = item.distance_to_uni || item.distanceToUni;
+                    const distanceStr = distVal ? `${walkTime} mins walk (${distVal} km)` : `${walkTime} mins walk to gate`;
 
                     const marker = L.marker([parseFloat(item.latitude), parseFloat(item.longitude)]).addTo(map);
                     marker.bindPopup(`
@@ -167,7 +168,8 @@ const AnnexList = () => {
                     const matchesAddress = item.address?.toLowerCase().includes(query);
                     const matchesUniName = item.university?.name?.toLowerCase().includes(query);
                     const matchesUniLoc = item.university?.location?.toLowerCase().includes(query);
-                    const matchesDistance = isNumeric && item.distanceToUni && parseFloat(item.distanceToUni) <= numericQuery;
+                    const itemDist = item.distance_to_uni || item.distanceToUni;
+                    const matchesDistance = isNumeric && itemDist && parseFloat(itemDist) <= numericQuery;
 
                     return matchesTitle || matchesAddress || matchesUniName || matchesUniLoc || matchesDistance;
                 });
@@ -591,6 +593,7 @@ const AnnexList = () => {
                                                                         </p>
                                                                         <span className="text-[10px] font-black bg-blue-500/10 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/20 inline-flex items-center gap-1">
                                                                             <LuFootprints size={11} className="shrink-0" /> {item.walk_time_mins || item.walkTimeMins || 5} mins walk to gate
+                                                                            {(item.distance_to_uni || item.distanceToUni) ? ` (~${item.distance_to_uni || item.distanceToUni} km)` : ''}
                                                                         </span>
                                                                     </div>
                                                                 </div>
