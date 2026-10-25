@@ -184,6 +184,7 @@ const AnnexList = () => {
     };
 
     useEffect(() => {
+        setCurrentPage(1);
         fetchAnnexes();
     }, [selectedUni, maxDistance, activeCategory]);
 
@@ -510,8 +511,9 @@ const AnnexList = () => {
                             ) : (
                                 /* Animated Grid */
                                 <motion.div
+                                    id="listing-grid"
                                     layout
-                                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
+                                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 scroll-mt-24"
                                 >
                                     <AnimatePresence mode="popLayout">
                                         {paginatedData.map((item, index) => {
