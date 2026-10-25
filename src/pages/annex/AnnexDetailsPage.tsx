@@ -235,6 +235,14 @@ const AnnexDetailsPage = () => {
     power: LuZap
   };
 
+  const resolveImageUrl = (img: any): string => {
+    if (!img) return "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
+    const url = typeof img === 'string' ? img : (img.imageUrl || img.url || '');
+    if (!url) return "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
+    if (url.startsWith('http')) return url;
+    return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${url}`;
+  };
+
   const galleryImages = (annex?.images && annex.images.length > 0)
     ? annex.images
     : [{ imageUrl: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800' }];
@@ -246,7 +254,7 @@ const AnnexDetailsPage = () => {
       <SEO
         title={annex ? `${annex.title} - The Uni Gang Accommodation` : "Accommodation Details - The Uni Gang"}
         description={annex ? `${annex.walk_time_mins || annex.walkTimeMins || 5} mins walk to ${annex.university ? annex.university.name : 'Campus'}. ${annex.address}. Verified Student Accommodation.` : undefined}
-        image={annex && annex.images && annex.images[0] ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${annex.images[0].imageUrl}` : undefined}
+        image={annex && annex.images && annex.images[0] ? resolveImageUrl(annex.images[0]) : undefined}
       />
 
       {annex && !loading && (
@@ -308,9 +316,7 @@ const AnnexDetailsPage = () => {
                 {/* Main Hero Image */}
                 <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-sm bg-slate-100 dark:bg-slate-800 group">
                   <img
-                    src={galleryImages[activeImageIdx]?.imageUrl.startsWith('http')
-                      ? galleryImages[activeImageIdx].imageUrl
-                      : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${galleryImages[activeImageIdx]?.imageUrl}`}
+                    src={resolveImageUrl(galleryImages[activeImageIdx])}
                     alt={annex.title}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     onError={(e: any) => {
@@ -335,9 +341,7 @@ const AnnexDetailsPage = () => {
                 {galleryImages.length > 1 && (
                   <div className="flex items-center gap-2.5 overflow-x-auto pb-1 pt-1 custom-scrollbar">
                     {galleryImages.map((img: any, idx: number) => {
-                      const src = img.imageUrl.startsWith('http')
-                        ? img.imageUrl
-                        : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${img.imageUrl}`;
+                      const src = resolveImageUrl(img);
                       return (
                         <button
                           key={idx}
