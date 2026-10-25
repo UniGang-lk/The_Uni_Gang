@@ -196,7 +196,14 @@ export const api = {
   },
 
   updateProfile: async (
-    profileData: { name: string; profile_pic?: string | null; phone?: string | null },
+    profileData: {
+      name: string;
+      profile_pic?: string | null;
+      phone?: string | null;
+      university?: string | null;
+      fb_handle?: string | null;
+      linkedin_handle?: string | null;
+    },
     token: string
   ): Promise<any> => {
     const response = await fetch(`${BASE_URL}/api/users/profile`, {
@@ -319,7 +326,7 @@ export const api = {
     });
     if (!response.ok) throw new Error('Failed to fetch your service requests');
     const data = await response.json();
-    return data.data ?? [];
+    return Array.isArray(data) ? data : (data.data ?? []);
   },
 
   getServiceMessages: async (requestId: string, token: string): Promise<any[]> => {
@@ -330,7 +337,7 @@ export const api = {
     });
     if (!response.ok) throw new Error('Failed to fetch messages for this request');
     const data = await response.json();
-    return data.data ?? [];
+    return Array.isArray(data) ? data : (data.data ?? []);
   },
 
   addServiceMessage: async (requestId: string, message: string, token: string): Promise<any> => {
@@ -546,7 +553,7 @@ export const api = {
     const response = await fetch(`${BASE_URL}/api/advertisements/active`);
     if (!response.ok) throw new Error('Failed to fetch advertisements');
     const data = await response.json();
-    return data.data ?? [];
+    return Array.isArray(data) ? data : (data.data ?? []);
   },
 
   submitAdvertisement: async (formData: FormData): Promise<any> => {
@@ -583,7 +590,7 @@ export const api = {
     });
     if (!response.ok) throw new Error('Failed to fetch your advertisements');
     const data = await response.json();
-    return data.data ?? [];
+    return Array.isArray(data) ? data : (data.data ?? []);
   },
 
   getPublicStats: async (): Promise<{

@@ -573,7 +573,10 @@ const Profile = () => {
             setProfilePicture(data.user.profile_pic);
             localStorage.setItem('userProfilePicture', data.user.profile_pic);
           }
-          if (data.user.campus_email && !localStorage.getItem('userUniversity')) {
+          if (data.user.university) {
+            setUniversity(data.user.university);
+            localStorage.setItem('userUniversity', data.user.university);
+          } else if (data.user.campus_email && !localStorage.getItem('userUniversity')) {
             const cEmail = data.user.campus_email.toLowerCase();
             let detectedUni = '';
             if (cEmail.includes('mrt.ac.lk')) detectedUni = 'University of Moratuwa';
@@ -590,6 +593,14 @@ const Profile = () => {
               setUniversity(detectedUni);
               localStorage.setItem('userUniversity', detectedUni);
             }
+          }
+          if (data.user.fb_handle) {
+            setFbHandle(data.user.fb_handle);
+            localStorage.setItem('userFbHandle', data.user.fb_handle);
+          }
+          if (data.user.linkedin_handle) {
+            setLinkedinHandle(data.user.linkedin_handle);
+            localStorage.setItem('userLinkedinHandle', data.user.linkedin_handle);
           }
           if (Array.isArray(data.user.followers)) {
             setStats(prev => ({ ...prev, followers: data.user.followers.length }));
@@ -949,7 +960,10 @@ const Profile = () => {
         await api.updateProfile({
           name: fullName,
           profile_pic: profilePicture,
-          phone: phoneNumber
+          phone: phoneNumber,
+          university: university || undefined,
+          fb_handle: fbHandle || undefined,
+          linkedin_handle: linkedinHandle || undefined
         }, token);
         localStorage.setItem('userName', fullName);
       } catch (err: any) {
@@ -2060,14 +2074,19 @@ const Profile = () => {
                                   className="w-full h-full object-cover"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-5">
-                                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${selectedEvent.status === 'approved'
-                                    ? 'bg-emerald-500 border-emerald-500 text-white'
-                                    : selectedEvent.status === 'rejected'
-                                      ? 'bg-red-500 border-red-500 text-white'
-                                      : 'bg-amber-500 border-amber-500 text-white'
-                                    }`}>
-                                    {selectedEvent.status}
-                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${selectedEvent.status === 'approved'
+                                      ? 'bg-emerald-500 border-emerald-500 text-white'
+                                      : selectedEvent.status === 'rejected'
+                                        ? 'bg-red-500 border-red-500 text-white'
+                                        : 'bg-amber-500 border-amber-500 text-white'
+                                      }`}>
+                                      {selectedEvent.status}
+                                    </span>
+                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-indigo-600/90 text-white border border-indigo-400/30">
+                                      {selectedEvent.attendees ? selectedEvent.attendees.length : (selectedEvent.attendee_count || 0)} RSVPs
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
 
@@ -2365,6 +2384,12 @@ const Profile = () => {
                                       <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold mt-1">
                                         Qty: {order.quantity} • Total Price: <span className="text-indigo-650 dark:text-indigo-400 font-bold">Rs. {parseFloat(order.total_price).toLocaleString()}</span>
                                       </p>
+                                      {item?.seller && (
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                                          Seller: <span className="font-semibold text-slate-700 dark:text-slate-200">{item.seller.name || 'Student Seller'}</span>
+                                          {item.seller.phone && <span> • Tel: <a href={`tel:${item.seller.phone}`} className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">{item.seller.phone}</a></span>}
+                                        </p>
+                                      )}
                                     </div>
                                     <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
                                       order.status === 'DELIVERED' ? 'bg-emerald-500/10 text-emerald-500' :
