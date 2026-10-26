@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import {
   LuLayoutDashboard,
@@ -20,6 +21,7 @@ import { api } from '../../api';
 import AuthCard from '../../components/auth/AuthCard';
 import AdBanner from '../../components/advertise/AdBanner';
 import SEO from '../../components/SEO';
+import { PageBreadcrumb } from '../../components/ui/PageBreadcrumb';
 
 interface ServiceItem {
   id: number;
@@ -130,6 +132,7 @@ const TiltCard = ({ children, className }: { children: React.ReactNode, classNam
 };
 
 const ServicesPage = () => {
+  const navigate = useNavigate();
   const [selectedService, setSelectedService] = useState<ServiceItem | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -146,6 +149,18 @@ const ServicesPage = () => {
       return () => clearTimeout(timer);
     }
   }, [showToast]);
+
+  // Lock background scroll when any modal is open
+  useEffect(() => {
+    if (selectedService || showSuccessModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedService, showSuccessModal]);
 
   // Reset auth gate view & configurator when modal is closed/opened
   useEffect(() => {
@@ -359,9 +374,22 @@ const ServicesPage = () => {
 
     const token = localStorage.getItem('userToken');
     const formData = new FormData(e.target as HTMLFormElement);
-    const phone = formData.get('phone') as string;
-    const email = formData.get('email') as string;
-    const brief = formData.get('brief') as string;
+    const rawPhone = (formData.get('phone') as string) || '';
+    const rawEmail = (formData.get('email') as string) || '';
+    const brief = ((formData.get('brief') as string) || '').trim();
+
+    const phone = rawPhone.trim();
+    const email = rawEmail.trim();
+
+    if (!phone) {
+      setSubmitError('Please provide a valid WhatsApp number so we can reach you.');
+      return;
+    }
+
+    if (!brief) {
+      setSubmitError('Please provide a brief description of your project or requirements.');
+      return;
+    }
     
     const est = calculateEstimate();
     const estBudget = `LKR ${est.minPrice.toLocaleString()} - ${est.maxPrice.toLocaleString()}`;
@@ -490,6 +518,18 @@ const ServicesPage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        {/* Top Breadcrumb Navigation */}
+        <div className="pt-2 mb-8">
+          <PageBreadcrumb
+            items={[
+              { label: 'Campus Services', active: true }
+            ]}
+            backTo="/"
+            backLabel="Back to Home"
+            shareTitle="Uni Gang Digital & Creative Services for Students"
+          />
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1048,7 +1088,29 @@ const ServicesPage = () => {
 
 
 
-                                <div className="pt-2">
+                                <div className="space-y-4 pt-2">
+                                  {/* Dynamic Real-time Price & Delivery Estimation Card */}
+                                  {(() => {
+                                    const est = calculateEstimate();
+                                    return (
+                                      <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-blue-500/5 dark:from-blue-500/15 dark:via-indigo-500/15 dark:to-transparent border border-blue-500/20 dark:border-blue-500/30">
+                                        <div className="flex items-center justify-between text-[11px] font-black uppercase text-blue-600 dark:text-blue-400 tracking-wider mb-2">
+                                          <span className="flex items-center gap-1.5"><LuDollarSign size={14} /> Estimated Investment</span>
+                                          <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 text-[9px] font-bold">Dynamic Quote</span>
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                          <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                                            LKR {est.minPrice.toLocaleString()} - {est.maxPrice.toLocaleString()}
+                                          </div>
+                                          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-350">
+                                            <LuClock size={14} className="text-blue-600 dark:text-blue-400" />
+                                            <span>Est. Delivery: <strong className="text-slate-900 dark:text-white">~ {est.days} Days</strong></span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })()}
+
                                   <button
                                     type="button"
                                     onClick={() => setStep(2)}
@@ -1086,6 +1148,7 @@ const ServicesPage = () => {
                                       borderColor: "#003fdd"
                                     }}
                                     name="phone"
+                                    defaultValue={localStorage.getItem('userPhoneNumber') || ''}
                                     required
                                     type="text"
                                     placeholder="WhatsApp Number"
@@ -1104,6 +1167,7 @@ const ServicesPage = () => {
                                       borderColor: "#003fdd"
                                     }}
                                     name="email"
+                                    defaultValue={localStorage.getItem('userEmail') || ''}
                                     type="email"
                                     placeholder="Email Address"
                                     className="w-full px-5 py-4 sm:p-5 rounded-2xl bg-white/40 dark:bg-slate-950/40 border border-slate-200/60 dark:border-slate-800/60 focus:border-blue-600 focus:ring-8 focus:ring-blue-600/5 outline-none transition-all duration-300 placeholder:text-slate-400 backdrop-blur-sm dark:text-white"
@@ -1314,7 +1378,7 @@ const ServicesPage = () => {
                     type="button"
                     onClick={() => {
                       setShowSuccessModal(false);
-                      window.location.href = '/profile';
+                      navigate('/profile?tab=services');
                     }}
                     className="flex-1 py-3.5 bg-blue-600 text-white font-black rounded-xl text-xs uppercase tracking-wider hover:bg-blue-700 transition-all border-none cursor-pointer shadow-md shadow-blue-500/20"
                   >

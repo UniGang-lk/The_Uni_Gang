@@ -26,15 +26,10 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
     const fetchAds = async () => {
       try {
         const activeAds = await api.getActiveAds();
-        const nativeAds = activeAds.filter((a: Ad) =>
-          a.placement_type === 'NATIVE_FEED' ||
-          (a.placement_type && (
-            a.placement_type.includes('NATIVE') ||
-            a.placement_type.includes('FEED') ||
-            a.placement_type.includes('Hero') ||
-            a.placement_type.includes('Ultimate')
-          ))
-        );
+        const nativeAds = activeAds.filter((a: Ad) => {
+          const p = (a.placement_type || '').toUpperCase();
+          return p === 'NATIVE_FEED' || p.includes('NATIVE') || p.includes('FEED') || p.includes('HERO') || p.includes('ULTIMATE');
+        });
         setAds(nativeAds);
       } catch (err) {
         console.error('Failed to load native ads', err);
@@ -89,7 +84,14 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
     api.trackAdClick(ad.id);
   };
 
-  const adImgSrc = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${ad.image_url}`;
+  const rawImg = ad.image_url;
+  const adImgSrc = rawImg
+    ? (rawImg.startsWith('http') ? rawImg : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`)
+    : '';
+
+  const targetHref = ad.target_link
+    ? (ad.target_link.trim().startsWith('http://') || ad.target_link.trim().startsWith('https://') ? ad.target_link.trim() : `https://${ad.target_link.trim()}`)
+    : '#';
 
   return (
     <motion.div
@@ -102,7 +104,7 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
       onClick={handleAdClick}
     >
       <a
-        href={ad.target_link || '#'}
+        href={targetHref}
         target={ad.target_link ? "_blank" : "_self"}
         rel="noopener noreferrer"
         className="block"

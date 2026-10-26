@@ -200,7 +200,14 @@ const Services = () => {
                 </div>
 
                 <div className="relative z-10 mt-6">
-                  <button className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-black uppercase tracking-widest text-xs shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 active:scale-[0.98] transition-all border-none">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleExploreServices();
+                    }}
+                    className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-black uppercase tracking-widest text-xs shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 active:scale-[0.98] transition-all border-none cursor-pointer"
+                  >
                     Start Calculation
                   </button>
                 </div>
@@ -218,7 +225,7 @@ const Services = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.7, delay: idx * 0.12 }}
                 onClick={handleExploreServices}
-                className="group relative bg-white dark:bg-slate-900/50 backdrop-blur-xl border border-slate-150 dark:border-slate-800/80 rounded-[2rem] p-4 2xl:p-6 transition-all duration-300 flex flex-col justify-between cursor-pointer hover:border-indigo-500/40"
+                className="group relative bg-white dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-[2rem] p-4 2xl:p-6 shadow-xl shadow-slate-200/50 dark:shadow-none transition-all duration-300 flex flex-col justify-between cursor-pointer hover:border-indigo-500/50 hover:shadow-2xl hover:shadow-indigo-500/10"
                 whileHover={{ y: -6, transition: { duration: 0.2 } }}
               >
                 {/* Top Image Thumbnail with gradient overlay */}
@@ -231,7 +238,7 @@ const Services = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent" />
 
                   {/* Floating Icon badge over image */}
-                  <div className={`absolute bottom-3 right-3 p-2.5 rounded-xl bg-white/90 dark:bg-slate-950/90 backdrop-blur shadow-lg border border-white/20 ${cat.accentColor} group-hover:scale-110 transition-transform`}>
+                  <div className={`absolute bottom-3 right-3 p-2.5 rounded-xl bg-white/95 dark:bg-slate-950/95 backdrop-blur shadow-lg border border-slate-200/50 dark:border-white/20 ${cat.accentColor} group-hover:scale-110 transition-transform`}>
                     {cat.icon}
                   </div>
                 </div>
@@ -247,9 +254,9 @@ const Services = () => {
                     </p>
 
                     {/* Mini specs list */}
-                    <div className="flex flex-wrap gap-2.5 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                    <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80">
                       {cat.features.slice(0, 2).map((feat, i) => (
-                        <span key={i} className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-650 dark:text-slate-350 bg-slate-100 dark:bg-slate-800/60 py-1 px-2.5 rounded-lg border border-transparent dark:border-slate-700/40">
+                        <span key={i} className="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-700 dark:text-slate-350 bg-slate-100/80 dark:bg-slate-800/60 py-1 px-2.5 rounded-lg border border-slate-200/70 dark:border-slate-700/40">
                           <LuCheck size={10} className="text-indigo-500" />
                           {feat}
                         </span>
@@ -259,10 +266,10 @@ const Services = () => {
 
                   {/* Arrow Link */}
                   <div className="flex items-center justify-between mt-5 pt-3 border-t border-slate-100 dark:border-slate-800/65">
-                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-550 uppercase tracking-widest">
+                    <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                       Estimated Package
                     </span>
-                    <span className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider group-hover:text-indigo-500 transition-colors flex items-center gap-1 select-none">
+                    <span className="text-xs font-black text-slate-800 dark:text-slate-300 uppercase tracking-wider group-hover:text-indigo-500 transition-colors flex items-center gap-1 select-none">
                       Details <LuArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
                     </span>
                   </div>

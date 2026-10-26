@@ -16,7 +16,7 @@ interface Ad {
 export default function AdPopup() {
   const [ad, setAd] = useState<Ad | null>(null);
   const [isVisible, setIsVisible] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(5);
+  const [timeLeft, setTimeLeft] = useState(10);
   const [hasShownThisSession, setHasShownThisSession] = useState(false);
 
   useEffect(() => {
@@ -33,17 +33,35 @@ export default function AdPopup() {
     const fetchPopupAd = async () => {
       try {
         const ads = await api.getActiveAds();
-        const popupAds = ads.filter((a: Ad) =>
-          a.placement_type === 'POPUP' ||
-          (a.placement_type && (
-            a.placement_type.includes('POPUP') ||
-            a.placement_type.includes('Ultimate')
-          ))
-        );
+        const popupAds = ads.filter((a: Ad) => {
+          const p = (a.placement_type || '').toUpperCase();
+          return p === 'POPUP' || p.includes('POPUP') || p.includes('ULTIMATE');
+        });
         
         if (popupAds.length > 0) {
-          const randomAd = popupAds[Math.floor(Math.random() * popupAds.length)];
-          setAd(randomAd);
+          const userUni = typeof window !== 'undefined' ? (localStorage.getItem('userUniversity') || '').toLowerCase() : '';
+          const weighted = popupAds.map((adItem: any) => {
+            let w = adItem.priority_weight || 1;
+            if (userUni && adItem.target_campus) {
+              const tc = adItem.target_campus.toLowerCase();
+              if (userUni.includes(tc) || tc.includes(userUni)) {
+                w *= 3;
+              }
+            }
+            return { ad: adItem, w };
+          });
+
+          const totalWeight = weighted.reduce((sum: number, it: any) => sum + it.w, 0);
+          let random = Math.random() * totalWeight;
+          let chosen = popupAds[0];
+          for (const it of weighted) {
+            if (random < it.w) {
+              chosen = it.ad;
+              break;
+            }
+            random -= it.w;
+          }
+          setAd(chosen);
           
           setTimeout(() => {
             setIsVisible(true);
@@ -78,7 +96,9 @@ export default function AdPopup() {
     if (ad) {
       api.trackAdClick(ad.id);
       if (ad.target_link) {
-        window.open(ad.target_link, '_blank');
+        const trimmed = ad.target_link.trim();
+        const href = trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`;
+        window.open(href, '_blank', 'noopener,noreferrer');
       }
       handleClose();
     }
@@ -161,7 +181,7 @@ export default function AdPopup() {
               {ad.image_url && (
                 <div className="w-full h-40 sm:h-44 mb-5 rounded-2xl overflow-hidden relative border border-slate-100 dark:border-white/5">
                   <img 
-                    src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${ad.image_url}`} 
+                    src={ad.image_url.startsWith('http') ? ad.image_url : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${ad.image_url.startsWith('/') ? '' : '/'}${ad.image_url}`} 
                     alt={ad.ad_title} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 pointer-events-none"
                   />

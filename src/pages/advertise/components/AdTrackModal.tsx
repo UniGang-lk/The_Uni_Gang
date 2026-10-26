@@ -157,41 +157,61 @@ export const AdTrackModal: React.FC<AdTrackModalProps> = ({
 
             {results.map((ad) => {
               const ctr = ad.views ? ((ad.clicks / ad.views) * 100).toFixed(1) : '0.0';
-              const isApproved = ad.status === 'ACTIVE';
-              const isPending = ad.status === 'PENDING';
+              const status = (ad.status || ad.Status || '').toUpperCase();
+              const isApproved = status === 'ACTIVE' || status === 'APPROVED';
+              const isPending = status === 'PENDING';
+              const isRejected = status === 'REJECTED';
+              const isExpired = status === 'EXPIRED';
+
+              const rawImg = ad.image_url || ad.ImageURL;
+              const imgSrc = rawImg
+                ? (rawImg.startsWith('http') ? rawImg : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`)
+                : null;
 
               return (
                 <div
                   key={ad.id}
                   className="p-5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 hover:border-cyan-500/50 transition-all space-y-4"
                 >
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/50 px-2 py-0.5 rounded border border-cyan-200 dark:border-cyan-800">
-                          ID: {ad.id}
-                        </span>
-                        <span className="text-xs text-slate-400">
-                          • {new Date(ad.createdAt || Date.now()).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <h4 className="text-base font-bold text-slate-900 dark:text-white mt-1">
-                        {ad.ad_title || ad.AdTitle || ad.company_name || 'Campaign'}
-                      </h4>
-                      <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        <span className="flex items-center gap-1">
-                          <LuBuilding className="w-3.5 h-3.5" />
-                          {ad.company_name || ad.CompanyName}
-                        </span>
-                        <span>•</span>
-                        <span className="font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wider text-[10px] bg-indigo-50 dark:bg-indigo-950 px-1.5 py-0.5 rounded">
-                          {ad.placement_type || ad.PlacementType}
-                        </span>
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      {imgSrc && (
+                        <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800">
+                          <img
+                            src={imgSrc}
+                            alt={ad.ad_title || 'Creative'}
+                            className="w-full h-full object-cover"
+                            onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
+                          />
+                        </div>
+                      )}
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/50 px-2 py-0.5 rounded border border-cyan-200 dark:border-cyan-800">
+                            ID: {ad.id}
+                          </span>
+                          <span className="text-xs text-slate-400">
+                            • {new Date(ad.createdAt || ad.CreatedAt || Date.now()).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <h4 className="text-base font-bold text-slate-900 dark:text-white mt-1">
+                          {ad.ad_title || ad.AdTitle || ad.company_name || 'Campaign'}
+                        </h4>
+                        <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                          <span className="flex items-center gap-1">
+                            <LuBuilding className="w-3.5 h-3.5" />
+                            {ad.company_name || ad.CompanyName}
+                          </span>
+                          <span>•</span>
+                          <span className="font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wider text-[10px] bg-indigo-50 dark:bg-indigo-950 px-1.5 py-0.5 rounded">
+                            {ad.placement_type || ad.PlacementType}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
                     {/* Status Badge */}
-                    <div>
+                    <div className="self-start">
                       {isApproved ? (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
                           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -202,9 +222,17 @@ export const AdTrackModal: React.FC<AdTrackModalProps> = ({
                           <LuClock className="w-3.5 h-3.5" />
                           UNDER REVIEW
                         </span>
+                      ) : isRejected ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-950/60 dark:text-red-300 border border-red-300 dark:border-red-800">
+                          REJECTED
+                        </span>
+                      ) : isExpired ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                          EXPIRED
+                        </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                          {ad.status}
+                          {status || 'UNKNOWN'}
                         </span>
                       )}
                     </div>

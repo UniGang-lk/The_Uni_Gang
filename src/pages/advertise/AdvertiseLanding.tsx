@@ -3,8 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   LuTrendingUp, LuUsers, LuTarget, LuMegaphone, LuCheck,
-  LuFileText, LuX, LuZap
+  LuFileText, LuX, LuZap, LuShieldCheck, LuPrinter, LuSparkles,
+  LuGraduationCap, LuMousePointer, LuLayoutDashboard, LuPanelRight,
+  LuRss, LuMaximize
 } from 'react-icons/lu';
+import { FaWhatsapp } from 'react-icons/fa6';
 import SEO from '../../components/SEO';
 import HeroDeviceMockup from './components/HeroDeviceMockup';
 import HowItWorks from './components/HowItWorks';
@@ -13,6 +16,7 @@ import ReachCalculator from './components/ReachCalculator';
 import FaqAccordion from './components/FaqAccordion';
 import MobileStickyCta from './components/MobileStickyCta';
 import { AdTrackModal } from './components/AdTrackModal';
+import { PageBreadcrumb } from '../../components/ui/PageBreadcrumb';
 import { api } from '../../api';
 
 export default function AdvertiseLanding() {
@@ -55,7 +59,7 @@ export default function AdvertiseLanding() {
     {
       name: 'Campus Starter',
       tagline: 'Ideal for local shops, student deals & single campus events',
-      price: 'LKR 7,500',
+      price: 'LKR 4,500',
       period: '/ 7 Days',
       badge: 'Starter',
       featured: false,
@@ -72,7 +76,7 @@ export default function AdvertiseLanding() {
     {
       name: 'Campus Hero',
       tagline: 'Most Popular for Higher Ed Institutes, IT Academies & Fast Food Brands',
-      price: 'LKR 18,500',
+      price: 'LKR 12,500',
       period: '/ 14 Days',
       badge: 'Most Popular',
       featured: true,
@@ -90,7 +94,7 @@ export default function AdvertiseLanding() {
     {
       name: 'Ultimate Uni Blast',
       tagline: 'Maximum Reach & Domination for National Brands & Large Events',
-      price: 'LKR 35,000',
+      price: 'LKR 24,500',
       period: '/ 30 Days',
       badge: 'Maximum Impact',
       featured: false,
@@ -127,12 +131,23 @@ export default function AdvertiseLanding() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-20 pb-24 px-4 sm:px-6 lg:px-8 overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-20 pb-24 px-4 sm:px-6 lg:px-8 2xl:px-16 overflow-x-hidden">
       <SEO
         title="Advertise to University Students in Sri Lanka - The Uni Gang"
         description="Reach Sri Lankan university students with banner, feed, sidebar and popup ads. Estimate your reach and launch a campaign in minutes."
       />
-      <div className="max-w-7xl mx-auto space-y-24">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto space-y-20 lg:space-y-28">
+        {/* Top Breadcrumb Navigation */}
+        <div className="pt-2">
+          <PageBreadcrumb
+            items={[
+              { label: 'Advertise', active: true }
+            ]}
+            backTo="/"
+            backLabel="Back to Home"
+            shareTitle="Advertise on The Uni Gang - Reach 50,000+ Sri Lankan University Students"
+          />
+        </div>
 
         {/* Hero Section */}
         <section id="advertise-hero" className="relative grid lg:grid-cols-2 gap-14 lg:gap-10 items-center pt-6">
@@ -253,7 +268,7 @@ export default function AdvertiseLanding() {
             <p className="text-slate-600 dark:text-slate-400 text-base sm:text-lg font-medium">Choose a package tailored for your budget and campaign objectives. No hidden fees.</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 2xl:gap-10 items-stretch">
             {pricingTiers.map((tier, idx) => (
               <motion.div
                 key={idx}
@@ -261,8 +276,8 @@ export default function AdvertiseLanding() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.15 }}
-                className={`relative rounded-3xl p-8 flex flex-col justify-between transition-all duration-300 ${tier.featured
-                  ? 'bg-slate-900 text-white border-2 border-blue-500 shadow-2xl shadow-blue-500/20 scale-105 z-10'
+                className={`relative rounded-3xl p-6 sm:p-7 2xl:p-8 flex flex-col justify-between transition-all duration-300 ${tier.featured
+                  ? 'bg-slate-900 text-white border-2 border-blue-500 shadow-2xl shadow-blue-500/20 lg:scale-105 z-10'
                   : 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-800 shadow-xl'
                   }`}
               >
@@ -285,9 +300,9 @@ export default function AdvertiseLanding() {
                     </p>
                   </div>
 
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl sm:text-5xl font-black tracking-tight">{tier.price}</span>
-                    <span className={`text-sm font-bold uppercase tracking-wider ${tier.featured ? 'text-slate-400' : 'text-slate-400'}`}>
+                  <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                    <span className="text-3xl sm:text-4xl 2xl:text-5xl font-black tracking-tight whitespace-nowrap">{tier.price}</span>
+                    <span className={`text-xs sm:text-sm font-bold uppercase tracking-wider whitespace-nowrap shrink-0 ${tier.featured ? 'text-slate-400' : 'text-slate-400'}`}>
                       {tier.period}
                     </span>
                   </div>
@@ -306,9 +321,9 @@ export default function AdvertiseLanding() {
 
                 <button
                   onClick={() => navigate(`/advertise/submit?tier=${encodeURIComponent(tier.name)}`)}
-                  className={`mt-8 w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all ${tier.featured
-                    ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-xl shadow-blue-600/30 hover:scale-[1.02]'
-                    : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white hover:scale-[1.02]'
+                  className={`mt-8 w-full py-4 rounded-2xl font-black text-sm uppercase tracking-wider transition-all cursor-pointer ${tier.featured
+                    ? 'bg-blue-600 hover:bg-blue-500 active:scale-95 text-white shadow-xl shadow-blue-600/30 hover:scale-[1.02]'
+                    : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95 text-slate-900 dark:text-white hover:scale-[1.02]'
                     }`}
                 >
                   {tier.ctaText}
@@ -341,80 +356,215 @@ export default function AdvertiseLanding() {
 
       <MobileStickyCta />
 
-      {/* Media Kit Modal */}
+      {/* Premium Media Kit Modal */}
       <AnimatePresence>
         {showMediaKit && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-md flex items-center justify-center p-4"
-          >
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+            {/* Backdrop */}
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto space-y-6 shadow-2xl relative"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowMediaKit(false)}
+              className="fixed inset-0 bg-slate-950/75 backdrop-blur-md"
+            />
+
+            {/* Modal Dialog */}
+            <motion.div
+              initial={{ scale: 0.94, opacity: 0, y: 25 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.94, opacity: 0, y: 25 }}
+              transition={{ type: "spring", damping: 28, stiffness: 320 }}
+              className="relative w-full max-w-3xl bg-white/95 dark:bg-slate-900/95 border border-white/60 dark:border-white/10 rounded-[2.5rem] p-6 sm:p-10 shadow-[0_30px_90px_-20px_rgba(0,0,0,0.5)] max-h-[92vh] overflow-y-auto space-y-7 z-10 custom-scrollbar"
             >
+              {/* Ambient glows */}
+              <div className="absolute -top-24 -right-24 w-72 h-72 bg-blue-500/20 blur-3xl rounded-full pointer-events-none" />
+              <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-purple-500/20 blur-3xl rounded-full pointer-events-none" />
+
+              {/* Close Button */}
               <button
                 onClick={() => setShowMediaKit(false)}
-                className="absolute top-6 right-6 p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                className="absolute top-6 right-6 p-2.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-rose-500 hover:text-white hover:rotate-90 transition-all duration-300 border-none cursor-pointer z-20"
+                aria-label="Close Media Kit"
               >
                 <LuX className="w-5 h-5" />
               </button>
 
-              <div className="space-y-2 border-b border-slate-200 dark:border-slate-800 pb-4">
-                <span className="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">Official Document</span>
-                <h3 className="text-2xl font-black text-slate-900 dark:text-white uppercase">The Uni Gang Media Kit 2026</h3>
-                <p className="text-xs font-medium text-slate-500">Audience Demographics & Advertising Specifications</p>
+              {/* Header */}
+              <div className="space-y-2 border-b border-slate-150 dark:border-slate-800/80 pb-5 pr-12">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/50 border border-blue-200/80 dark:border-blue-800/60 text-blue-600 dark:text-cyan-400 text-[10px] font-black uppercase tracking-widest">
+                  <LuSparkles className="text-amber-400" /> Official Publisher Deck 2026
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
+                  The Uni Gang <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-cyan-400 dark:to-indigo-400">Media Kit</span>
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
+                  Verified audience demographics, advertising specs, and performance guarantees for brands reaching Sri Lankan university students.
+                </p>
               </div>
 
-              <div className="space-y-4 text-sm text-slate-700 dark:text-slate-300">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                    <p className="text-xs font-bold text-slate-400 uppercase">Age Distribution</p>
-                    <p className="text-xl font-black text-slate-900 dark:text-white">18 - 25 Years (94%)</p>
+              {/* 4 Core Verified Metrics Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-center">
+                  <div className="flex items-center justify-center text-blue-600 dark:text-cyan-400 mb-1">
+                    <LuUsers size={18} />
                   </div>
-                  <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
-                    <p className="text-xs font-bold text-slate-400 uppercase">Top Campuses</p>
-                    <p className="text-xl font-black text-slate-900 dark:text-white">UOM, UOC, SLIIT, USJ</p>
-                  </div>
+                  <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-tight">50,000+</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Active Students</p>
                 </div>
 
-                <div className="space-y-2">
-                  <h4 className="font-bold text-slate-900 dark:text-white uppercase text-xs">Ad Banner Size Specifications:</h4>
-                  <ul className="list-disc list-inside space-y-1 text-xs text-slate-600 dark:text-slate-400">
-                    <li><strong>Top Banner:</strong> 1200 x 400 pixels (Landscape, Max 5MB)</li>
-                    <li><strong>Sidebar Widget:</strong> 300 x 300 pixels (Square / Sticky, Max 3MB)</li>
-                    <li><strong>Native Feed Card:</strong> 800 x 450 pixels (16:9 ratio, Max 4MB)</li>
-                    <li><strong>Popup Interstitial:</strong> 600 x 600 pixels (Square High Impact, Max 5MB)</li>
-                  </ul>
+                <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-center">
+                  <div className="flex items-center justify-center text-purple-600 dark:text-purple-400 mb-1">
+                    <LuTrendingUp size={18} />
+                  </div>
+                  <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-tight">2,000,000+</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Monthly Views</p>
                 </div>
 
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-2xl border border-blue-200 dark:border-blue-800 text-xs text-blue-900 dark:text-blue-300 font-medium">
-                  📌 All ads are audited for brand safety, non-deceptive claims, and student-focused relevance before activation.
+                <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-center">
+                  <div className="flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-1">
+                    <LuMousePointer size={18} />
+                  </div>
+                  <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-tight">3.8%</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Avg Click-Through</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 text-center">
+                  <div className="flex items-center justify-center text-amber-500 mb-1">
+                    <LuGraduationCap size={18} />
+                  </div>
+                  <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white leading-tight">94%</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Age 18 - 25 Cohort</p>
                 </div>
               </div>
 
-              <div className="pt-2 flex gap-4">
+              {/* Placement Specifications Grid */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <LuTarget className="text-blue-500" /> Ad Placement Dimensions & Specs
+                  </h4>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">JPG, PNG, WebP (Max 8MB)</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                  <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex items-start gap-3">
+                    <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-600 dark:text-cyan-400 shrink-0">
+                      <LuLayoutDashboard size={20} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white">Top Hero Banner</span>
+                        <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase bg-blue-500/15 text-blue-600 dark:text-cyan-400">1200 x 400 px</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                        Full-width placement at the header of major sections. First touchpoint for all campus visitors (~45K daily views).
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex items-start gap-3">
+                    <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
+                      <LuPanelRight size={20} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white">Sticky Sidebar Widget</span>
+                        <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">300 x 300 px</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                        Persistent square ad card that remains anchored as students scroll through feeds (~30K daily views).
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex items-start gap-3">
+                    <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
+                      <LuRss size={20} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white">Native Feed Card</span>
+                        <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase bg-amber-500/15 text-amber-600 dark:text-amber-400">800 x 450 px</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                        In-stream organic banner integrated naturally between listings and stories. Highest organic CTR (~38K daily views).
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-2xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-800 flex items-start gap-3">
+                    <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 shrink-0">
+                      <LuMaximize size={20} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white">Global Popup Interstitial</span>
+                        <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase bg-purple-500/15 text-purple-600 dark:text-purple-400">600 x 600 px</span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                        High-impact interstitial overlay with automatic 8s countdown timer. Guaranteed 100% impression rate (~50K daily views).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Demographics & Campus Reach */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-slate-100/70 dark:bg-slate-800/40 border border-slate-200/70 dark:border-slate-800 space-y-2.5">
+                <p className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  Campus Distribution Breakdown
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {['University of Moratuwa (UOM)', 'University of Colombo (UOC)', 'SLIIT Malabe', 'University of Sri Jayewardenepura (USJ)', 'University of Kelaniya', 'University of Peradeniya', 'NSBM Green University', 'IIT Colombo'].map(uni => (
+                    <span key={uni} className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                      {uni}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Trust & Brand Safety Notice */}
+              <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-900/60 flex items-start gap-3">
+                <LuShieldCheck className="w-5 h-5 text-blue-600 dark:text-cyan-400 shrink-0 mt-0.5" />
+                <div className="text-xs leading-relaxed text-blue-950 dark:text-blue-200 font-medium">
+                  <strong>Brand Safety & Student Relevance Guarantee:</strong> Every advertisement is vetted by human moderators within 2-4 hours to guarantee zero spam, authentic youth relevance, and verified external destination URLs.
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 flex flex-col sm:flex-row items-center gap-3 border-t border-slate-150 dark:border-slate-800">
                 <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all border-none cursor-pointer"
+                  title="Print or Save as PDF"
+                >
+                  <LuPrinter size={15} /> Save / Print Deck
+                </button>
+
+                <a
+                  href="https://wa.me/94724478148?text=Hi%20UniGang!%20I%20would%20like%20to%20discuss%20a%20Custom%20Media%20Kit%20Advertising%20Campaign."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all text-decoration-none shadow-md shadow-emerald-600/20"
+                >
+                  <FaWhatsapp size={15} /> WhatsApp Media Desk
+                </a>
+
+                <button
+                  type="button"
                   onClick={() => {
                     setShowMediaKit(false);
                     navigate('/advertise/submit');
                   }}
-                  className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm uppercase tracking-wider"
+                  className="w-full sm:flex-1 py-3.5 px-6 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2 border-none cursor-pointer"
                 >
-                  Book Ad Now
-                </button>
-                <button
-                  onClick={() => setShowMediaKit(false)}
-                  className="px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-sm"
-                >
-                  Close
+                  <LuZap size={15} /> Book Campaign Now
                 </button>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
@@ -422,6 +572,7 @@ export default function AdvertiseLanding() {
       <AdTrackModal
         isOpen={showTrackModal}
         onClose={() => setShowTrackModal(false)}
+        initialQuery={new URLSearchParams(window.location.search).get('id') || undefined}
       />
 
     </div>

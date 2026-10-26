@@ -10,16 +10,34 @@ export default function AdSidebarWidget() {
     const fetchAd = async () => {
       try {
         const ads = await api.getActiveAds();
-        const sidebarAds = ads.filter(a =>
-          a.placement_type === 'SIDEBAR' ||
-          (a.placement_type && (
-            a.placement_type.includes('SIDEBAR') ||
-            a.placement_type.includes('Starter')
-          ))
-        );
+        const sidebarAds = ads.filter(a => {
+          const p = (a.placement_type || '').toUpperCase();
+          return p === 'SIDEBAR' || p.includes('SIDEBAR') || p.includes('STARTER') || p.includes('ULTIMATE');
+        });
         if (sidebarAds.length > 0) {
-          const randomAd = sidebarAds[Math.floor(Math.random() * sidebarAds.length)];
-          setAd(randomAd);
+          const userUni = typeof window !== 'undefined' ? (localStorage.getItem('userUniversity') || '').toLowerCase() : '';
+          const weighted = sidebarAds.map((adItem: any) => {
+            let w = adItem.priority_weight || 1;
+            if (userUni && adItem.target_campus) {
+              const tc = adItem.target_campus.toLowerCase();
+              if (userUni.includes(tc) || tc.includes(userUni)) {
+                w *= 3;
+              }
+            }
+            return { ad: adItem, w };
+          });
+
+          const totalWeight = weighted.reduce((sum: number, it: any) => sum + it.w, 0);
+          let random = Math.random() * totalWeight;
+          let chosen = sidebarAds[0];
+          for (const it of weighted) {
+            if (random < it.w) {
+              chosen = it.ad;
+              break;
+            }
+            random -= it.w;
+          }
+          setAd(chosen);
         }
       } catch (error) {
         console.error('Error fetching ads:', error);
@@ -33,11 +51,16 @@ export default function AdSidebarWidget() {
   const handleClick = () => {
     api.trackAdClick(ad.id);
     if (ad.target_link) {
-      window.open(ad.target_link, '_blank');
+      const trimmed = ad.target_link.trim();
+      const href = trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`;
+      window.open(href, '_blank', 'noopener,noreferrer');
     }
   };
 
-  const adImgSrc = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${ad.image_url}`;
+  const rawImg = ad.image_url;
+  const adImgSrc = rawImg
+    ? (rawImg.startsWith('http') ? rawImg : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`)
+    : '';
 
   return (
     <motion.div

@@ -10,18 +10,36 @@ export default function AdBanner({ placement = 'BANNER' }: { placement?: string 
     const fetchAd = async () => {
       try {
         const ads = await api.getActiveAds();
-        const bannerAds = ads.filter(a =>
-          a.placement_type === placement ||
-          (a.placement_type && (
-            a.placement_type.includes(placement) ||
-            a.placement_type.includes('Hero') ||
-            a.placement_type.includes('Ultimate')
-          ))
-        );
+        const bannerAds = ads.filter(a => {
+          const p = (a.placement_type || '').toUpperCase();
+          const target = (placement || 'BANNER').toUpperCase();
+          return p === target || p.includes(target) || p.includes('HERO') || p.includes('ULTIMATE');
+        });
         if (bannerAds.length > 0) {
-          // Pick a random ad for rotation
-          const randomAd = bannerAds[Math.floor(Math.random() * bannerAds.length)];
-          setAd(randomAd);
+          // Weighted Fair Rotation with Campus Affinity
+          const userUni = typeof window !== 'undefined' ? (localStorage.getItem('userUniversity') || '').toLowerCase() : '';
+          const weighted = bannerAds.map((adItem: any) => {
+            let w = adItem.priority_weight || 1;
+            if (userUni && adItem.target_campus) {
+              const tc = adItem.target_campus.toLowerCase();
+              if (userUni.includes(tc) || tc.includes(userUni)) {
+                w *= 3; // 3x affinity boost for matching campus
+              }
+            }
+            return { ad: adItem, w };
+          });
+
+          const totalWeight = weighted.reduce((sum: number, it: any) => sum + it.w, 0);
+          let random = Math.random() * totalWeight;
+          let chosen = bannerAds[0];
+          for (const it of weighted) {
+            if (random < it.w) {
+              chosen = it.ad;
+              break;
+            }
+            random -= it.w;
+          }
+          setAd(chosen);
         }
       } catch (error) {
         console.error('Error fetching ads:', error);
@@ -35,11 +53,16 @@ export default function AdBanner({ placement = 'BANNER' }: { placement?: string 
   const handleClick = () => {
     api.trackAdClick(ad.id);
     if (ad.target_link) {
-      window.open(ad.target_link, '_blank');
+      const trimmed = ad.target_link.trim();
+      const href = trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`;
+      window.open(href, '_blank', 'noopener,noreferrer');
     }
   };
 
-  const adImgSrc = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${ad.image_url}`;
+  const rawImg = ad.image_url;
+  const adImgSrc = rawImg
+    ? (rawImg.startsWith('http') ? rawImg : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`)
+    : '';
 
   return (
     <motion.div
