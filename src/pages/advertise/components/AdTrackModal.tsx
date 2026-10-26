@@ -11,6 +11,8 @@ import {
   LuMessageCircle,
   LuBuilding,
   LuTrendingUp,
+  LuCopy,
+  LuCheck,
 } from 'react-icons/lu';
 import { api } from '../../../api';
 
@@ -30,6 +32,7 @@ export const AdTrackModal: React.FC<AdTrackModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [results, setResults] = useState<any[]>([]);
   const [searched, setSearched] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -185,13 +188,30 @@ export const AdTrackModal: React.FC<AdTrackModalProps> = ({
                           />
                         </div>
                       )}
-                      <div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <span
                             className="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/50 px-2 py-0.5 rounded border border-cyan-200 dark:border-cyan-800"
                             title={`Full System ID: ${ad.id}`}
                           >
                             AD-{ad.id.length > 8 ? ad.id.slice(0, 8).toUpperCase() : ad.id}
                           </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(ad.id);
+                              setCopiedId(ad.id);
+                              setTimeout(() => setCopiedId(null), 2000);
+                            }}
+                            className="p-1 rounded text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-950 transition-colors cursor-pointer"
+                            title="Copy full tracking ID"
+                          >
+                            {copiedId === ad.id ? (
+                              <LuCheck className="w-3.5 h-3.5 text-emerald-500" />
+                            ) : (
+                              <LuCopy className="w-3.5 h-3.5" />
+                            )}
+                          </button>
                           <span className="text-xs text-slate-400">
                             • {new Date(ad.createdAt || ad.CreatedAt || Date.now()).toLocaleDateString()}
                           </span>

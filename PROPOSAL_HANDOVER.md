@@ -573,6 +573,41 @@
       - **Direct Client Routing (`/profile?tab=services`):** Success modal එකෙන් 'Track Request in Profile' ක්ලික් කළ විට Profile හි Events & Services tab එක සහ Services Tracker modal එක ස්වයංක්‍රීයව open වන පරිදි URL parameter deep link handling එක ([Profile.tsx](file:///e:/The-Uni-Gang/Website/src/pages/profile/Profile.tsx)) සම්පූර්ණ කරන ලදී.
     - **✅ 0 TypeScript Compilation Errors:** `npx tsc --noEmit` මගින් Website codebase එක 100% clean සහ production ready බව තහවුරු කරන ලදී.
 
+  - **Round 45 (Campus Advertising & Brand Sponsorship Ecosystem Full A-to-Z Architecture, Rotation Engine, Live Preview Studio & Tracking Handover):**
+    - **💰 Complete Fair-Value Pricing Architecture & Unified Rate Card:**
+      - ශ්‍රී ලාංකික විශ්වවිද්‍යාල ශිෂ්‍ය වෙළඳපොළට ගැළපෙන පරිදි සම්පූර්ණ මිල ගණන් සහ පැකේජ ව්‍යුහය යාවත්කාලීන කර සියලුම Frontend පිටු ([AdvertiseLanding.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/AdvertiseLanding.tsx), [ReachCalculator.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/components/ReachCalculator.tsx), [placements.ts](file:///e:/The-Uni-Gang/Website/src/pages/advertise/components/placements.ts), [AdSubmissionForm.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/AdSubmissionForm.tsx)) අතර 100% සමපාත කරන ලදී:
+        - **1. 🥉 Campus Starter (රු. 4,500 / දින 7):** Local shops, student food deals සහ campus events සඳහා (Sidebar/Feed, ~15,000 views).
+        - **2. 🥈 Campus Hero (රු. 12,500 / දින 14 - Most Popular):** Higher Ed institutes, IT academies & brands සඳහා (Top Banner + Native Feed, Campus Filter, ~50,000+ views).
+        - **3. 🥇 Ultimate Uni Blast (රු. 24,500 / දින 30 - Maximum Impact):** National brands & major campaigns සඳහා (Full Suite: Top Banner + Feed + 10s Countdown Popup, ~150,000+ views).
+        - **Custom Placement Daily Rates:** Banner = රු. 1,000/දිනකට, Feed = රු. 800/දිනකට, Sidebar = රු. 600/දිනකට, Popup = රු. 1,500/දිනකට (දින 30+ සඳහා 10% auto-discount).
+      - මිල ගණන් line දෙකකට කැඩී යාමේ bug එක `whitespace-nowrap` සහ responsive font sizes (`text-3xl sm:text-4xl 2xl:text-5xl`) මගින් සම්පූර්ණයෙන්ම තනි line එකක් ලෙස නිරාකරණය කරන ලදී.
+    - **⚖️ Weighted Fair Rotation & Campus Affinity Multiplier Engine:**
+      - දැන්වීම්කරුවන් කිහිප දෙනෙකු එකම placement එකක් හෝ පැකේජ ලබා ගත් විට ඔවුන්ගේ දැන්වීම් සාධාරණව මාරුවෙන් මාරුවට පෙන්වීම සඳහා Server-side සහ Client-side Weighted Fair Rotation ඇල්ගොරිතමය ([AdBanner.tsx](file:///e:/The-Uni-Gang/Website/src/components/advertise/AdBanner.tsx), [AdSidebarWidget.tsx](file:///e:/The-Uni-Gang/Website/src/components/advertise/AdSidebarWidget.tsx), [AdNativeFeed.tsx](file:///e:/The-Uni-Gang/Website/src/components/advertise/AdNativeFeed.tsx), [AdPopup.tsx](file:///e:/The-Uni-Gang/Website/src/components/advertise/AdPopup.tsx)):
+        - Ultimate Blast (Priority Weight 5), Campus Hero (Priority Weight 3), Starter (Priority Weight 1).
+        - **3x Campus Affinity Boost:** වෙබ් අඩවියට පිවිසෙන ශිෂ්‍යයාගේ Campus එක (`localStorage.getItem('userUniversity')`) දැන්වීමේ `target_campus` එක සමඟ ගැළපේ නම් එහි rotation weight එක ක්ෂණිකව 3 ගුණයකින් වැඩි වී (`w *= 3`) අදාළ campus එකේ සිසුන්ට වැඩි වාර ගණනක් පෙන්වනු ලැබේ.
+    - **📊 Authentic Real-Time Impression & Click Tracking Architecture:**
+      - GET request එකක් පැමිණි පමණින් බොරුවට view count වැඩි වීමේ legacy bug එක සම්පූර්ණයෙන්ම ඉවත් කර, නිශ්චිතවම ශිෂ්‍යයාගේ තිරය මත දැන්වීම render වූ විට පමණක් ක්‍රියාත්මක වන dedicated `POST /api/advertisements/:id/impression` endpoint එක Go backend එකෙහි ([advertisement_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/advertisement_controller.go)) නිර්මාණය කරන ලදී.
+      - ශිෂ්‍යයා click කළ විට `POST /api/advertisements/:id/click` හරහා click count එක සහ CTR (Click-Through Rate) නිවැරදිව වාර්තා වේ.
+      - කාලය අවසන් වූ දැන්වීම් (`end_date < now`) background goroutine මගින් ස්වයංක්‍රීයව `status = 'EXPIRED'` බවට පත් කර public feeds වලින් ඉවත් කෙරේ.
+    - **🎨 Interactive Self-Serve Submission & Live Preview Studio ([AdSubmissionForm.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/AdSubmissionForm.tsx)):**
+      - නවීනතම 2-Column SaaS Studio Layout එකක් ලෙස ප්‍රතිනිර්මාණය කරන ලදී:
+        - **Left Column:** පියවරෙන් පියවර සැකසුණු Advertiser Profile, Campaign Creative, Placement & Duration, සහ Target University Dropdown (UOM, SLIIT, UOC, USJ, NSBM, Kelaniya, Peradeniya, IIT, KDU).
+        - **Right Column (Sticky Studio):** ශිෂ්‍යයන්ගේ feed එක තුළ දැන්වීම සැබවින්ම දිස්වන ආකාරය තත්‍ය කාලීනව පෙන්වන **Interactive Live Student Feed Preview Mockup Card**. පරිශීලකයා Title, Company, Description type කරන විට සහ Artwork upload කරන විට Live Preview එක ක්ෂණිකව යාවත්කාලීන වේ.
+        - **Flexible Link Handling:** URL ඇතුළත් කිරීමේදී `https://` අමතක වූවද ස්වයංක්‍රීයව normalize කිරීම.
+    - **🔍 Campaign Performance Tracker Modal ([AdTrackModal.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/components/AdTrackModal.tsx)):**
+      - දැන්වීම්කරුවන්ට තමන්ගේ Tracking ID (e.g. `AD-XXXXXX`) හෝ Contact Email ඇතුළත් කර සජීවී Approval Status, Views, Clicks, Average CTR (%) සහ Expiry Days පරීක්ෂා කිරීමේ පහසුකම.
+      - පහසුවෙන් System ID එක copy කර ගැනීමට One-Click Copy Button එකක් (`LuCopy` / `LuCheck`) එක් කරන ලදී.
+      - ඕනෑම විමසීමක් සඳහා One-click Direct WhatsApp Ad Desk සම්බන්ධතාව සක්‍රීය කරන ලදී.
+    - **👑 Admin Dashboard Moderation Suite ([AdminDashboard.tsx](file:///e:/The-Uni-Gang/Website/src/pages/admin/AdminDashboard.tsx)):**
+      - Admin Dashboard එක තුළ නව **"📢 Advertisements"** කළමනාකරණ tab එක සම්පූර්ණයෙන්ම එක් කරන ලදී.
+      - Pending, Active, Expired, Paused, Rejected filters.
+      - **1-Click Actions:** "Activate Live" (Start Date සහ Duration අනුව End Date ස්වයංක්‍රීයව Database හි set වීම), "Reject", "Pause", "Delete", සහ දැන්වීම්කරුගේ දුරකථන අංකයට සෘජුවම WhatsApp chat විවෘත වන Action Link.
+    - **📱 Seamless Cross-Device Responsiveness (24.5" Monitor, Laptop, Tablet, Mobile):**
+      - 24.5" ඩෙස්ක්ටොප් මොනිටර් වල (2XL screens) Layout එක කැඩී නොයන ලෙස `2xl:max-w-[1536px]` සහ grid columns සමතුලිත කිරීම.
+      - ජංගම දුරකථන වල scroll කරන විට පහළින් මතුවන Sleek Mobile Sticky CTA Bar එක ([MobileStickyCta.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/components/MobileStickyCta.tsx)).
+      - 10-second automatic countdown timer badge එක සහ progress bar එක සහිත Global Popup Interstitial ([AdPopup.tsx](file:///e:/The-Uni-Gang/Website/src/components/advertise/AdPopup.tsx)).
+    - **✅ Zero Build & Compile Errors:** `npx tsc --noEmit` සහ `go vet ./...` මගින් Website සහ Backend 100% clean, error-free සහ production-ready බව තහවුරු කරන ලදී.
+
 ---
 
 ## 🚀 2. ඊළඟ Session එකේදී කළ හැකි ඉදිරි වැඩ (Next Steps / Roadmap)
@@ -580,11 +615,12 @@
 2. **Audio/Video In-App Calling (WebRTC):** VIP සාමාජිකයින් අතර 100% private in-app voice/video calls සක්‍රීය කිරීම.
 3. **Automated Horoscope Match Percentage:** උපන් වේලාව සහ ස්ථානය අනුව පොරොන්දම් 20 auto-calculate වන backend engine එක සම්බන්ධ කිරීම.
 4. **Annex Landlord Verified Badge Auto-Sync:** Landlord identity review portal එක Admin Dashboard එකට සම්බන්ධ කිරීම.
+5. **Automated Ad Payment Gateway (PayHere / Stripe):** දැන්වීම් අනුමත වූ පසු auto-payment invoice link එකක් WhatsApp / Email හරහා යැවීම.
 
 ---
 
 ## 💬 3. ඊළඟ Session එක ආරම්භ කරන විට යොදන Prompt එක (Resume Prompt)
-> **"mcn api PROPOSAL_HANDOVER.md eke liyapu handover eka balala, ethanin issarahata proposal saha annex section eke weda tika karagena yamu."**
+> **"mcn api PROPOSAL_HANDOVER.md eke liyapu handover eka balala, ethanin issarahata ad section, proposal saha annex section eke weda tika karagena yamu."**
 
 
 

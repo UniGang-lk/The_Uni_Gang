@@ -33,7 +33,7 @@ export default function MobileStickyCta() {
             id="mobile-sticky-start-campaign"
             type="button"
             onClick={() => navigate('/advertise/submit')}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-sm uppercase tracking-wider shadow-lg shadow-blue-600/30 active:scale-95 transition-all flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-sm uppercase tracking-wider shadow-lg shadow-blue-600/30 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <LuMegaphone className="w-4 h-4" /> Start Campaign
           </button>

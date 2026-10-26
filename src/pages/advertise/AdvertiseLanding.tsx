@@ -503,7 +503,7 @@ export default function AdvertiseLanding() {
                         <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase bg-purple-500/15 text-purple-600 dark:text-purple-400">600 x 600 px</span>
                       </div>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                        High-impact interstitial overlay with automatic 8s countdown timer. Guaranteed 100% impression rate (~50K daily views).
+                        High-impact interstitial overlay with automatic 10s countdown timer. Guaranteed 100% impression rate (~50K daily views).
                       </p>
                     </div>
                   </div>

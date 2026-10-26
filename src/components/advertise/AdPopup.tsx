@@ -64,6 +64,7 @@ export default function AdPopup() {
           setAd(chosen);
           
           setTimeout(() => {
+            setTimeLeft(10);
             setIsVisible(true);
             if (chosen && chosen.id) {
               api.trackAdImpression(chosen.id);
@@ -217,7 +218,7 @@ export default function AdPopup() {
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-slate-100 dark:bg-slate-800">
               <motion.div
                 initial={{ width: "100%" }}
-                animate={{ width: `${(timeLeft / 5) * 100}%` }}
+                animate={{ width: `${(timeLeft / 10) * 100}%` }}
                 transition={{ duration: 1, ease: "linear" }}
                 className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500"
               />
