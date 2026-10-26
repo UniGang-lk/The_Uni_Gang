@@ -188,9 +188,18 @@ const Header = () => {
   const handleLogout = () => {
     localStorage.removeItem('userToken');
     localStorage.removeItem('userName');
+    localStorage.removeItem('userFirstName');
+    localStorage.removeItem('userLastName');
+    localStorage.removeItem('userEmail');
     localStorage.removeItem('userProfilePicture');
     localStorage.removeItem('userId');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userPhoneNumber');
+    localStorage.removeItem('userUniversity');
+    localStorage.removeItem('userFbHandle');
+    localStorage.removeItem('userLinkedinHandle');
     localStorage.removeItem('userIsVerifiedStudent');
+    localStorage.removeItem('userIsVerifiedLandlord');
     setIsLoggedIn(false);
     setUserName(null);
     setUserProfilePic(null);
@@ -208,7 +217,7 @@ const Header = () => {
     { name: 'Events', path: '/#events', id: 'events', icon: LuCalendar },
     { name: 'Proposals', path: '/#proposals', id: 'proposals', icon: LuHeart },
     { name: 'Blogs', path: '/#blogs', id: 'blogs', icon: LuFileText },
-    { name: 'Advertise', path: '/advertise', id: 'advertise', icon: LuMegaphone },
+    { name: 'Advertise', path: '/#advertise', id: 'advertise', icon: LuMegaphone },
     { name: 'Contact', path: '/#contact', id: 'contact', icon: LuMessageSquare },
   ];
 

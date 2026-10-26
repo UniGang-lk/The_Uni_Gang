@@ -27,7 +27,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, isFeatured = false }) => {
       )}
 
       {/* Image Container */}
-      <div className={`relative overflow-hidden ${isFeatured ? 'h-64 md:h-full' : 'h-48'}`}>
+      <Link to={`/blogs/${blog.slug}`} className={`relative block overflow-hidden ${isFeatured ? 'h-64 md:h-full' : 'h-48'}`}>
         <img
           src={blog.featuredImage || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=800'}
           alt={blog.title}
@@ -37,7 +37,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, isFeatured = false }) => {
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-      </div>
+      </Link>
 
       {/* Content */}
       <div className={`flex flex-col p-6 ${isFeatured ? 'justify-center' : ''}`}>
@@ -50,10 +50,12 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, isFeatured = false }) => {
           </span>
         </div>
 
-        <h3 className={`font-bold text-slate-800 dark:text-white group-hover:text-blue-600 transition-colors ${isFeatured ? 'text-2xl md:text-4xl mb-4' : 'text-xl mb-2'
-          }`}>
-          {blog.title}
-        </h3>
+        <Link to={`/blogs/${blog.slug}`}>
+          <h3 className={`font-bold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors ${isFeatured ? 'text-2xl md:text-4xl mb-4' : 'text-xl mb-2'
+            }`}>
+            {blog.title}
+          </h3>
+        </Link>
 
         <p className="mb-6 text-sm text-slate-600 dark:text-slate-400 line-clamp-3">
           {blog.excerpt}

@@ -1,4 +1,4 @@
-import { MapPin, Briefcase, Lock, User as UserIcon, ShieldCheck, Check, Crown, Bookmark, X, Star, Sparkles } from 'lucide-react';
+import { MapPin, Briefcase, Lock, User as UserIcon, ShieldCheck, Check, Crown, X, Star, Sparkles } from 'lucide-react';
 import { useTheme } from '../../../../context/ThemeContext';
 
 export interface CandidateProfile {

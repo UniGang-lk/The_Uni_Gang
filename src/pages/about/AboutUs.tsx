@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import {
   LuGraduationCap, LuBuilding, LuUsers, LuCalendar,
   LuHeartHandshake, LuShieldCheck, LuSparkles, LuArrowRight,
-  LuShoppingBag, LuCheck, LuMegaphone, LuMail
+  LuShoppingBag, LuMegaphone, LuMail
 } from 'react-icons/lu';
 import SEO from '../../components/SEO';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';

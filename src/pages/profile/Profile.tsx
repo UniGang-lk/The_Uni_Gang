@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import {
   LuUser, LuMail, LuPhone, LuBuilding, LuLock, LuCamera, LuPencil, LuSave,
-  LuEye, LuEyeOff, LuFacebook, LuLinkedin,
+  LuEye, LuFacebook, LuLinkedin,
   LuMessageSquare, LuActivity, LuChevronRight, LuShieldCheck,
   LuCalendar, LuLayoutGrid, LuTrophy, LuSettings, LuLogOut, LuBriefcase, LuX, LuSend, LuTrash2, LuMegaphone, LuShoppingBag, LuStar,
-  LuClock, LuHouse, LuGraduationCap, LuBell, LuLifeBuoy
+  LuClock, LuHouse, LuGraduationCap, LuBell, LuLifeBuoy, LuSparkles, LuGift, LuPenLine
 } from 'react-icons/lu';
 import { motion, AnimatePresence } from 'framer-motion';
 import { io } from 'socket.io-client';
@@ -83,14 +83,14 @@ const getIconClasses = (isEditing: boolean, theme: 'blue' | 'purple' | 'indigo' 
 
 const Profile = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [university, setUniversity] = useState<string>('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sendingResetEmail, setSendingResetEmail] = useState(false);
@@ -222,6 +222,8 @@ const Profile = () => {
 
   // Unified Inbox states
   const [showInboxModal, setShowInboxModal] = useState(false);
+  const [showRewardsModal, setShowRewardsModal] = useState(false);
+  const [showActivityModal, setShowActivityModal] = useState(false);
   const [inboxTab, setInboxTab] = useState<'annex' | 'marketplace' | 'events' | 'support'>('annex');
 
   // Annex Chat states
@@ -498,6 +500,32 @@ const Profile = () => {
     fetchSupportProblems();
   }, []);
 
+  // Handle URL deep link (e.g., from Services Page: ?tab=services, or Events Page: ?tab=inbox&type=event)
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    const type = searchParams.get('type');
+    const chatId = searchParams.get('chatId');
+
+    if (tab === 'services') {
+      setActiveProfileTab('events');
+      setShowServicesModal(true);
+    } else if (tab === 'inbox') {
+      setShowInboxModal(true);
+      if (type === 'event') {
+        setInboxTab('events');
+        fetchEventChats().then(() => {
+          if (chatId) {
+            setSelectedEventChat((prev: any) => prev || { id: chatId });
+          }
+        });
+      } else if (type === 'marketplace') {
+        setInboxTab('marketplace');
+      } else if (type === 'annex') {
+        setInboxTab('annex');
+      }
+    }
+  }, [searchParams]);
+
   const fetchListings = async () => {
     try {
       setLoadingListings(true);
@@ -587,22 +615,28 @@ const Profile = () => {
             localStorage.setItem('userFirstName', fn);
             localStorage.setItem('userLastName', ln);
           }
-          if (data.user.email) {
-            setEmail(data.user.email);
-            localStorage.setItem('userEmail', data.user.email);
-          }
+          setEmail(data.user.email || '');
+          localStorage.setItem('userEmail', data.user.email || '');
+
+          setPhoneNumber(data.user.phone || '');
           if (data.user.phone) {
-            setPhoneNumber(data.user.phone);
             localStorage.setItem('userPhoneNumber', data.user.phone);
+          } else {
+            localStorage.removeItem('userPhoneNumber');
           }
+
           if (data.user.profile_pic) {
             setProfilePicture(data.user.profile_pic);
             localStorage.setItem('userProfilePicture', data.user.profile_pic);
+          } else {
+            setProfilePicture(null);
+            localStorage.removeItem('userProfilePicture');
           }
+
           if (data.user.university) {
             setUniversity(data.user.university);
             localStorage.setItem('userUniversity', data.user.university);
-          } else if (data.user.campus_email && !localStorage.getItem('userUniversity')) {
+          } else if (data.user.campus_email) {
             const cEmail = data.user.campus_email.toLowerCase();
             let detectedUni = '';
             if (cEmail.includes('mrt.ac.lk')) detectedUni = 'University of Moratuwa';
@@ -618,15 +652,27 @@ const Profile = () => {
             if (detectedUni) {
               setUniversity(detectedUni);
               localStorage.setItem('userUniversity', detectedUni);
+            } else {
+              setUniversity('');
+              localStorage.removeItem('userUniversity');
             }
+          } else {
+            setUniversity('');
+            localStorage.removeItem('userUniversity');
           }
+
+          setFbHandle(data.user.fb_handle || '');
           if (data.user.fb_handle) {
-            setFbHandle(data.user.fb_handle);
             localStorage.setItem('userFbHandle', data.user.fb_handle);
+          } else {
+            localStorage.removeItem('userFbHandle');
           }
+
+          setLinkedinHandle(data.user.linkedin_handle || '');
           if (data.user.linkedin_handle) {
-            setLinkedinHandle(data.user.linkedin_handle);
             localStorage.setItem('userLinkedinHandle', data.user.linkedin_handle);
+          } else {
+            localStorage.removeItem('userLinkedinHandle');
           }
           if (Array.isArray(data.user.followers)) {
             setStats(prev => ({ ...prev, followers: data.user.followers.length }));
@@ -1212,17 +1258,54 @@ const Profile = () => {
                   {[
                     { label: 'Followers', value: stats.followers, icon: LuUser, color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
                     { label: 'Following', value: stats.following, icon: LuActivity, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-                    { label: 'Activity', value: `${stats.activityScore}%`, icon: LuActivity, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-                    { label: 'Reward Points', value: stats.rewardPoints, icon: LuTrophy, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-                  ].map((stat) => (
-                    <div key={stat.label} className="flex items-center gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm">
-                      <div className={`p-2.5 rounded-xl ${stat.bg} ${stat.color}`}><stat.icon size={18} /></div>
-                      <div>
-                        <div className="text-lg font-black text-slate-900 dark:text-white leading-none">{stat.value}</div>
-                        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1">{stat.label}</div>
+                    { 
+                      label: 'Activity', 
+                      value: `${stats.activityScore}%`, 
+                      icon: LuActivity, 
+                      color: 'text-emerald-500', 
+                      bg: 'bg-emerald-500/10',
+                      badge: 'Info',
+                      onClick: () => setShowActivityModal(true)
+                    },
+                    { 
+                      label: 'Reward Points', 
+                      value: stats.rewardPoints, 
+                      icon: LuTrophy, 
+                      color: 'text-amber-500', 
+                      bg: 'bg-amber-500/10',
+                      badge: 'v2 Store',
+                      onClick: () => setShowRewardsModal(true)
+                    },
+                  ].map((stat) => {
+                    const isClickable = Boolean(stat.onClick);
+                    return (
+                      <div 
+                        key={stat.label} 
+                        onClick={stat.onClick}
+                        className={`group relative flex items-center justify-between gap-3 p-4 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-white/10 shadow-sm transition-all ${
+                          isClickable 
+                            ? 'cursor-pointer hover:border-indigo-400/60 dark:hover:border-indigo-500/50 hover:shadow-md hover:-translate-y-0.5' 
+                            : ''
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className={`p-2.5 rounded-xl shrink-0 ${stat.bg} ${stat.color} transition-transform group-hover:scale-105`}>
+                            <stat.icon size={18} />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="text-lg font-black text-slate-900 dark:text-white leading-none truncate">{stat.value}</div>
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-1 truncate">{stat.label}</div>
+                          </div>
+                        </div>
+
+                        {stat.badge && (
+                          <span className="shrink-0 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-950/60 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            {stat.badge}
+                          </span>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* Quick access */}
@@ -2351,6 +2434,25 @@ const Profile = () => {
                                   <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Comments</p>
                                 </div>
                               </div>
+
+                              <div className="flex gap-3 pt-2">
+                                <Link
+                                  to={`/blogs/submit?edit=${selectedBlog.slug || selectedBlog.id}`}
+                                  className="flex-1 py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-xs uppercase tracking-wider text-center transition-all shadow-md shadow-purple-500/20 flex items-center justify-center gap-2"
+                                  onClick={() => setShowBlogsModal(false)}
+                                >
+                                  <LuPenLine size={15} />
+                                  <span>Edit Story</span>
+                                </Link>
+                                <Link
+                                  to={`/blogs/${selectedBlog.slug || selectedBlog.id}`}
+                                  className="py-3 px-5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5"
+                                  onClick={() => setShowBlogsModal(false)}
+                                >
+                                  <LuEye size={15} />
+                                  <span>View</span>
+                                </Link>
+                              </div>
                             </div>
                           </motion.div>
                         )}
@@ -3363,6 +3465,232 @@ const Profile = () => {
                     </div>
                   </>
                 )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* ═════════ MODAL: Reward Points Explainer & v2 Store Teaser ═════════ */}
+        {showRewardsModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm"
+            onClick={() => setShowRewardsModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative overflow-hidden"
+            >
+              {/* Background gradient decoration */}
+              <div className="absolute top-0 right-0 w-44 h-44 bg-gradient-to-br from-amber-500/20 to-orange-500/0 rounded-full blur-2xl -mr-16 -mt-16 pointer-events-none" />
+
+              <div className="flex items-start justify-between gap-4 mb-4 relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/30">
+                    <LuTrophy size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white">UniGang Reward Points</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Campus Contribution & Activity Credits</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowRewardsModal(false)}
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-none bg-transparent cursor-pointer"
+                >
+                  <LuX size={18} />
+                </button>
+              </div>
+
+              {/* Points status hero */}
+              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 mb-5 relative z-10 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-300">Your Available Balance</span>
+                  <div className="text-2xl font-black text-amber-600 dark:text-amber-400 flex items-center gap-1.5 mt-0.5">
+                    {stats.rewardPoints} <span className="text-sm font-bold text-amber-600/80">PTS</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300">
+                    Active Student Tier
+                  </span>
+                </div>
+              </div>
+
+              {/* What is it and how to earn */}
+              <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300 relative z-10">
+                <div>
+                  <h4 className="font-black text-slate-900 dark:text-white mb-1.5 flex items-center gap-1.5">
+                    <LuSparkles className="text-amber-500 w-3.5 h-3.5" /> මේ Points මොනවාටද? (What are Reward Points?)
+                  </h4>
+                  <p className="leading-relaxed">
+                    ඔබ Campus Community එක වෙනුවෙන් කරන සෑම ක්‍රියාකාරකමකටම UniGang හරහා හිමිවන ලකුණු ප්‍රමාණයයි. Marketplace Listings, Annex Listings, Campus Events, හෝ Student Verification සම්පූර්ණ කිරීමෙන් ඔබට නොමිලේ Points එකතු වේ.
+                  </p>
+                </div>
+
+                {/* Point Earning Breakdown */}
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-white/5 space-y-2">
+                  <div className="text-[11px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-wide">
+                    ලකුණු ලැබෙන අයුරු (Point Multipliers):
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/5">
+                      <span>🎓 Student Verification</span>
+                      <strong className="text-emerald-500 font-black">+300 pts</strong>
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/5">
+                      <span>🏠 Annex Listing</span>
+                      <strong className="text-amber-500 font-black">+150 pts</strong>
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/5">
+                      <span>🎉 Campus Event</span>
+                      <strong className="text-blue-500 font-black">+120 pts</strong>
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/5">
+                      <span>🛍️ Market Item Post</span>
+                      <strong className="text-indigo-500 font-black">+100 pts</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* v2 Teaser Banner */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 border border-indigo-500/20 flex items-start gap-3">
+                  <div className="p-2 rounded-xl bg-indigo-600 text-white shrink-0 mt-0.5">
+                    <LuGift size={16} />
+                  </div>
+                  <div>
+                    <h5 className="font-black text-indigo-600 dark:text-indigo-400 text-xs">
+                      UniGang v2 Rewards Store ළඟදීම! (Coming Soon)
+                    </h5>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+                      UniGang v2 release එකේදී ඔබේ Points භාවිතා කරලා Campus Partner Discounts, Canteen/Food Vouchers, Merchandise, සහ Listing Boost Perks ලබාගැනීමට Rewards Store එක විවෘත වේ!
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end relative z-10">
+                <button
+                  type="button"
+                  onClick={() => setShowRewardsModal(false)}
+                  className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-amber-500 hover:bg-amber-600 transition-all shadow-md shadow-amber-500/20 border-none cursor-pointer"
+                >
+                  තේරුණා (Got it)
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* ═════════ MODAL: Activity Score Explainer ═════════ */}
+        {showActivityModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm"
+            onClick={() => setShowActivityModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 10 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl relative overflow-hidden"
+            >
+              {/* Background gradient decoration */}
+              <div className="absolute top-0 right-0 w-44 h-44 bg-gradient-to-br from-emerald-500/20 to-teal-500/0 rounded-full blur-2xl -mr-16 -mt-16 pointer-events-none" />
+
+              <div className="flex items-start justify-between gap-4 mb-4 relative z-10">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30">
+                    <LuActivity size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white">Activity & Trust Score</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Profile Completeness & Platform Engagement</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowActivityModal(false)}
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-none bg-transparent cursor-pointer"
+                >
+                  <LuX size={18} />
+                </button>
+              </div>
+
+              {/* Activity status hero */}
+              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 mb-5 relative z-10 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300">Current Trust Level</span>
+                  <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-0.5">
+                    {stats.activityScore}%
+                  </div>
+                </div>
+                <div className="w-32 bg-slate-200 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                  <div 
+                    className="bg-emerald-500 h-full rounded-full transition-all duration-500" 
+                    style={{ width: `${stats.activityScore}%` }} 
+                  />
+                </div>
+              </div>
+
+              {/* What is Activity Card doing */}
+              <div className="space-y-4 text-xs text-slate-600 dark:text-slate-300 relative z-10">
+                <div>
+                  <h4 className="font-black text-slate-900 dark:text-white mb-1.5 flex items-center gap-1.5">
+                    <LuShieldCheck className="text-emerald-500 w-4 h-4" /> Activity & Trust Score එකෙන් මොකක්ද කරන්නේ?
+                  </h4>
+                  <p className="leading-relaxed">
+                    මෙය මුළු <strong>UniGang Platform</strong> එක පුරාම ඔබේ <strong>ගිණුමේ විශ්වාසනීයත්වය (Campus Trust Level) සහ සක්‍රීය භාවය</strong> මනින නිල දර්ශකයයි. <strong>Marketplace</strong> හි භාණ්ඩ මිලදී ගැනීමේදී හෝ විකිණීමේදී, <strong>Annex / බෝඩිම්</strong> සෙවීමේදී, <strong>Uni Porondam (Proposal System)</strong> හරහා යෝජනා හුවමාරුවේදී, සහ <strong>Campus Events & Services</strong> භාවිතා කිරීමේදී ඉහළ Activity Score එකක් ඇති verified profiles වලට මුළු ප්‍රජාව තුළම ඉහළම ආරක්ෂාවක්, පිළිගැනීමක් සහ ප්‍රමුඛතාවක් හිමිවේ.
+                  </p>
+                </div>
+
+                {/* Score Breakdown Checklist */}
+                <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-white/5 space-y-2">
+                  <div className="text-[11px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-wide">
+                    Score එක 100% කරගන්නේ කෙසේද? (Trust Criteria):
+                  </div>
+                  <div className="space-y-1.5 text-[11px]">
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/5">
+                      <span>✓ Base Active Account (ලියාපදිංචිය)</span>
+                      <strong className="text-slate-600 dark:text-slate-300 font-bold">+40%</strong>
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/5">
+                      <span className={isVerifiedStudent ? "text-emerald-600 dark:text-emerald-400 font-bold" : ""}>
+                        {isVerifiedStudent ? "✓" : "○"} Verified University Student Status (තහවුරු කළ ශිෂ්‍යභාවය)
+                      </span>
+                      <strong className="text-emerald-500 font-black">+25%</strong>
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/5">
+                      <span className={profilePicture ? "text-emerald-600 dark:text-emerald-400 font-bold" : ""}>
+                        {profilePicture ? "✓" : "○"} Profile Avatar & University Info (සම්පූර්ණ Profile තොරතුරු)
+                      </span>
+                      <strong className="text-blue-500 font-bold">+15%</strong>
+                    </div>
+                    <div className="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/5">
+                      <span>○ Ecosystem Engagement (Marketplace, Annexes, Events, Proposals)</span>
+                      <strong className="text-indigo-500 font-bold">+20%</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-end relative z-10">
+                <button
+                  type="button"
+                  onClick={() => setShowActivityModal(false)}
+                  className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-md shadow-emerald-600/20 border-none cursor-pointer"
+                >
+                  තේරුණා (Got it)
+                </button>
               </div>
             </motion.div>
           </motion.div>

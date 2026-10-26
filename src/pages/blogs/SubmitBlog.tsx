@@ -39,7 +39,7 @@ import {
   LuUndo,
   LuRedo
 } from 'react-icons/lu';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import DOMPurify from 'dompurify';
 import SEO from '../../components/SEO';
@@ -47,6 +47,7 @@ import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
 import { toast } from 'react-hot-toast';
 import { api } from '../../api';
 import { BlogCategory } from '../../types/blog';
+import AuthCard from '../../components/auth/AuthCard';
 
 // Curated category fallback images (synced with backend fallbacks)
 const CATEGORY_FALLBACK_IMAGES: Record<BlogCategory, string> = {
@@ -376,6 +377,10 @@ const SubmitBlog: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
   const [previewSubMode, setPreviewSubMode] = useState<'card' | 'article'>('card');
 
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get('edit');
+  const [isEditMode, setIsEditMode] = useState(false);
+
   // Form State
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<BlogCategory>('Campus Life');
@@ -391,10 +396,58 @@ const SubmitBlog: React.FC = () => {
   const [draftStatus, setDraftStatus] = useState<string>('');
   const [showDraftBanner, setShowDraftBanner] = useState(false);
 
-  // Auth Info
-  const userToken = localStorage.getItem('userToken');
-  const userName = localStorage.getItem('userName') || 'Student Writer';
-  const userProfilePic = localStorage.getItem('userProfilePicture') || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`;
+  // Load existing blog for editing
+  useEffect(() => {
+    if (editId) {
+      setIsEditMode(true);
+      const loadBlogToEdit = async () => {
+        setLoading(true);
+        try {
+          const blog = await api.getBlogBySlug(editId);
+          if (blog) {
+            setTitle(blog.title || '');
+            if (blog.category) setCategory(blog.category);
+            setExcerpt(blog.excerpt || '');
+            setContent(blog.content || '');
+            if (Array.isArray(blog.tags)) {
+              setTags(blog.tags);
+            } else if (typeof blog.tags === 'string' && blog.tags) {
+              setTags((blog.tags as string).split(',').map((t: string) => t.trim()).filter(Boolean));
+            }
+            if (blog.featuredImage) {
+              setImagePreviewUrl(blog.featuredImage);
+            }
+          }
+        } catch (err) {
+          console.error('Failed to load blog for editing:', err);
+          toast.error('Failed to load blog for editing.');
+        } finally {
+          setLoading(false);
+        }
+      };
+      loadBlogToEdit();
+    }
+  }, [editId]);
+
+  // Auth Info & In-situ Modal
+  const [userToken, setUserToken] = useState<string | null>(() => localStorage.getItem('userToken'));
+  const [userName, setUserName] = useState<string>(() => localStorage.getItem('userName') || 'Student Writer');
+  const [userProfilePic, setUserProfilePic] = useState<string>(() => localStorage.getItem('userProfilePicture') || `https://api.dicebear.com/7.x/avataaars/svg?seed=StudentWriter`);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const token = localStorage.getItem('userToken');
+      const name = localStorage.getItem('userName') || 'Student Writer';
+      const pic = localStorage.getItem('userProfilePicture') || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`;
+      setUserToken(token);
+      setUserName(name);
+      setUserProfilePic(pic);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Image Object URL lifecycle management
   useEffect(() => {
@@ -402,8 +455,6 @@ const SubmitBlog: React.FC = () => {
       const url = URL.createObjectURL(imageFile);
       setImagePreviewUrl(url);
       return () => URL.revokeObjectURL(url);
-    } else {
-      setImagePreviewUrl(null);
     }
   }, [imageFile]);
 
@@ -413,8 +464,9 @@ const SubmitBlog: React.FC = () => {
   const readTimeMin = Math.max(1, Math.round(wordCount / 200));
   const readTime = `${readTimeMin} min read`;
 
-  // Draft Recovery on Mount
+  // Draft Recovery on Mount (Only in create mode)
   useEffect(() => {
+    if (editId) return;
     const savedDraft = localStorage.getItem('blog_draft_v2') || localStorage.getItem('blog_draft');
     if (savedDraft) {
       try {
@@ -426,7 +478,7 @@ const SubmitBlog: React.FC = () => {
         console.error('Draft parsing error:', e);
       }
     }
-  }, []);
+  }, [editId]);
 
   const restoreDraft = () => {
     try {
@@ -460,8 +512,9 @@ const SubmitBlog: React.FC = () => {
     toast('Draft cleared', { icon: '🗑️' });
   };
 
-  // Debounced Auto-Save
+  // Debounced Auto-Save (only for new creations)
   useEffect(() => {
+    if (editId) return;
     if (!title && !content && !excerpt) return;
 
     setDraftStatus('Saving...');
@@ -480,7 +533,7 @@ const SubmitBlog: React.FC = () => {
     }, 1200);
 
     return () => clearTimeout(timeoutId);
-  }, [title, category, excerpt, content, tags]);
+  }, [title, category, excerpt, content, tags, editId]);
 
   // Handle Tag Input
   const handleAddTag = (rawTag: string) => {
@@ -526,10 +579,12 @@ const SubmitBlog: React.FC = () => {
     if (e) e.preventDefault();
 
     if (!userToken) {
-      toast.error('Please log in first to submit your story for moderation.', {
+      toast('Please sign in to publish your story!', {
+        icon: '🔐',
         duration: 4000,
         style: { borderRadius: '14px', background: '#0f172a', color: '#fff' }
       });
+      setIsAuthModalOpen(true);
       return;
     }
 
@@ -558,33 +613,45 @@ const SubmitBlog: React.FC = () => {
         data.append('image', imageFile);
       }
 
-      await api.createBlog(data, userToken);
-
-      // Trigger Celebration Fireworks
-      try {
-        confetti({
-          particleCount: 120,
-          spread: 80,
-          origin: { y: 0.6 }
+      if (editId) {
+        await api.updateBlog(editId, data, userToken);
+        toast.success('Story updated successfully! Submitted for editorial review.', {
+          duration: 5000,
+          style: {
+            borderRadius: '16px',
+            background: '#0f172a',
+            color: '#fff',
+            fontWeight: 600
+          }
         });
-      } catch {
-        /* ignore confetti errors */
-      }
-
-      // Clear drafts
-      localStorage.removeItem('blog_draft_v2');
-      localStorage.removeItem('blog_draft');
-      setDraftStatus('');
-
-      toast.success('Story submitted successfully! Our editors will review it shortly.', {
-        duration: 5000,
-        style: {
-          borderRadius: '16px',
-          background: '#0f172a',
-          color: '#fff',
-          fontWeight: 600
+      } else {
+        await api.createBlog(data, userToken);
+        // Trigger Celebration Fireworks
+        try {
+          confetti({
+            particleCount: 120,
+            spread: 80,
+            origin: { y: 0.6 }
+          });
+        } catch {
+          /* ignore confetti errors */
         }
-      });
+
+        // Clear drafts
+        localStorage.removeItem('blog_draft_v2');
+        localStorage.removeItem('blog_draft');
+        setDraftStatus('');
+
+        toast.success('Story submitted successfully! Our editors will review it shortly.', {
+          duration: 5000,
+          style: {
+            borderRadius: '16px',
+            background: '#0f172a',
+            color: '#fff',
+            fontWeight: 600
+          }
+        });
+      }
 
       navigate('/blogs');
     } catch (err: any) {
@@ -653,12 +720,13 @@ const SubmitBlog: React.FC = () => {
               You are currently drafting as a guest. Please log in before publishing so your story is attributed to your student profile!
             </p>
           </div>
-          <Link
-            to="/profile"
-            className="shrink-0 px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl transition-colors shadow-sm"
+          <button
+            type="button"
+            onClick={() => setIsAuthModalOpen(true)}
+            className="shrink-0 px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-white text-xs font-bold rounded-xl transition-all shadow-sm"
           >
             Log In
-          </Link>
+          </button>
         </div>
       )}
 
@@ -738,7 +806,7 @@ const SubmitBlog: React.FC = () => {
                 : 'bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed shadow-none'
             }`}
           >
-            <span>Publish Story</span>
+            <span>{isEditMode ? 'Update Story' : 'Publish Story'}</span>
             <LuSend className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -757,11 +825,12 @@ const SubmitBlog: React.FC = () => {
                     <LuImage className="w-3.5 h-3.5 text-blue-500" />
                     Cover Photo
                   </label>
-                  {imageFile ? (
+                  {imageFile || (imagePreviewUrl && isEditMode) ? (
                     <button
                       type="button"
                       onClick={() => {
                         setImageFile(null);
+                        setImagePreviewUrl(null);
                         if (fileInputRef.current) fileInputRef.current.value = '';
                       }}
                       className="text-xs font-semibold text-rose-500 hover:text-rose-600 flex items-center gap-1 transition-colors"
@@ -790,12 +859,12 @@ const SubmitBlog: React.FC = () => {
                       <LuImage className="w-6 h-6 text-white" />
                     </div>
                     <p className="text-sm font-bold tracking-tight">
-                      {imageFile ? 'Click to replace cover photo' : 'Upload custom cover image'}
+                      {imageFile || imagePreviewUrl ? 'Click to replace cover photo' : 'Upload custom cover image'}
                     </p>
                     <p className="text-xs text-slate-200 mt-1">
                       PNG, JPG, or WebP (Recommended 1200 × 630px)
                     </p>
-                    {!imageFile && (
+                    {!imageFile && !imagePreviewUrl && (
                       <span className="mt-3 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-[11px] font-semibold text-white/90">
                         Default: {category} Photo Active
                       </span>
@@ -1314,6 +1383,47 @@ const SubmitBlog: React.FC = () => {
           )}
         </div>
       )}
+      {/* In-situ Auth Modal for drafting writers */}
+      <AnimatePresence>
+        {isAuthModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsAuthModalOpen(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="relative w-full max-w-md z-10"
+            >
+              <button
+                type="button"
+                onClick={() => setIsAuthModalOpen(false)}
+                className="absolute top-4 right-4 z-20 p-2 text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-700/80 rounded-full transition-colors"
+                title="Close modal"
+              >
+                <LuX className="w-5 h-5" />
+              </button>
+              <AuthCard
+                onAuthSuccess={() => {
+                  setIsAuthModalOpen(false);
+                  const token = localStorage.getItem('userToken');
+                  const name = localStorage.getItem('userName') || 'Student Writer';
+                  const pic = localStorage.getItem('userProfilePicture') || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`;
+                  setUserToken(token);
+                  setUserName(name);
+                  setUserProfilePic(pic);
+                  toast.success(`Welcome back, ${name}! Your draft is intact.`);
+                }}
+              />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

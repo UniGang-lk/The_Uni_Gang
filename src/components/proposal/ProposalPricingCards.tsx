@@ -1,4 +1,4 @@
-import { LuCheck, LuX, LuCrown, LuSparkles, LuShieldCheck } from 'react-icons/lu';
+import { LuCheck, LuX, LuCrown, LuSparkles } from 'react-icons/lu';
 import toast from 'react-hot-toast';
 
 interface ProposalPricingCardsProps {

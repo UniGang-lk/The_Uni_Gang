@@ -460,9 +460,9 @@ export default function ProposalFullProfilePage({
                   { label: 'Height (ft)', value: profile.height || 'Not Specified' },
                   { label: 'Age', value: profile.age ? `${profile.age} years` : 'Not Specified' },
                   { label: 'Civil Status', value: profile.civilStatus || 'Never Married (අවිවාහක)' },
-                  { label: 'Drinking Habits', value: (profile.social_drinking_level || profile.drinkingStatus || 'Non-drinker').replace(/[^\w\s\/-]/g, '').trim() },
-                  { label: 'Smoking Habits', value: (profile.smokingStatus || 'Non-smoker').replace(/[^\w\s\/-]/g, '').trim() },
-                  { label: 'Food / Diet Preference', value: (profile.dietaryPreference || profile.diet || 'Non-Vegetarian').replace(/[^\w\s\/-]/g, '').trim() },
+                  { label: 'Drinking Habits', value: (profile.social_drinking_level || profile.drinkingStatus || 'Non-drinker').replace(/[^\w\s/-]/g, '').trim() },
+                  { label: 'Smoking Habits', value: (profile.smokingStatus || 'Non-smoker').replace(/[^\w\s/-]/g, '').trim() },
+                  { label: 'Food / Diet Preference', value: (profile.dietaryPreference || profile.diet || 'Non-Vegetarian').replace(/[^\w\s/-]/g, '').trim() },
                 ].map((row, i) => (
                   <div key={i} className="flex justify-between items-center gap-3 px-5 py-2.5 font-sans">
                     <span className="font-semibold text-slate-500 shrink-0">{row.label}</span>

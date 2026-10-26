@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { X, RotateCcw, Check, SlidersHorizontal, Crown, Lock, Sparkles } from 'lucide-react';
+import { X, RotateCcw, Check, SlidersHorizontal, Crown } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTheme } from '../../../../context/ThemeContext';
 import { SearchFilterState } from './ProposalSearchSidebar';

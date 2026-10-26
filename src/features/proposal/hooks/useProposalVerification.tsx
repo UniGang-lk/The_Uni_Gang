@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { ShieldCheck, X, Crown, Sparkles } from 'lucide-react';
+import { ShieldCheck, X, Crown } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 import toast from 'react-hot-toast';
 

@@ -1,11 +1,11 @@
 import { LuGraduationCap, LuActivity, LuUsers, LuBook, LuGlobe, LuApple } from 'react-icons/lu';
 import { SiGoogleplay, SiHuawei } from 'react-icons/si';
 import { motion } from 'framer-motion';
-// import PremiumTraceButton from '../ui/PremiumTraceButton';
+import campusLifeImg from '../../assets/campus-life.jpg';
 
 const Hero = () => {
   return (
-    <section id="home" className="relative w-full min-h-screen flex items-center justify-center px-4 lg:px-12 2xl:px-20 max-w-7xl 2xl:max-w-[1600px] mx-auto overflow-hidden pt-20 pb-10">
+    <section id="home" className="relative w-full min-h-[calc(100vh-5rem)] flex items-center justify-center px-4 lg:px-12 2xl:px-20 max-w-7xl 2xl:max-w-[1600px] mx-auto overflow-hidden pt-4 sm:pt-6 pb-12">
       <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 2xl:gap-24 items-center w-full">
         {/* Left Content Column */}
         <div className="space-y-8 order-2 lg:order-1 relative z-10">
@@ -46,9 +46,9 @@ const Hero = () => {
           {/* Main Image Frame with Soft Frosted Glass */}
           <div className="relative w-full max-w-[14rem] sm:max-w-[18rem] lg:max-w-[22rem] 2xl:max-w-[30rem] aspect-[3/4] rounded-[3rem] overflow-hidden shadow-[0px_40px_80px_rgba(220,38,246,0.15)] border-[10px] border-white/40 dark:border-slate-800/40 backdrop-blur-xl z-10 bg-white/20 dark:bg-slate-900/20">
             <img
-              alt="Modern University Architecture"
+              alt="Uni Gang Student Life"
               className="w-full h-full object-cover"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRFV7zovlhxOqNLIlMHmIV8r4A8byd5D4NvJlHk_apI8EpkWiMlGBbSFZxhO74seWe_R6-XvzvN6-XAJCX7Ys5PyPLPo6T7HSGAfid5fB02VsRMX0v9MjPy5W_YSGqOvMaEQw6usHEXlCJOOWwjczK51PTTkCtv7YJOeVWwMN6DMqZWFqW5BC2RgJXtNh8Aq9eYplzYIM_M0inQeE8cUxq-kByRJltNoMGkrZYfHY1KQtnheVXT4q7RSYp-CB4zBiMF6Q9FadmuYxl"
+              src={campusLifeImg}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-blue-600/20 to-transparent pointer-events-none"></div>
           </div>
@@ -85,15 +85,6 @@ const Hero = () => {
             <LuGlobe className="text-blue-400 text-2xl" />
           </div>
 
-        </div>
-      </div>
-
-      {/* Connection Dots / Background Patterns */}
-      <div className="absolute top-0 right-0 p-12 sm:p-24 opacity-10 pointer-events-none hidden sm:block">
-        <div className="grid grid-cols-6 gap-8">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="w-1 h-1 bg-blue-600 rounded-full"></div>
-          ))}
         </div>
       </div>
     </section>

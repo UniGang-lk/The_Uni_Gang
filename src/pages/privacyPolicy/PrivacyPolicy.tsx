@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuShieldCheck, LuCookie, LuDatabase, LuUserCheck,
-  LuLock, LuGlobe, LuMail, LuFileText, LuClock, LuCheck
+  LuLock, LuGlobe, LuClock
 } from 'react-icons/lu';
 import SEO from '../../components/SEO';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';

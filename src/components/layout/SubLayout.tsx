@@ -53,8 +53,8 @@ const SubLayout: React.FC<SubLayoutProps> = ({ children }) => {
           },
         }}
       />
-      <main className="flex-grow pt-20 sm:pt-24 pb-12 px-4 md:px-6">
-        <div className="container mx-auto max-w-7xl">
+      <main className="flex-grow pt-20 sm:pt-24 pb-12 px-4 sm:px-6 lg:px-8 2xl:px-12">
+        <div className="w-full max-w-7xl 2xl:max-w-[1600px] 3xl:max-w-[1760px] mx-auto">
           {children}
         </div>
       </main>

@@ -416,17 +416,176 @@
     - **✅ Production Verification:**
       - `npm run build` (`tsc -b && vite build`) 0 errors සහිතව 100% clean ලෙස සම්පූර්ණ විය (`✓ built in 39.83s`).
 
+30. **Twentieth Round: Comprehensive Campus Annexes Ecosystem Handover & Deep Bug Fixes (2026-10-25):**
+    - **🎓 University Badge & Information Prominence ([AnnexList.tsx](file:///e:/The-Uni-Gang/Website/src/pages/annex/AnnexList.tsx)):**
+      - සෑම Accommodation Card එකකම අදාළ විශ්වවිද්‍යාලයේ නම (`LuGraduationCap` badge) පැහැදිලිව පෙනෙන පරිදි එකතු කරන ලදී.
+    - **🖥️ Ultra-Wide / 24.5" Monitor Responsive Grid:**
+      - 3-column restriction එක ඉවත් කර `2xl:grid-cols-4` (Desktop/Monitor) දක්වා dynamic layout එකක් සකස් කර, විශාල තිරවල දෙපැත්තේ අනවශ්‍ය හිස් ඉඩ වැළැක්වීම.
+    - **🔍 Explicit Search Flow & Custom Glassmorphic Dropdowns:**
+      - Campus හෝ Proximity select කළ පමණින් search button ඔබන්න පෙර auto-search වීමේ bug එක නිරාකරණය කර, "Search Now" බොත්තමට explicit control එක ලබා දීම.
+      - Full-screen span වන ugly browser native selects වෙනුවට **In-Dropdown Live Search Input** සහිත ultra-clean Custom Glass Dropdowns හඳුන්වා දීම.
+    - **📱 Mobile & Tablet Annex Details Perfection ([AnnexDetailsPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/annex/AnnexDetailsPage.tsx)):**
+      - Quick info grid badges, Contact & Share WhatsApp buttons, සහ Map containers කුඩා තිරවලට text wrap & clean proportions සහිතව optimize කිරීම.
+    - **🗺️ Leaflet Map Network Resilience & Fallback Loaders:**
+      - Network slow අවස්ථාවල `window.L` crash නොවී automatic retry mechanism සහ "Loading Map..." spinner overlays එක් කිරීම. Memory leak prevention.
+    - **⚡ Server-Side Database Pagination Architecture ([annex_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/annex_controller.go)):**
+      - Go GORM backend controller එකට optional `page` & `limit` query parameters (`OFFSET` & `LIMIT`) සහ `total` count query එක් කිරීම.
+    - **📸 Client-Side Photo Optimization & Compression ([AnnexAdForm.tsx](file:///e:/The-Uni-Gang/Website/src/pages/annex/AnnexAdForm.tsx)):**
+      - Landlords ලා 15MB+ විශාල ඡායාරූප upload කළද, browser canvas එකෙන්ම 1200px max-width සහ JPEG 0.82 compression හරහා 300KB දක්වා optimize කර ultra-fast upload කිරීම.
+    - **🏷️ Category URL Deep Linking & Empty State Reset:**
+      - URL parameters (`?category=ROOMMATE_WANTED` / `LANDLORD_RENT`) auto-sync වීම සහ zero-result අවස්ථාවල "Reset All Filters" සහිත Friendly Empty State එකක් එකතු කිරීම.
+
+  - **Round 31 (System-Wide Authentication & Admin User Management Deep Audit):**
+    - **🔐 Full Pipeline Line-by-Line Inspection:**
+      - Frontend ([AuthCard.tsx](file:///e:/The-Uni-Gang/Website/src/components/auth/AuthCard.tsx), [AuthSynchronizer.tsx](file:///e:/The-Uni-Gang/Website/src/components/auth/AuthSynchronizer.tsx), [Header.tsx](file:///e:/The-Uni-Gang/Website/src/components/common/Header.tsx)).
+      - Backend Go API ([auth_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/auth_controller.go), [middleware/auth.go](file:///e:/The-Uni-Gang/Backend/internal/middleware/auth.go), [admin_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/admin_controller.go)).
+      - Admin Dashboard ([UsersPage.tsx](file:///e:/The-Uni-Gang/Dashboard/src/pages/admin/UsersPage.tsx)).
+    - **🐛 Critical Bug Fixes in Auth Session:**
+      - `localStorage` එකෙහි Login, Register සහ Google Sign-in වලදී `userId`, `userRole`, `userIsVerifiedStudent`, `userIsVerifiedLandlord` save නොවී තිබූ critical bug එක fix කිරීම.
+      - User Logout වන විට `AuthSynchronizer` හරහා සියලු auth variables පිරිසිදු කිරීම (clean slate state).
+    - **🛡️ Multi-Role Security & Auto-Sync:**
+      - Firebase Auth UID token එක Go Backend `/api/users/sync` endpoint එකට යවා PostgreSQL `users` table එකේ auto-provision/sync වන ආකාරය තහවුරු කිරීම.
+      - Admin Dashboard එකෙහි users ලැයිස්තුව, search, filter, role switch, student ID verification, සහ account ban/delete functions 100% ක්‍රියාකාරී බව තහවුරු කිරීම.
+    - **✨ World-Class Modern Auth Standards Implemented ([AuthCard.tsx](file:///e:/The-Uni-Gang/Website/src/components/auth/AuthCard.tsx)):**
+      - 👁️ **Show/Hide Password Toggle:** `LuEye` & `LuEyeOff` icons සහිත seamless password reveal toggle.
+      - 🔑 **"Forgot Security Key?" Modal & Email Dispatch:** Firebase `sendPasswordResetEmail` හරහා user ගේ inbox එකට encrypted reset password link එක auto-dispatch වීම.
+      - 📊 **Real-Time Password Strength Meter:** 4-tier indicator (`Weak / Fair / Good / Strong`) animated progress bar.
+      - 🎓 **Smart Campus Email Detection (.ac.lk):** User register වෙද්දී University domain එකක් (`.ac.lk`) දුන්නොත් ක්ෂණිකව animate වන green badge එකක් දිස්වන අතර, Go Backend එකෙන් `is_verified_student: true` ලෙස auto-award වේ. සාමාන්‍ය email (Gmail/Yahoo) වලින් register වීමට බාධාවක් නැති අතර, කිසිදු force කිරීමකින් තොරව (Frictionless / Optional) ක්‍රියාත්මක වේ.
+    - **⏳ Proposal Membership Daily Countdown Tracker ([ProposalsPage.tsx](file:///e:/The-Uni-Gang/Dashboard/src/pages/admin/ProposalsPage.tsx)):**
+      - Classic (මාස 3) සහ VIP (මාස 6) පැකේජ Admin විසින් Approve කළ දිනයේ සිට package එක expire වන දිනය දක්වා දිනෙන් දින අඩු වන live dynamic countdown එකක් එක් කිරීම: `⏳ තව දින Xක් ඉතිරියි (X Days Left)`.
+      - දින 7කට වඩා අඩු වූ විට Amber warning badge එකක් සමඟින්ද, කාලය අවසන් වූ විට `Expired` badge එකක් සමඟින්ද Admin හට ක්ෂණිකව හඳුනාගත හැක.
+
+  - **Round 32 (Campus Marketplace Line-by-Line Deep Audit & Pagination Implementation):**
+    - **📦 Glassmorphic Item Pagination ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):**
+      - Marketplace එකේ items 100+ ක් එකතු වන විට page load වීම සහ rendering slow වීම වැළැක්වීමට පිටුවකට items 12 බැගින් වන Glassmorphic Pagination System එකක් ක්‍රියාත්මක කිරීම (`12 items per page`, page switcher, dynamic items counter `Showing 1 - 12 of X`, smooth auto-scroll to top).
+      - Category filter හෝ search මාරු වන විට `currentPage` එක auto-reset (page 1) වීම.
+    - **🖼️ Universal Product Image Fallback ([MarketplaceCard.tsx](file:///e:/The-Uni-Gang/Website/src/components/market/MarketplaceCard.tsx)):**
+      - Direct external CDN links (`http://`, `https://`) සහ backend upload paths (`/uploads/...`) දෙවර්ගයම error නොවී auto-resolve වන resilient image path parser එකක් සවි කිරීම.
+    - **🎨 Light Mode Contrast Polish ([Events.tsx](file:///e:/The-Uni-Gang/Website/src/components/events/Events.tsx), [Services.tsx](file:///e:/The-Uni-Gang/Website/src/components/services/Services.tsx)):**
+      - Events feature cards වල light mode contrast වැඩි කර pure white surface, `border-slate-200/80` සහ ambient shadow එකතු කිරීම.
+      - Services cards වටේ තිබූ තද කළු/harsh border එක ඉවත් කර minimalist `border-slate-200/70` සහ soft elevation shadow ලබා දීම.
+    - **🛡️ Cross-Account Profile Stale State Leakage Fix ([Profile.tsx](file:///e:/The-Uni-Gang/Website/src/pages/profile/Profile.tsx), [Header.tsx](file:///e:/The-Uni-Gang/Website/src/components/layout/Header.tsx), [AuthSynchronizer.tsx](file:///e:/The-Uni-Gang/Website/src/components/auth/AuthSynchronizer.tsx), [AuthCard.tsx](file:///e:/The-Uni-Gang/Website/src/components/auth/AuthCard.tsx)):**
+      - කලින් login වී සිටි user කෙනෙකුගේ `userPhoneNumber`, `userUniversity` වැනි fields අලුත් user කෙනෙක් register වූ විට browser `localStorage` එකේ stale වී profile එකට leak වීමේ critical bug එක සම්පූර්ණයෙන්ම fix කිරීම.
+  - **Round 33 (User Profile Reward Points Explainer, Activity Trust Metric & Enterprise Auth Security):**
+    - **🏆 Reward Points Interactive Modal & v2 Store Teaser ([Profile.tsx](file:///e:/The-Uni-Gang/Website/src/pages/profile/Profile.tsx)):**
+      - User Profile එකේ ඇති `Reward Points` card එක click කළ හැකි interactive card එකක් බවට පත් කිරීම (`v2 Store` badge + hover motion).
+      - Card එක click කළ විට විවෘත වන Glassmorphic popup modal එකක් මගින්:
+        1. Points ලැබෙන්නේ කුමකටද යන්න පැහැදිලි කිරීම (Campus Contributions: Student verification +300pts, Annex listing +150pts, Events +120pts, Marketplace item +100pts).
+        2. **UniGang v2 Rewards Store (Coming Soon)** teaser banner එකක් මගින් මෙම points ඉදිරියේදී Canteen/Food vouchers, Merchandise, Campus partner discounts, සහ Listing Boost perks වලට redeem කරගත හැකි බව පරිශීලකයින්ට දැනුම් දීම.
+    - **🛡️ Activity Score & Trust Level Explainer Modal ([Profile.tsx](file:///e:/The-Uni-Gang/Website/src/pages/profile/Profile.tsx)):**
+      - `Activity` card එක click කළ විට විවෘත වන Trust Explainer modal එකක් මගින්:
+        - Activity Score එකෙන් මනින්නේ Profile එකේ විශ්වාසනීයත්වය (Trust Level) සහ Community Engagement එක බව පැහැදිලි කිරීම.
+        - Score එක 100% කරගැනීමේ criteria (Base 40% + Verified Student 25% + Avatar/Uni 15% + Active listings 20%) live progress bar එකක් සමඟින් පරිශීලකයාට පෙන්වීම.
+    - **🔐 Login/Signup 100% Security Architecture Verification:**
+  - **Round 34 (Market Section Full A-Z Deep Codebase Audit & Resilient Polishing):**
+    - **🔗 URL-Driven Category Sync & Deep Linking ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):**
+      - Detail page breadcrumb එකෙන් `/market?type=PRODUCT` හෝ `/market?type=GIG` ක්ලික් කර ආපසු එන විට URL query parameter එක කියවා අදාළ tab එක auto-select වීම.
+      - Tab එක මාරු කරන විට URL එක `/market?type=...` ලෙස replaceState මගින් update වීම (Back button navigation 100% stable).
+    - **🖼️ Universal Cart Drawer Image Resolution ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):**
+      - Cart Drawer එකේ item images external CDN (`https://`) හෝ local uploads (`/uploads/...`) දෙකටම prefix duplication නොවී නිවැරදිව display වන පරිදි normalize කිරීම.
+    - **🔍 Selected Item Modal Image Sanitizer ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):**
+      - `selectedItem` preview modal එකේ image path එක safe URL sanitizer එකක් මගින් handle කිරීම.
+    - **📦 Detail Page Image Prefix Fix ([MarketItemDetailPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketItemDetailPage.tsx)):**
+      - `BASE_URL` සහ image relative path අතර missing/duplicate slash එක වැළැක්වීමට `${BASE_URL}${img.startsWith('/') ? '' : '/'}${img}` ලෙස normalize කිරීම.
+    - **🛡️ Rating & Ownership Safeguards:**
+      - තමන්ගේම listings තමන්ට rate කළ නොහැකි වීම සහ contact seller හිදී direct chat එක unlock වීම තහවුරු කිරීම.
+    - **✅ TypeScript Verification:**
+      - `npx tsc --noEmit` මගින් සම්පූර්ණ Website codebase එකේ zero compile errors තහවුරු කිරීම.
+
+  - **Round 35 (Hero Section Visual Ergonomics, Gap Optimization & Student Life Imagery):**
+    - **📐 Standard Header-Hero Vertical Gap ([Hero.tsx](file:///e:/The-Uni-Gang/Website/src/components/home/Hero.tsx)):**
+      - Layout එකේ `pt-20 sm:pt-24` දැනටමත් පවතින බැවින්, Hero Section එකේ තිබූ අමතර `pt-20` ඉවත් කර `pt-4 sm:pt-6` බවට පත් කිරීම. Header එක සහ Welcome text එක අතර තිබූ අනවශ්‍ය විශාල පරතරය ස්වභාවික, modern web standard එකකට පත් කරන ලදී.
+    - **🧹 Background Dot Grid Cleanup ([Hero.tsx](file:///e:/The-Uni-Gang/Website/src/components/home/Hero.tsx)):**
+      - Hero card එකේ දකුණු පස ඉහළින් තිබූ අනවශ්‍ය නිල් පාට Background dots grid එක සම්පූර්ණයෙන්ම ඉවත් කර clean, minimalist visual එකක් ලබා දීම.
+    - **🎓 Real Campus Life Visual Integration ([Hero.tsx](file:///e:/The-Uni-Gang/Website/src/components/home/Hero.tsx)):**
+  - **Round 36 (Annex Section Light Mode Contrast Polish & Soft Glassmorphic Badges):**
+    - **🎨 Annex Feature Cards High Contrast ([Annex.tsx](file:///e:/The-Uni-Gang/Website/src/components/annex/Annex.tsx)):**
+      - දකුණු පස ඇති feature cards 3 (Boarding Place Finder, Roommate Hub, Zero Scams) Light Mode හිදී background එකට මැකී නොපෙනී යාම වැළැක්වීමට `bg-white dark:bg-slate-900/70`, `border-slate-200/80` සහ ambient card shadow (`shadow-md shadow-slate-200/50`) ලබා දීම.
+      - Text contrast එක `text-slate-600 dark:text-slate-400 font-medium` ලෙස වැඩි කර කියවීමේ පහසුව උපරිම කිරීම.
+  - **Round 37 (Market Section Cart & Listing Engine Deep Stability Hardening):**
+    - **🛒 Robust Cart Identifier Matching ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):**
+      - `addToCart`, `updateCartQuantity`, සහ `removeFromCart` functions වලදී MongoDB / GORM string IDs සහ numeric IDs අතර සිදුවිය හැකි type mismatch (e.g. `String(i.id) === String(itemId)`) සම්පූර්ණයෙන්ම normalize කිරීම.
+      - Cart Drawer එක තුළ item quantity එක අඩු වැඩි කිරීම සහ remove කිරීම 100% ක් නිවැරදිව ක්‍රියාත්මක වීම තහවුරු කිරීම.
+  - **Round 38 (Marketplace Search & Filter Pagination Reset Synchronization):**
+    - **⚡ Dynamic Search & Sort Auto-Reset ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):**
+  - **Round 39 (Checkout Frictionless User Contact Pre-fill & Session Integrity):**
+    - **📦 Auto-Populate Active Student Delivery Info ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):**
+      - Official Store Checkout Step 2 වෙත පිවිසෙන විට, දැනට ලොග් වී සිටින ශිෂ්‍යයාගේ `userPhoneNumber` සහ `userUniversity` අගයන් `cartPhone` සහ `cartLocation` වෙත ස්වයංක්‍රීයව pre-fill වන පරිදි සකස් කිරීම. එමගින් සෑම මිලදී ගැනීමකදීම නැවත නැවත contact details type කිරීමට සිදුවන friction එක සම්පූර්ණයෙන්ම ඉවත් කර පරිශීලක අත්දැකීම (UX) උපරිම කිරීම.
+  - **Round 40 (Marketplace Checkout Input Trimming & Form Validation Hardening):**
+    - **🛡️ Strict Delivery Input Validation ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):**
+      - Delivery Phone Number සහ Delivery Location/Hostel fields හි whitespace-only inputs (`"   "`) submit වීම වැළැක්වීමට `.trim()` validation guards යෙදීම.
+      - Input හිස්ව තිබුණහොත් friendly error toast alert එකක් මගින් පරිශීලකයාට දැනුම් දීම.
+  - **Round 43 (Events Section Full A-to-Z Audit, Deep Routing, Modal Polish & Chat Integration):**
+    - **🎫 Homepage Ticker Direct Event Detail Navigation ([Events.tsx](file:///e:/The-Uni-Gang/Website/src/components/events/Events.tsx)):**
+      - මුල් පිටුවේ (Homepage Events showcase) පහළින් auto-scroll වන Live Marquee Events Ticker එකේ cards ක්ලික් කළ විට, කලින් generic `/event-list` එකට යැවීම වෙනුවට අදාළ event එකේ නිශ්චිත විස්තර පිටුවට (`/events/${event.id}`) සෘජුවම navigate වන පරිදි යාවත්කාලීන කරන ලදී.
+    - **🏷️ Category Cards Deep Filter Linking ([Events.tsx](file:///e:/The-Uni-Gang/Website/src/components/events/Events.tsx)):**
+      - Events showcase හි ප්‍රධාන කාණ්ඩ 3 (Cultural Festivals, Tech & Hackathons, Sports Meets) ක්ලික් කළ විට `/event-list?category=Culture`, `/event-list?category=Tech`, `/event-list?category=Sports` ලෙස deep-linked category parameter එක සමග Events Hub පිටුවට පිවිසෙන පරිදි සකසන ලදී.
+    - **🔒 Create Event Modal Body Scroll Lock & Contact Pre-fill ([CreateEventModal.tsx](file:///e:/The-Uni-Gang/Website/src/components/events/CreateEventModal.tsx)):**
+      - Event එකක් post කිරීමට Modal එක විවෘත වූ විට background body scroll වීම වැළැක්වීමට `overflow = 'hidden'` lock එකක් එක් කරන ලදී.
+      - ශිෂ්‍යයා දැනට ලොග් වී සිටින WhatsApp contact number එක (`localStorage.getItem('userPhoneNumber')`) WhatsApp Contact input එකට ස්වයංක්‍රීයව pre-fill වන පරිදි සකසා input friction ඉවත් කරන ලදී.
+    - **🛡️ Strict Input Trimming & Validation Guards ([CreateEventModal.tsx](file:///e:/The-Uni-Gang/Website/src/components/events/CreateEventModal.tsx)):**
+      - Event Title, University, Location, Date, Contact Number, සහ Description යන සියලුම fields වල whitespace-only inputs (`"   "`) submit වීම වැළැක්වීමට `.trim()` validation guards යොදා පැහැදිලි error toast alerts ලබා දෙන ලදී.
+    - **⚡ Two-Way URL Search & Category Filter Synchronization ([EventList.tsx](file:///e:/The-Uni-Gang/Website/src/pages/events/EventList.tsx)):**
+      - Events Hub පිටුවට `useSearchParams` hook එක සම්බන්ධ කර URL query parameters (`?category=...&q=...`) හරහා category tabs සහ search bar එක ස්වයංක්‍රීයව sync කර external links හෝ browser back/forward buttons සමඟ 100% නිවැරදිව ක්‍රියාත්මක වන පරිදි සකසන ලදී.
+    - **💬 Fluid SPA Direct Campus Chat Routing ([EventDetailPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/events/EventDetailPage.tsx) & [Profile.tsx](file:///e:/The-Uni-Gang/Website/src/pages/profile/Profile.tsx)):**
+    - **📄 Event Hub Pagination Engine ([EventList.tsx](file:///e:/The-Uni-Gang/Website/src/pages/events/EventList.tsx)):**
+      - Events Hub හි එකවර events රාශියක් ඇති විට page performance සහ user readability එක උපරිම කිරීමට **9 items per page** අගයකින් යුත් premium responsive pagination engine එකක් එක් කරන ලදී.
+      - Page change එකකදී smooth scroll-to-top (`window.scrollTo({ top: 400, behavior: 'smooth' })`) සහ Search / Category switch කරන විට ස්වයංක්‍රීයව Page 1 වෙත reset වන safe listener effect එකක් ක්‍රියාත්මක කරන ලදී.
+    - **👥 Instant Attendee Roster State Synchronization ([EventDetailPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/events/EventDetailPage.tsx)):**
+      - ශිෂ්‍යයෙක් "Join Event / Reserve Spot" ක්ලික් කළ විට, host ගේ Attendee Roster එකට සහ CSV download dataset එකට අදාළ ශිෂ්‍යයාගේ නම සහ email එක ක්ෂණිකව එකතු වන (හෝ cancel කළ විට ඉවත් වන) dynamic state updater එකක් එක් කරන ලදී.
+    - **📊 Dynamic Real-Time Campus Stats Engine ([Events.tsx](file:///e:/The-Uni-Gang/Website/src/components/events/Events.tsx)):**
+      - Homepage Events showcase හි පහළ ඇති stats cards (Active Events, University Partners, Engagement) hardcoded static values වෙනුවට Database හි සජීවීව පවතින approved events ගණන සහ unique universities අනුව dynamic ලෙස auto-calculate වී render වන පරිදි සකසන ලදී.
+    - **🧭 Breadcrumb Category Deep-Link Routing ([EventDetailPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/events/EventDetailPage.tsx)):**
+      - Event Details පිටුවේ ඉහළ Breadcrumb හි category link එක ක්ලික් කළ විට `/event-list?category=...` ලෙස අදාළ category එකට පෙරහන් වී Events Hub විවෘත වන පරිදි සකසා navigation continuity එක පරිපූර්ණ කරන ලදී.
+    - **💬 Contextual Pre-Filled WhatsApp Direct Chat ([EventDetailPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/events/EventDetailPage.tsx)):**
+      - "Contact via WhatsApp" බොත්තම ක්ලික් කළ විට host ගේ WhatsApp වෙත event title එක ස්වයංක්‍රීයව අඩංගු කරගත් friendly pre-filled text එකක් (`Hi, I'm reaching out regarding your event...`) සහිතව direct chat open වන පරිදි URL encoding එක යාවත්කාලීන කරන ලදී.
+    - **🖼️ Related Events Asset URL Normalization ([EventDetailPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/events/EventDetailPage.tsx)):**
+      - Event Details පිටුවේ පහළින් ඇති "More Campus Events You Might Like" cards වල upload කරන ලද local server images (`/uploads/...`) බිඳී යාම වැළැක්වීමට `VITE_API_BASE_URL` normalize කර fallback Unsplash placeholder එකක් සහිතව image source එක render වන පරිදි සකසන ලදී.
+    - **✅ Zero Build & Syntax Errors:** `npx tsc --noEmit` මගින් Website codebase එක 100% clean, type-safe සහ production ready බව තහවුරු කරන ලදී.
+  - **Round 44 (Campus Blogs Section Full A-to-Z Audit, Real-Time Sync, In-Situ Auth & Pagination):**
+    - **🔐 Discussion Auth Frictionless In-Situ Sign-In ([BlogDetail.tsx](file:///e:/The-Uni-Gang/Website/src/pages/blogs/BlogDetail.tsx)):**
+      - Story comments section එකේ sign-in නොවූ පාඨකයින්ට "Sign In to post a comment" ක්ලික් කළ විට කලින් වැරදි ලෙස `/post-ad` (annex listing) වෙත redirect වීමේ ගැටලුව සම්පූර්ණයෙන්ම ඉවත් කර, පිටුවෙන් ඉවත් නොවී සෘජුවම popup වන sleek glassmorphic Student Auth Modal එකක් (`<AuthCard />`) සම්බන්ධ කරන ලදී. Login වූ සැනින් comment input එක active වී story context එක ආරක්ෂා වේ.
+    - **⚡ Two-Way URL Category & Search Sync ([BlogList.tsx](file:///e:/The-Uni-Gang/Website/src/pages/blogs/BlogList.tsx)):**
+      - `useSearchParams` hook එක හරහා `?category=...&q=...` query parameters සෘජුවම filter tabs සහ search input එක සමඟ two-way synchronize කර, external share links හෝ browser navigation වලදී filter state එක 100% නිරවද්‍යව පවතින පරිදි සකසන ලදී.
+    - **📄 Campus Blogs Responsive Pagination Engine ([BlogList.tsx](file:///e:/The-Uni-Gang/Website/src/pages/blogs/BlogList.tsx)):**
+      - පිටුවකට stories 8 බැගින් පෙන්වන responsive glassmorphic pagination engine එකක් එක් කරන ලදී. Search/category මාරු කරන විට ස්වයංක්‍රීයව Page 1 reset වීම සහ page change වලදී smooth top scroll (`window.scrollTo({ top: 450, behavior: 'smooth' })`) සක්‍රීය කරන ලදී.
+    - **🛡️ Strict Cross-Site Scripting (XSS) Sanitization Defense ([BlogDetail.tsx](file:///e:/The-Uni-Gang/Website/src/pages/blogs/BlogDetail.tsx)):**
+      - User-submitted Rich Text HTML render වන විට `DOMPurify.sanitize` එකට strict configuration එකක් (allowed tags: `p`, `h1`-`h6`, `blockquote`, `pre`, `code`, `ul`, `ol`, `li`, `a`, `strong`, `em`; forbidden tags: `script`, `iframe`, `object`, `embed`, `form`; forbidden attributes: `onerror`, `onload`, `onclick`, `onmouseover`) ලබා දී XSS injection ප්‍රහාර 100% ක් වැළැක්වීම.
+    - **🔐 Backend Authorization & Role-Based Access Control ([blog_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/blog_controller.go)):**
+      - Story creation සහ comments submit කිරීම සඳහා JWT Authentication middleware (`Protect()`) සක්‍රීය කර ඇති අතර, අලුතින් submit වන සියලුම stories පෙරනිමියෙන්ම `status = 'Pending'` ලෙස Database එකට ගොස් Admin කෙනෙකු approve කරන තෙක් public feed එකට release නොවේ.
+      - Story හෝ Comment deletion වලදී Token UID එක අදාළ කතුවරයාගේ (Author) හෝ System Admin ගේ ID එක සමඟ server-side සත්‍යාපනය කර IDOR (Insecure Direct Object Reference) දුර්වලතා සම්පූර්ණයෙන්ම වළක්වා ඇත.
+    - **⚡ Real-Time Webhook Synchronization:** Admin Dashboard එකෙන් blog එකක් approve හෝ reject වූ සැනින්, පිටුව reload නොකර මුල් පිටුවේ Blogs showcase එක සහ BlogList feed එක live update වීම තහවුරු කරන ලදී.
+    - **✅ 0 TypeScript Compile Errors:** `npx tsc --noEmit` මගින් codebase එක 100% clean සහ production-ready බව තහවුරු කරන ලදී.
+
+---
+    - **🖱️ Estimator TiltCard Interactive Navigation Fix ([Services.tsx](file:///e:/The-Uni-Gang/Website/src/components/services/Services.tsx)):**
+      - මුල් පිටුවේ (Home Services showcase) වම් පස ඇති TiltCard Live Estimator widget එකේ "Start Calculation" button එකට `onClick={handleExploreServices}` handler එක සහ `e.stopPropagation()` නිසි ලෙස සම්බන්ධ කිරීම. කලින් එය click කළ විට කිසිදු navigation එකක් සිදු නොවීමේ ගැටලුව සම්පූර්ණයෙන්ම නිරාකරණය කරන ලදී.
+    - **🎨 Light Mode Category Cards High Contrast & Soft Depth ([Services.tsx](file:///e:/The-Uni-Gang/Website/src/components/services/Services.tsx)):**
+      - Services category cards 4 (Software & Tech, Branding & Design, Media Production, Growth & SEO) Light Mode හිදී background එක සමග නොගැළපී flat වීම වැළැක්වීමට `bg-white dark:bg-slate-900/60`, `border-slate-200/80`, `shadow-xl shadow-slate-200/50` සහ enhanced badge contrast එකක් ලබා දීම.
+    - **⚡ Dynamic Real-Time Investment & Delivery Days Estimator Card ([ServicesPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/services/ServicesPage.tsx)):**
+      - Services modal Step 1 (Configuration) තුළ client options තෝරන සැනින් (Web Platform, Pages, Features, Shoot Duration, etc.) ගණනය වන `minPrice`, `maxPrice` (LKR) සහ `estimated delivery days` සජීවීව පෙන්වන **Dynamic Real-Time Quote Card** එකක් "Continue to Details" button එකට ඉහළින් එක් කරන ලදී. එමගින් student/client හට Step 2 වෙත යාමට පෙරම පැහැදිලි මිල සහ කාල සීමාව ඇස් ඉදිරිපිටම දැකගත හැක.
+    - **⚡ WhatsApp Submission Form Validation & Whitespace Hardening ([ServicesPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/services/ServicesPage.tsx)):**
+      - Services brief submission එකේදී WhatsApp number හෝ brief එක හිස්ව හෝ space පමණක් ගසා submit කිරීම වැළැක්වීමට `.trim()` validations එක් කර පැහැදිලි error toast alert මගින් පෙන්වීම.
+    - **🔒 Modal Background Scroll Lock & Fluid SPA Navigation ([ServicesPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/services/ServicesPage.tsx)):**
+    - **🔄 End-to-End Service Request Data Flow to Admin Verification ([service_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/service_controller.go) & [ServicesPage.tsx](file:///e:/The-Uni-Gang/Dashboard/src/pages/admin/ServicesPage.tsx)):**
+      - Website හි ශිෂ්‍යයෙක් Service Request එකක් submit කළ විට, එය Database හි `service_requests` table එකට ඇතුළත් වී, සියලුම System Admins ලාට `🛠️ New Service Request` notification එකක් auto-dispatch වීම තහවුරු කරන ලදී.
+      - **Admin Dashboard (`/admin/services`):** Admin හට ශිෂ්‍යයාගේ නම, Email, University, WhatsApp Number (one-click direct chat link සමග), Full Specification (Platform, Features, Shoot Scope ආදිය), Target Budget සහ Deadline සියල්ල පැහැදිලිව ලැබී Status එක `approved`, `in_progress`, `completed` හෝ `rejected` ලෙස update කළ හැක.
+      - **Direct Client Routing (`/profile?tab=services`):** Success modal එකෙන් 'Track Request in Profile' ක්ලික් කළ විට Profile හි Events & Services tab එක සහ Services Tracker modal එක ස්වයංක්‍රීයව open වන පරිදි URL parameter deep link handling එක ([Profile.tsx](file:///e:/The-Uni-Gang/Website/src/pages/profile/Profile.tsx)) සම්පූර්ණ කරන ලදී.
+    - **✅ 0 TypeScript Compilation Errors:** `npx tsc --noEmit` මගින් Website codebase එක 100% clean සහ production ready බව තහවුරු කරන ලදී.
+
 ---
 
 ## 🚀 2. ඊළඟ Session එකේදී කළ හැකි ඉදිරි වැඩ (Next Steps / Roadmap)
 1. **SMS / Email Notification Webhooks:** Proposal එකක් accept වූ විට හෝ payment එක verify වූ විට NotifyLK / Twilio SMS alert යැවීම.
 2. **Audio/Video In-App Calling (WebRTC):** VIP සාමාජිකයින් අතර 100% private in-app voice/video calls සක්‍රීය කිරීම.
 3. **Automated Horoscope Match Percentage:** උපන් වේලාව සහ ස්ථානය අනුව පොරොන්දම් 20 auto-calculate වන backend engine එක සම්බන්ධ කිරීම.
+4. **Annex Landlord Verified Badge Auto-Sync:** Landlord identity review portal එක Admin Dashboard එකට සම්බන්ධ කිරීම.
 
 ---
 
 ## 💬 3. ඊළඟ Session එක ආරම්භ කරන විට යොදන Prompt එක (Resume Prompt)
-> **"mcn api PROPOSAL_HANDOVER.md eke liyapu handover eka balala, ethanin issarahata proposal section eke weda tika karagena yamu."**
+> **"mcn api PROPOSAL_HANDOVER.md eke liyapu handover eka balala, ethanin issarahata proposal saha annex section eke weda tika karagena yamu."**
+
 
 
 

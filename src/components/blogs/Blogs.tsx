@@ -195,7 +195,7 @@ const Blogs = () => {
             <PremiumTraceButton
               index={6}
               icon={<span className="material-symbols-outlined">auto_awesome</span>}
-              onClick={() => navigate('/submit-blog')}
+              onClick={() => navigate('/blogs/submit')}
               className="w-full sm:w-auto"
             >
               Submit Entry

@@ -12,8 +12,7 @@ import {
   Users,
   User2,
   Sparkles,
-  Info,
-  Camera
+  Info
 } from 'lucide-react';
 import { cx } from './ui/ProposalPrimitives';
 import { WatermarkOverlay } from './privacy/WatermarkOverlay';

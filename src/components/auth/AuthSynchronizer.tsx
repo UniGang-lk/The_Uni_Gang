@@ -27,16 +27,21 @@ const AuthSynchronizer = () => {
           console.error('Failed to synchronize session token:', error);
         }
       } else {
-        // If the user was signed out from Firebase, clean up session UNLESS it's a Demo session!
-        const currentToken = localStorage.getItem('userToken');
-        const currentEmail = localStorage.getItem('userEmail');
-        if (currentToken === 'dummy_token' || currentEmail === 'kasun.demo@unigang.lk') {
-          return;
-        }
+        // When signed out from Firebase, clean up all session variables
         localStorage.removeItem('userToken');
         localStorage.removeItem('userName');
+        localStorage.removeItem('userFirstName');
+        localStorage.removeItem('userLastName');
         localStorage.removeItem('userEmail');
         localStorage.removeItem('userProfilePicture');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('userPhoneNumber');
+        localStorage.removeItem('userUniversity');
+        localStorage.removeItem('userFbHandle');
+        localStorage.removeItem('userLinkedinHandle');
+        localStorage.removeItem('userIsVerifiedStudent');
+        localStorage.removeItem('userIsVerifiedLandlord');
       }
     });
 

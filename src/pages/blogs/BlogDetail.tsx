@@ -14,7 +14,8 @@ import {
   LuSend,
   LuTrendingUp,
   LuSparkles,
-  LuPenLine
+  LuPenLine,
+  LuX
 } from 'react-icons/lu';
 import { FaWhatsapp, FaFacebookF, FaTwitter } from 'react-icons/fa6';
 import { api } from '../../api';
@@ -22,6 +23,8 @@ import { Blog } from '../../types/blog';
 import SEO from '../../components/SEO';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
+import AdSidebarWidget from '../../components/advertise/AdSidebarWidget';
+import AuthCard from '../../components/auth/AuthCard';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 import DOMPurify from 'dompurify';
@@ -129,6 +132,9 @@ const BlogDetail: React.FC = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [togglingFollow, setTogglingFollow] = useState(false);
 
+  // In-situ Auth modal state
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100, damping: 30, restDelta: 0.001
@@ -204,7 +210,8 @@ const BlogDetail: React.FC = () => {
       return;
     }
     try {
-      const result = await api.toggleLike(blog.id, token);
+      const targetId = blog.id || blog.slug;
+      const result = await api.toggleLike(targetId, token);
       setBlog(prev => prev ? { ...prev, likes: result.likes, hasLiked: result.hasLiked } : null);
       if (result.hasLiked) {
         toast.success('Liked story!', {
@@ -601,7 +608,18 @@ const BlogDetail: React.FC = () => {
                   <article className="prose prose-slate lg:prose-lg dark:prose-invert max-w-none prose-headings:font-black prose-p:leading-[1.85] prose-p:text-slate-700 dark:prose-p:text-slate-300">
                     <div
                       className="ql-editor !p-0 font-sans text-slate-800 dark:text-slate-200 text-base md:text-lg leading-relaxed space-y-4"
-                      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(blog.content) }}
+                      dangerouslySetInnerHTML={{
+                        __html: DOMPurify.sanitize(blog.content, {
+                          ALLOWED_TAGS: [
+                            'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'strong', 'em', 'u', 's',
+                            'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'a', 'br', 'span', 'img'
+                          ],
+                          ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'src', 'alt', 'loading', 'width', 'height'],
+                          ADD_ATTR: ['target'],
+                          FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form'],
+                          FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover']
+                        })
+                      }}
                     />
                   </article>
 
@@ -609,12 +627,13 @@ const BlogDetail: React.FC = () => {
                   {blog.tags && blog.tags.length > 0 && (
                     <div className="mt-10 flex flex-wrap gap-2 pt-6 border-t border-slate-200/60 dark:border-slate-800">
                       {blog.tags.map(tag => (
-                        <span
+                        <Link
                           key={tag}
-                          className="px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold transition-colors"
+                          to={`/blogs?q=${encodeURIComponent(tag.replace(/^#/, ''))}`}
+                          className="px-3 py-1 rounded-full bg-slate-100 hover:bg-blue-50 hover:text-blue-600 dark:bg-slate-800/80 dark:hover:bg-blue-900/30 dark:hover:text-blue-400 text-slate-600 dark:text-slate-300 text-xs font-semibold transition-colors shadow-xs"
                         >
-                          #{tag}
-                        </span>
+                          #{tag.replace(/^#/, '')}
+                        </Link>
                       ))}
                     </div>
                   )}
@@ -634,9 +653,18 @@ const BlogDetail: React.FC = () => {
                         </div>
                         {blog.author?.id && (
                           isAuthor ? (
-                            <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 w-fit mx-auto sm:mx-0 border border-blue-200/60 dark:border-blue-800/60">
-                              You (Author)
-                            </span>
+                            <div className="flex items-center gap-2 w-fit mx-auto sm:mx-0">
+                              <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60">
+                                You (Author)
+                              </span>
+                              <Link
+                                to={`/blogs/submit?edit=${blog.slug || blog.id}`}
+                                className="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-500 dark:hover:text-white transition-all shadow-sm"
+                              >
+                                <LuPenLine className="w-3.5 h-3.5" />
+                                <span>Edit Story</span>
+                              </Link>
+                            </div>
                           ) : (
                             <button
                               onClick={handleFollow}
@@ -708,18 +736,19 @@ const BlogDetail: React.FC = () => {
                         </div>
                       </form>
                     ) : (
-                      /* Compact Sign In Strip - NOT a giant bulky block! */
+                      /* Compact Sign In Strip */
                       <div className="mb-6 p-3 rounded-xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/40 flex items-center justify-between gap-3 text-xs sm:text-sm">
                         <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                           <LuMessageSquare className="w-4 h-4 text-blue-500 shrink-0" />
                           <span>Join the discussion — Sign in to post a comment.</span>
                         </div>
-                        <Link
-                          to="/post-ad"
-                          className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all shrink-0"
+                        <button
+                          type="button"
+                          onClick={() => setIsAuthModalOpen(true)}
+                          className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold shadow-sm transition-all shrink-0 cursor-pointer border-none"
                         >
                           Sign In
-                        </Link>
+                        </button>
                       </div>
                     )}
 
@@ -771,7 +800,7 @@ const BlogDetail: React.FC = () => {
                                   {canDelete && (
                                     <button
                                       onClick={() => handleCommentDelete(comment.id)}
-                                      className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 p-1 transition-all cursor-pointer border-none bg-transparent"
+                                      className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 text-slate-400 hover:text-red-500 p-1 transition-all cursor-pointer border-none bg-transparent"
                                       title={isCommentOwner ? "Delete your comment" : (isAuthor ? "Delete comment (as Story Author)" : "Delete comment (as Admin)")}
                                     >
                                       <LuTrash2 className="w-3.5 h-3.5" />
@@ -859,12 +888,15 @@ const BlogDetail: React.FC = () => {
                       Share your campus experience, guides, or tech tips with university students across Sri Lanka.
                     </p>
                     <Link
-                      to="/submit-blog"
+                      to="/blogs/submit"
                       className="block w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-md shadow-blue-500/20"
                     >
                       Write an Article
                     </Link>
                   </div>
+
+                  {/* Sticky Sidebar Advertisement */}
+                  <AdSidebarWidget />
 
                 </aside>
 
@@ -949,6 +981,45 @@ const BlogDetail: React.FC = () => {
             </div>
 
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* In-Situ Student Auth Modal */}
+      <AnimatePresence>
+        {isAuthModalOpen && (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center overflow-y-auto p-4 sm:p-6 py-10">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsAuthModalOpen(false)}
+              className="fixed inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 20 }}
+              className="w-full max-w-md relative z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl border border-white/60 dark:border-white/10 shadow-2xl p-6 sm:p-8"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">Sign In to Continue</h3>
+                <button
+                  type="button"
+                  onClick={() => setIsAuthModalOpen(false)}
+                  className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border-none cursor-pointer"
+                >
+                  <LuX className="w-4 h-4" />
+                </button>
+              </div>
+              <AuthCard
+                onAuthSuccess={() => {
+                  setIsAuthModalOpen(false);
+                  fetchBlog();
+                  toast.success('Signed in successfully! You can now join the conversation.');
+                }}
+              />
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

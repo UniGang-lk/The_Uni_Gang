@@ -240,7 +240,7 @@ const AdminDashboard = () => {
   // Metrics summary
   const pendingAnnexesCount = annexes.filter(a => a.status === 'Pending').length;
   const pendingMarketCount = marketItems.filter(m => m.status === 'PENDING_VERIFICATION' || m.status === 'PENDING').length;
-  const pendingEventsCount = events.filter(e => e.status === 'Pending' || e.status === 'PENDING').length;
+  const pendingEventsCount = events.filter(e => (e.status || '').toLowerCase() === 'pending').length;
   const pendingProblemsCount = problems.filter(p => p.status === 'PENDING' || p.status === 'IN_PROGRESS').length;
   const pendingPaymentsCount = payments.filter(p => p.status === 'pending').length;
   const pendingProposalVerificationsCount = proposalProfiles.filter(p => p.verification_status === 'pending_review' || p.verificationStatus === 'pending_review').length;
@@ -478,8 +478,8 @@ const AdminDashboard = () => {
                       <div>
                         <div className="flex items-center justify-between mb-3">
                           <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                            event.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                            event.status === 'Rejected' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                            (event.status || '').toLowerCase() === 'approved' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                            (event.status || '').toLowerCase() === 'rejected' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
                             'bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse'
                           }`}>
                             {event.status || 'Pending'}
@@ -497,17 +497,17 @@ const AdminDashboard = () => {
                       </div>
 
                       <div className="pt-4 border-t border-slate-800/80 flex items-center justify-end gap-2">
-                        {event.status !== 'Approved' && (
+                        {(event.status || '').toLowerCase() !== 'approved' && (
                           <button
-                            onClick={() => handleEventStatus(event.id, 'Approved')}
+                            onClick={() => handleEventStatus(event.id, 'approved')}
                             className="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
                           >
                             <LuCheck size={14} /> Approve
                           </button>
                         )}
-                        {event.status !== 'Rejected' && (
+                        {(event.status || '').toLowerCase() !== 'rejected' && (
                           <button
-                            onClick={() => handleEventStatus(event.id, 'Rejected')}
+                            onClick={() => handleEventStatus(event.id, 'rejected')}
                             className="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
                           >
                             <LuX size={14} /> Reject

@@ -262,7 +262,7 @@ export const proposalApi = {
 
   submitPayment: async (formData: FormData) => {
     try {
-      let token = localStorage.getItem('userToken') || '';
+      const token = localStorage.getItem('userToken') || '';
       const response = await fetch(`${API_URL}/payments`, {
         method: 'POST',
         headers: {

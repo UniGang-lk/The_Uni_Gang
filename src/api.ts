@@ -136,6 +136,33 @@ export const api = {
     }
   },
 
+  updateBlog: async (blogId: string, formData: FormData, token: string): Promise<any> => {
+    const response = await fetch(`${BASE_URL}/api/blogs/${blogId}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    const rawText = await response.text();
+
+    if (!response.ok) {
+      try {
+        const err = JSON.parse(rawText);
+        throw new Error(err.message || `Server error ${response.status}`);
+      } catch {
+        throw new Error(`Server error ${response.status} — check backend console for details.`);
+      }
+    }
+
+    try {
+      return JSON.parse(rawText);
+    } catch {
+      throw new Error('Server returned an unexpected response.');
+    }
+  },
+
   toggleLike: async (blogId: string, token: string): Promise<{ likes: number; hasLiked: boolean }> => {
     const response = await fetch(`${BASE_URL}/api/blogs/${blogId}/like`, {
       method: 'POST',

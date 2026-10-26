@@ -89,14 +89,18 @@ const ContributorLeaderboard: React.FC<ContributorLeaderboardProps> = ({ contrib
                       </span>
                     )}
                   </div>
-                  <div className="min-w-0">
+                  <Link
+                    to={`/blogs?q=${encodeURIComponent(contributor.name)}`}
+                    className="min-w-0 hover:underline"
+                    title={`View stories by ${contributor.name}`}
+                  >
                     <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       {contributor.name}
                     </h4>
                     <p className="text-[11px] text-slate-400 truncate">
                       {contributor.university || 'University Student'}
                     </p>
-                  </div>
+                  </Link>
                 </div>
 
                 {/* Right: Posts & Likes stats */}
@@ -128,7 +132,7 @@ const ContributorLeaderboard: React.FC<ContributorLeaderboardProps> = ({ contrib
 
       {/* Footer Action */}
       <Link
-        to="/submit-blog"
+        to="/blogs/submit"
         className="flex items-center justify-between p-3 rounded-2xl bg-blue-50/60 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-100/60 dark:hover:bg-blue-900/40 transition-colors group"
       >
         <span>Write a Story to Rank Up</span>

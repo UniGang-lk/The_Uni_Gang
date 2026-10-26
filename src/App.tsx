@@ -123,6 +123,7 @@ function App() {
 
           {/* Blogs Routes */}
           <Route path="/blogs" element={<SubLayout><BlogList /></SubLayout>} />
+          <Route path="/blogs/submit" element={<SubLayout><SubmitBlog /></SubLayout>} />
           <Route path="/blogs/:slug" element={<SubLayout><BlogDetail /></SubLayout>} />
           <Route path="/submit-blog" element={<SubLayout><SubmitBlog /></SubLayout>} />
 

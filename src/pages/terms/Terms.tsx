@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuScale, LuLayers, LuUserCog, LuMessageSquareWarning,
-  LuClock, LuBan, LuShieldAlert, LuMail, LuHeartHandshake, LuCheck
+  LuClock, LuBan, LuShieldAlert, LuHeartHandshake
 } from 'react-icons/lu';
 import SEO from '../../components/SEO';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';

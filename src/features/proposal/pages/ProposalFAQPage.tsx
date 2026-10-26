@@ -10,8 +10,7 @@ import {
   FileText, 
   Heart, 
   Crown, 
-  Compass,
-  CheckCircle2
+  Compass
 } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 
