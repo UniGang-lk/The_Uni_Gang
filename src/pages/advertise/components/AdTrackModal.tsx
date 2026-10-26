@@ -186,9 +186,11 @@ export const AdTrackModal: React.FC<AdTrackModalProps> = ({
                         </div>
                       )}
                       <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-mono text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/50 px-2 py-0.5 rounded border border-cyan-200 dark:border-cyan-800">
-                            ID: {ad.id}
+                          <span
+                            className="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/50 px-2 py-0.5 rounded border border-cyan-200 dark:border-cyan-800"
+                            title={`Full System ID: ${ad.id}`}
+                          >
+                            AD-{ad.id.length > 8 ? ad.id.slice(0, 8).toUpperCase() : ad.id}
                           </span>
                           <span className="text-xs text-slate-400">
                             • {new Date(ad.createdAt || ad.CreatedAt || Date.now()).toLocaleDateString()}
