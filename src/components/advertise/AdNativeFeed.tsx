@@ -26,11 +26,25 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
     const fetchAds = async () => {
       try {
         const activeAds = await api.getActiveAds();
-        const nativeAds = activeAds.filter((a: Ad) => {
+        const nativeAds = activeAds.filter((a: any) => {
           const p = (a.placement_type || '').toUpperCase();
-          return p === 'NATIVE_FEED' || p.includes('NATIVE') || p.includes('FEED') || p.includes('HERO') || p.includes('ULTIMATE');
+          return p === 'NATIVE_FEED' || p.includes('NATIVE') || p.includes('FEED') || p.includes('HERO') || p.includes('ULTIMATE') || p.includes('STARTER');
         });
-        setAds(nativeAds);
+
+        // Weighted sort with Campus Affinity boost
+        const userUni = typeof window !== 'undefined' ? (localStorage.getItem('userUniversity') || '').toLowerCase() : '';
+        const scored = nativeAds.map((adItem: any) => {
+          let w = adItem.priority_weight || 1;
+          if (userUni && adItem.target_campus) {
+            const tc = adItem.target_campus.toLowerCase();
+            if (userUni.includes(tc) || tc.includes(userUni)) {
+              w *= 3; // 3x affinity boost
+            }
+          }
+          return { ...adItem, _weight: w };
+        }).sort((a: any, b: any) => (b._weight || 1) - (a._weight || 1));
+
+        setAds(scored);
       } catch (err) {
         console.error('Failed to load native ads', err);
       }
@@ -50,6 +64,13 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
       return () => clearInterval(interval);
     }
   }, [ads.length, adIndex]);
+
+  // Track impression for rendered native feed ad
+  useEffect(() => {
+    if (ads[currentAdIndex]?.id) {
+      api.trackAdImpression(ads[currentAdIndex].id);
+    }
+  }, [ads, currentAdIndex]);
 
   if (ads.length === 0) {
     return (

@@ -65,6 +65,9 @@ export default function AdPopup() {
           
           setTimeout(() => {
             setIsVisible(true);
+            if (chosen && chosen.id) {
+              api.trackAdImpression(chosen.id);
+            }
             localStorage.setItem(storageKey, String(Date.now()));
           }, 2000);
         }
@@ -163,10 +166,14 @@ export default function AdPopup() {
                 </div>
                 <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Partner Spotlight</span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-blue-500/10 text-blue-600 dark:text-cyan-400 border border-blue-500/20">
+                  {timeLeft}s
+                </span>
                 <button
                   onClick={handleClose}
-                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors"
+                  className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-colors cursor-pointer"
+                  title="Close popup"
                 >
                   <LuX size={14} />
                 </button>

@@ -40,6 +40,9 @@ export default function AdBanner({ placement = 'BANNER' }: { placement?: string 
             random -= it.w;
           }
           setAd(chosen);
+          if (chosen && chosen.id) {
+            api.trackAdImpression(chosen.id);
+          }
         }
       } catch (error) {
         console.error('Error fetching ads:', error);

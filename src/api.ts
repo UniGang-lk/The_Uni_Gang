@@ -599,6 +599,16 @@ export const api = {
     return response.json();
   },
 
+  trackAdImpression: async (id: string | number): Promise<void> => {
+    try {
+      await fetch(`${BASE_URL}/api/advertisements/${id}/impression`, {
+        method: 'POST'
+      });
+    } catch (error) {
+      console.error('Failed to track ad impression', error);
+    }
+  },
+
   trackAdClick: async (id: string | number): Promise<void> => {
     try {
       await fetch(`${BASE_URL}/api/advertisements/${id}/click`, {
@@ -607,6 +617,47 @@ export const api = {
     } catch (error) {
       console.error('Failed to track ad click', error);
     }
+  },
+
+  getAdminAdvertisements: async (token: string): Promise<any[]> => {
+    const response = await fetch(`${BASE_URL}/api/advertisements`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    if (!response.ok) throw new Error('Failed to fetch admin advertisements');
+    const data = await response.json();
+    return Array.isArray(data) ? data : (data.data ?? []);
+  },
+
+  updateAdminAdStatus: async (id: string, status: string, token: string): Promise<any> => {
+    const response = await fetch(`${BASE_URL}/api/advertisements/${id}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ status })
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to update ad status');
+    }
+    return response.json();
+  },
+
+  deleteAdminAdvertisement: async (id: string, token: string): Promise<any> => {
+    const response = await fetch(`${BASE_URL}/api/advertisements/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to delete advertisement');
+    }
+    return response.json();
   },
 
   getMyAdvertisements: async (token: string): Promise<any[]> => {

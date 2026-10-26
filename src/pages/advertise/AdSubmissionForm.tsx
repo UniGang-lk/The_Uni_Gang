@@ -110,8 +110,10 @@ export default function AdSubmissionForm() {
         if (key === 'target_campus') {
           return;
         }
-        if (key === 'ad_description' && formData.target_campus && formData.target_campus !== 'All Campuses (Island-wide)') {
-          data.append('ad_description', `🎯 [Target Campus: ${formData.target_campus}]\n\n${value}`);
+        if (key === 'target_link') {
+          const trimmed = value.trim();
+          const normalized = trimmed ? (trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`) : '';
+          data.append('target_link', normalized);
         } else if (key === 'placement_type' && selectedTier) {
           if (selectedTier.toLowerCase().includes('starter')) {
             data.append('placement_type', 'Campus Starter (SIDEBAR)');
@@ -439,9 +441,9 @@ export default function AdSubmissionForm() {
                       <LuLink className="absolute left-4 top-3.5 text-slate-400 w-5 h-5 pointer-events-none" />
                       <input
                         required
-                        type="url"
+                        type="text"
                         name="target_link"
-                        placeholder="https://yourwebsite.com/apply or https://wa.me/94724478148"
+                        placeholder="e.g. wa.me/94724478148 or https://yourbrand.com/deal"
                         value={formData.target_link}
                         onChange={handleInputChange}
                         className="w-full bg-slate-50/80 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-2xl pl-12 pr-4 py-3 text-slate-900 dark:text-white placeholder-slate-400 focus:border-blue-500 dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all font-semibold text-sm"

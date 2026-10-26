@@ -5,7 +5,8 @@ import {
   LuMessageSquare, LuCheck, LuX, LuTrash2, LuSearch,
   LuExternalLink, LuUserCheck, LuMail, LuHouse, LuUsers,
   LuLifeBuoy, LuCreditCard, LuRefreshCw, LuFootprints,
-  LuMapPin, LuGraduationCap, LuBriefcase, LuHeart
+  LuMapPin, LuGraduationCap, LuBriefcase, LuHeart,
+  LuMegaphone, LuEye, LuMousePointer
 } from 'react-icons/lu';
 import { FiHome } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +15,7 @@ import { api } from '../../api';
 import SEO from '../../components/SEO';
 import { jwtDecode } from 'jwt-decode';
 
-type AdminTab = 'annexes' | 'market' | 'events' | 'users' | 'feedbacks' | 'problems' | 'payments' | 'proposals';
+type AdminTab = 'annexes' | 'market' | 'events' | 'users' | 'feedbacks' | 'problems' | 'payments' | 'proposals' | 'advertisements';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ const AdminDashboard = () => {
   const [problems, setProblems] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
   const [proposalProfiles, setProposalProfiles] = useState<any[]>([]);
+  const [advertisements, setAdvertisements] = useState<any[]>([]);
 
   // Reply modal state for problem reports
   const [replyModalOpen, setReplyModalOpen] = useState(false);
@@ -67,7 +69,7 @@ const AdminDashboard = () => {
     if (!token) return;
     setLoading(true);
     try {
-      const [annexData, marketData, eventData, userData, feedbackData, problemData, paymentData, proposalData] = await Promise.all([
+      const [annexData, marketData, eventData, userData, feedbackData, problemData, paymentData, proposalData, adData] = await Promise.all([
         api.getAdminAnnexes(token).catch(() => []),
         api.getAdminMarketItems(token).catch(() => []),
         api.getAdminEvents(token).catch(() => []),
@@ -75,7 +77,8 @@ const AdminDashboard = () => {
         api.getAdminFeedbacks(token).catch(() => []),
         api.getAdminProblems(token).catch(() => []),
         api.getAdminPremiumPayments(token).catch(() => []),
-        api.getAdminProposalProfiles(token).catch(() => [])
+        api.getAdminProposalProfiles(token).catch(() => []),
+        api.getAdminAdvertisements(token).catch(() => [])
       ]);
 
       setAnnexes(annexData);
@@ -86,6 +89,7 @@ const AdminDashboard = () => {
       setProblems(problemData);
       setPayments(paymentData);
       setProposalProfiles(proposalData);
+      setAdvertisements(adData);
     } catch (err: any) {
       console.error('Failed to load admin data:', err);
       toast.error('Failed to load some admin data.');
@@ -158,6 +162,28 @@ const AdminDashboard = () => {
       setUsers(prev => prev.map(u => u.id === userId ? { ...u, is_verified_student: true } : u));
     } catch (err: any) {
       toast.error(err.message || 'Failed to verify user');
+    }
+  };
+
+  const handleAdStatus = async (id: string, status: string) => {
+    if (!token) return;
+    try {
+      await api.updateAdminAdStatus(id, status, token);
+      toast.success(`Ad status updated to ${status}`);
+      setAdvertisements(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update ad status');
+    }
+  };
+
+  const handleDeleteAd = async (id: string) => {
+    if (!token || !window.confirm('Are you sure you want to delete this campaign advertisement?')) return;
+    try {
+      await api.deleteAdminAdvertisement(id, token);
+      toast.success('Advertisement deleted');
+      setAdvertisements(prev => prev.filter(a => a.id !== id));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete advertisement');
     }
   };
 
@@ -244,6 +270,7 @@ const AdminDashboard = () => {
   const pendingProblemsCount = problems.filter(p => p.status === 'PENDING' || p.status === 'IN_PROGRESS').length;
   const pendingPaymentsCount = payments.filter(p => p.status === 'pending').length;
   const pendingProposalVerificationsCount = proposalProfiles.filter(p => p.verification_status === 'pending_review' || p.verificationStatus === 'pending_review').length;
+  const pendingAdsCount = advertisements.filter(a => (a.status || '').toUpperCase() === 'PENDING').length;
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 py-12 px-4 sm:px-6 lg:px-12 font-sans relative overflow-hidden">
@@ -319,7 +346,8 @@ const AdminDashboard = () => {
             { id: 'feedbacks', label: `Client Feedbacks (${feedbacks.length})`, icon: LuMessageSquare },
             { id: 'problems', label: `Support Tickets (${problems.length})`, icon: LuLifeBuoy, count: pendingProblemsCount },
             { id: 'payments', label: `Premium Payments (${payments.length})`, icon: LuCreditCard, count: pendingPaymentsCount },
-            { id: 'proposals', label: `Proposal ID Verifications (${proposalProfiles.length})`, icon: LuHeart, count: pendingProposalVerificationsCount }
+            { id: 'proposals', label: `Proposal ID Verifications (${proposalProfiles.length})`, icon: LuHeart, count: pendingProposalVerificationsCount },
+            { id: 'advertisements', label: `Campaign Ads (${advertisements.length})`, icon: LuMegaphone, count: pendingAdsCount }
           ].map(tab => (
             <button
               key={tab.id}
@@ -852,6 +880,173 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                     ))}
+                </div>
+              </div>
+            )}
+
+            {/* ADVERTISEMENTS TAB */}
+            {activeTab === 'advertisements' && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-black text-white">Campaign Advertisements</h3>
+                    <p className="text-xs text-slate-400">Review advertiser creative requests, activate live campaigns, and track impression analytics</p>
+                  </div>
+                  <span className="px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                    {advertisements.length} Campaigns Submitted
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {advertisements
+                    .filter(a => {
+                      const q = searchQuery.toLowerCase();
+                      return (
+                        (a.company_name || '').toLowerCase().includes(q) ||
+                        (a.ad_title || '').toLowerCase().includes(q) ||
+                        (a.contact_email || '').toLowerCase().includes(q) ||
+                        (a.placement_type || '').toLowerCase().includes(q)
+                      );
+                    })
+                    .map(ad => {
+                      const status = (ad.status || '').toUpperCase();
+                      const isPending = status === 'PENDING';
+                      const isActive = status === 'ACTIVE';
+                      const isExpired = status === 'EXPIRED';
+
+                      const rawImg = ad.image_url;
+                      const imgSrc = rawImg
+                        ? (rawImg.startsWith('http') ? rawImg : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`)
+                        : null;
+
+                      return (
+                        <div
+                          key={ad.id}
+                          className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition-all space-y-4"
+                        >
+                          <div className="space-y-3">
+                            {/* Artwork Image */}
+                            {imgSrc && (
+                              <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-slate-950 border border-slate-800 relative group">
+                                <img src={imgSrc} alt={ad.ad_title} className="w-full h-full object-contain" />
+                                <a
+                                  href={imgSrc}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold gap-1 transition-opacity"
+                                >
+                                  <LuExternalLink size={14} /> Full View Artwork
+                                </a>
+                              </div>
+                            )}
+
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <span className="text-[10px] font-black uppercase text-indigo-400 tracking-wider">
+                                  {ad.company_name}
+                                </span>
+                                <h4 className="text-base font-bold text-white mt-0.5 line-clamp-1">{ad.ad_title}</h4>
+                              </div>
+                              <span
+                                className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shrink-0 ${
+                                  isActive
+                                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                    : isPending
+                                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                    : isExpired
+                                    ? 'bg-slate-700/50 text-slate-400 border border-slate-700'
+                                    : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                                }`}
+                              >
+                                {status}
+                              </span>
+                            </div>
+
+                            <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{ad.ad_description}</p>
+
+                            {/* Details Chips */}
+                            <div className="space-y-1.5 pt-2 border-t border-slate-800/80 text-xs text-slate-300">
+                              <div className="flex justify-between">
+                                <span className="text-slate-500">Placement:</span>
+                                <span className="font-bold text-indigo-300">{ad.placement_type}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-slate-500">Duration:</span>
+                                <span className="font-bold">{ad.duration_days} Days</span>
+                              </div>
+                              {ad.target_campus && (
+                                <div className="flex justify-between">
+                                  <span className="text-slate-500">Target Campus:</span>
+                                  <span className="font-bold text-cyan-400 truncate max-w-[150px]">{ad.target_campus}</span>
+                                </div>
+                              )}
+                              <div className="flex justify-between">
+                                <span className="text-slate-500">Stats:</span>
+                                <span className="font-bold text-slate-200">
+                                  {ad.views || 0} views • {ad.clicks || 0} clicks
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Contact Row */}
+                            <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] space-y-1">
+                              <p className="text-slate-400 truncate">📧 {ad.contact_email}</p>
+                              {ad.contact_phone && (
+                                <p className="text-slate-400">
+                                  📱 {ad.contact_phone}{' '}
+                                  <a
+                                    href={`https://wa.me/${ad.contact_phone.replace(/[^0-9]/g, '')}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-emerald-400 font-bold ml-1 hover:underline"
+                                  >
+                                    (WhatsApp)
+                                  </a>
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Action Buttons */}
+                          <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
+                            <div className="flex gap-2">
+                              {status !== 'ACTIVE' && (
+                                <button
+                                  onClick={() => handleAdStatus(ad.id, 'ACTIVE')}
+                                  className="px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                                >
+                                  <LuCheck size={13} /> Activate Live
+                                </button>
+                              )}
+                              {status === 'ACTIVE' && (
+                                <button
+                                  onClick={() => handleAdStatus(ad.id, 'PAUSED')}
+                                  className="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white border border-amber-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                                >
+                                  Pause
+                                </button>
+                              )}
+                              {status === 'PENDING' && (
+                                <button
+                                  onClick={() => handleAdStatus(ad.id, 'REJECTED')}
+                                  className="px-3 py-1.5 rounded-xl bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                                >
+                                  <LuX size={13} /> Reject
+                                </button>
+                              )}
+                            </div>
+
+                            <button
+                              onClick={() => handleDeleteAd(ad.id)}
+                              className="p-2 rounded-xl bg-slate-800 hover:bg-rose-600 hover:text-white text-slate-400 transition-all cursor-pointer"
+                              title="Delete Campaign"
+                            >
+                              <LuTrash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             )}
