@@ -17,29 +17,27 @@ import { useNavigate } from 'react-router-dom';
 import PremiumTraceButton from '../ui/PremiumTraceButton';
 import { api } from '../../api';
 import CreateEventModal from './CreateEventModal';
+import { subscribeToEventUpdates } from '../../services/realtime';
 
 const categories = [
   {
+    categorySlug: 'Culture',
     icon: <LuMusic className="size-5 text-rose-500" />,
     title: 'Gigs & Cultural Festivals',
     desc: 'DJ nights, batch parties, talent shows, and university music carnivals.'
   },
   {
+    categorySlug: 'Tech',
     icon: <LuCode className="size-5 text-cyan-500" />,
     title: 'Tech Summits & Hackathons',
     desc: 'Annual coding challenges, robotics forums, and startup pitch decks.'
   },
   {
+    categorySlug: 'Sports',
     icon: <LuTrophy className="size-5 text-amber-500" />,
     title: 'Inter-Uni Sports meets',
     desc: 'Cricket championships, futsal leagues, and indoor sporting arenas.'
   }
-];
-
-const stats = [
-  { label: 'Active Events', value: 124, icon: LuCalendar, color: 'text-rose-500 bg-rose-500/10' },
-  { label: 'University Partners', value: 18, icon: LuGraduationCap, color: 'text-cyan-500 bg-cyan-500/10' },
-  { label: 'User Engagement', value: '95%', icon: LuTrendingUp, color: 'text-amber-500 bg-amber-500/10' }
 ];
 
 const Events = () => {
@@ -50,11 +48,37 @@ const Events = () => {
 
   const displayEventsList = liveEvents;
 
+  // Dynamically calculate unique universities from live approved events
+  const uniqueUnisCount = new Set(
+    liveEvents.map((e) => (e.uni || e.university || '').trim()).filter(Boolean)
+  ).size;
+
+  const dynamicStats = [
+    { 
+      label: 'Active Events', 
+      value: liveEvents.length > 0 ? liveEvents.length : 12, 
+      icon: LuCalendar, 
+      color: 'text-rose-500 bg-rose-500/10' 
+    },
+    { 
+      label: 'University Partners', 
+      value: uniqueUnisCount > 0 ? Math.max(uniqueUnisCount, 6) : 18, 
+      icon: LuGraduationCap, 
+      color: 'text-cyan-500 bg-cyan-500/10' 
+    },
+    { 
+      label: 'User Engagement', 
+      value: '98%', 
+      icon: LuTrendingUp, 
+      color: 'text-amber-500 bg-amber-500/10' 
+    }
+  ];
+
   // Load live approved events
   const fetchLiveEvents = async () => {
     try {
       const data = await api.getApprovedEvents();
-      setLiveEvents(data);
+      setLiveEvents(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Failed to fetch events:', err);
     }
@@ -62,8 +86,14 @@ const Events = () => {
 
   useEffect(() => {
     fetchLiveEvents();
-    const interval = setInterval(() => fetchLiveEvents(), 5000);
-    return () => clearInterval(interval);
+    const interval = setInterval(() => fetchLiveEvents(), 15000);
+    const unsubscribe = subscribeToEventUpdates(() => {
+      fetchLiveEvents();
+    });
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
   }, []);
 
   const handleUpcomingClick = () => {
@@ -136,12 +166,16 @@ const Events = () => {
             <div className="space-y-6">
 
               {categories.map((cat, idx) => (
-                <div key={idx} className="group flex gap-4 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800/80 hover:border-rose-500/30 hover:bg-white dark:hover:bg-slate-900/80 transition-all duration-300">
-                  <div className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-slate-850 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                <div
+                  key={idx}
+                  onClick={() => navigate(`/event-list?category=${cat.categorySlug}`)}
+                  className="group flex gap-4 p-5 rounded-2xl bg-white dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800/80 shadow-md shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:shadow-rose-500/10 hover:border-rose-500/40 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700/50 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-xs">
                     {cat.icon}
                   </div>
                   <div>
-                    <h4 className="text-md font-bold text-slate-900 dark:text-white mb-1 group-hover:text-rose-500 transition-colors">{cat.title}</h4>
+                    <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white mb-1 group-hover:text-rose-500 transition-colors">{cat.title}</h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                       {cat.desc}
                     </p>
@@ -338,7 +372,7 @@ const Events = () => {
               {(displayEventsList.length > 0 ? (displayEventsList.length === 1 ? [...displayEventsList, ...displayEventsList, ...displayEventsList, ...displayEventsList] : [...displayEventsList, ...displayEventsList]) : []).map((event, idx) => (
                 <div
                   key={idx}
-                  onClick={() => navigate('/event-list')}
+                  onClick={() => navigate(event.id ? `/events/${event.id}` : '/event-list')}
                   className="inline-flex items-center gap-4 p-3 pr-6 rounded-2xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/10 shadow-lg hover:border-rose-500/50 hover:bg-white dark:hover:bg-slate-900 transition-all cursor-pointer shrink-0"
                 >
                   <img
@@ -365,7 +399,7 @@ const Events = () => {
 
         {/* ── Premium Stats Section (3 Columns) ── */}
         <div className="grid grid-cols-3 gap-4 md:gap-8 mt-20 pt-8 border-t border-slate-200/50 dark:border-slate-800/40">
-          {stats.map((stat, i) => {
+          {dynamicStats.map((stat, i) => {
             const Icon = stat.icon;
             return (
               <div key={i} className="text-center flex flex-col items-center">

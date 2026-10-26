@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuSearch, LuPlus, LuShoppingBag, LuBriefcase, LuShieldCheck,
@@ -20,7 +20,12 @@ import SEO from '../../components/SEO';
 
 const MarketplaceHome: React.FC = () => {
   const navigate = useNavigate();
-  const [filter, setFilter] = useState<'All' | 'PRODUCT' | 'GIG' | 'OFFICIAL_PRODUCT'>('All');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const urlType = searchParams.get('type');
+  const validFilters = ['PRODUCT', 'GIG', 'OFFICIAL_PRODUCT'];
+  const initialFilter = urlType && validFilters.includes(urlType.toUpperCase()) ? (urlType.toUpperCase() as any) : 'All';
+
+  const [filter, setFilter] = useState<'All' | 'PRODUCT' | 'GIG' | 'OFFICIAL_PRODUCT'>(initialFilter);
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'price_low' | 'price_high' | 'rating'>('newest');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,6 +34,10 @@ const MarketplaceHome: React.FC = () => {
   const [authTarget, setAuthTarget] = useState<'post_ad' | 'checkout' | null>(null);
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
 
   // Cart States for Official Store
   const [cart, setCart] = useState<any[]>([]);
@@ -67,10 +76,10 @@ const MarketplaceHome: React.FC = () => {
       toast.error('Please log in to add items to your cart.');
       return;
     }
-    const existing = cart.find(i => i.id === item.id);
+    const existing = cart.find(i => String(i.id) === String(item.id));
     let newCart = [];
     if (existing) {
-      newCart = cart.map(i => i.id === item.id ? { ...i, quantity: i.quantity + qty } : i);
+      newCart = cart.map(i => String(i.id) === String(item.id) ? { ...i, quantity: i.quantity + qty } : i);
     } else {
       newCart = [...cart, {
         id: item.id,
@@ -90,12 +99,12 @@ const MarketplaceHome: React.FC = () => {
 
   const updateCartQuantity = (itemId: string, newQty: number) => {
     if (newQty < 1) return;
-    const newCart = cart.map(i => i.id === itemId ? { ...i, quantity: newQty } : i);
+    const newCart = cart.map(i => String(i.id) === String(itemId) ? { ...i, quantity: newQty } : i);
     saveCart(newCart);
   };
 
   const removeFromCart = (itemId: string) => {
-    const newCart = cart.filter(i => i.id !== itemId);
+    const newCart = cart.filter(i => String(i.id) !== String(itemId));
     saveCart(newCart);
     toast.success('Item removed from cart.');
   };
@@ -153,12 +162,20 @@ const MarketplaceHome: React.FC = () => {
   const handleCartCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (cart.length === 0) return;
+    if (!cartPhone.trim()) {
+      toast.error('Please enter a valid delivery contact number.');
+      return;
+    }
+    if (!cartLocation.trim()) {
+      toast.error('Please enter your delivery address / hostel location.');
+      return;
+    }
     setIsSubmittingCheckout(true);
     try {
       const formData = new FormData();
       formData.append('cartItems', JSON.stringify(cart.map(i => ({ itemId: i.id, quantity: i.quantity, price: i.price }))));
-      formData.append('deliveryPhone', cartPhone);
-      formData.append('deliveryLocation', cartLocation);
+      formData.append('deliveryPhone', cartPhone.trim());
+      formData.append('deliveryLocation', cartLocation.trim());
       formData.append('paymentMethod', cartPayment);
       formData.append('notes', cartNotes);
       if (cartPayment === 'BANK_TRANSFER' && uploadedReceipt) {
@@ -228,6 +245,10 @@ const MarketplaceHome: React.FC = () => {
       setShowAuthModal(true);
       return;
     }
+    const currentPhone = localStorage.getItem('userPhoneNumber');
+    const currentUni = localStorage.getItem('userUniversity');
+    if (currentPhone && !cartPhone) setCartPhone(currentPhone);
+    if (currentUni && !cartLocation) setCartLocation(currentUni);
     setCartStep(2);
   };
 
@@ -241,8 +262,13 @@ const MarketplaceHome: React.FC = () => {
   };
 
   useEffect(() => {
+    setCurrentPage(1);
     fetchItems();
   }, [filter]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, sortBy]);
 
   // Ensure userId is synced and handle cart opening trigger from header
   useEffect(() => {
@@ -399,6 +425,18 @@ const MarketplaceHome: React.FC = () => {
     }
     return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
   });
+
+  // Calculate pagination slices
+  const totalPages = Math.ceil(sortedItems.length / itemsPerPage);
+  const paginatedItems = sortedItems.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 400, behavior: 'smooth' });
+  };
 
   const popularKeywords = [
     { label: 'All Items', query: '' },
@@ -584,7 +622,15 @@ const MarketplaceHome: React.FC = () => {
                 return (
                   <button
                     key={tab.key}
-                    onClick={() => setFilter(tab.key as any)}
+                    onClick={() => {
+                      setFilter(tab.key as any);
+                      if (tab.key === 'All') {
+                        searchParams.delete('type');
+                      } else {
+                        searchParams.set('type', tab.key);
+                      }
+                      setSearchParams(searchParams, { replace: true });
+                    }}
                     className={`relative px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center gap-2 whitespace-nowrap cursor-pointer border-none outline-none ${
                       isActive
                         ? 'text-white shadow-lg shadow-indigo-500/25'
@@ -700,24 +746,79 @@ const MarketplaceHome: React.FC = () => {
             ))}
           </div>
         ) : sortedItems.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {sortedItems.map((item, index) => (
-              <React.Fragment key={item.id}>
-                <MarketplaceCard
-                  item={item}
-                  onClick={() => {
-                    navigate(`/market/${item.id}`);
-                  }}
-                  onAddToCart={(item) => addToCart(item, 1, false)}
-                />
-                {(index + 1) % 8 === 0 && (
-                  <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4">
-                    <AdNativeFeed adIndex={Math.floor((index + 1) / 8) - 1} />
-                  </div>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {paginatedItems.map((item, index) => (
+                <React.Fragment key={item.id}>
+                  <MarketplaceCard
+                    item={item}
+                    onClick={() => {
+                      navigate(`/market/${item.id}`);
+                    }}
+                    onAddToCart={(item) => addToCart(item, 1, false)}
+                  />
+                  {(index + 1) % 8 === 0 && (
+                    <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4">
+                      <AdNativeFeed adIndex={Math.floor((index + 1) / 8) - 1} />
+                    </div>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+
+            {/* Glassmorphic Pagination Bar */}
+            {totalPages > 1 && (
+              <div className="mt-16 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 p-4 sm:p-5 rounded-3xl shadow-xl">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                  Showing <span className="text-indigo-600 dark:text-indigo-400 font-black">{(currentPage - 1) * itemsPerPage + 1}</span> - <span className="text-indigo-600 dark:text-indigo-400 font-black">{Math.min(currentPage * itemsPerPage, sortedItems.length)}</span> of <span className="text-slate-900 dark:text-white font-black">{sortedItems.length}</span> items
+                </span>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className={`w-10 h-10 flex items-center justify-center rounded-2xl border transition-all ${
+                      currentPage === 1 
+                        ? 'border-slate-100 text-slate-300 dark:border-slate-800 dark:text-slate-600 cursor-not-allowed' 
+                        : 'border-slate-200 text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer shadow-xs'
+                    }`}
+                  >
+                    <LuChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  {Array.from({ length: totalPages }).map((_, i) => {
+                    const pageNum = i + 1;
+                    const isActive = pageNum === currentPage;
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`w-10 h-10 flex items-center justify-center rounded-2xl text-xs font-black transition-all cursor-pointer ${
+                          isActive 
+                            ? 'bg-gradient-to-tr from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30 scale-105' 
+                            : 'bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-850 text-slate-700 dark:text-slate-300 border border-slate-200/70 dark:border-white/5'
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className={`w-10 h-10 flex items-center justify-center rounded-2xl border transition-all ${
+                      currentPage === totalPages 
+                        ? 'border-slate-100 text-slate-300 dark:border-slate-800 dark:text-slate-600 cursor-not-allowed' 
+                        : 'border-slate-200 text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer shadow-xs'
+                    }`}
+                  >
+                    <LuChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           /* High-Converting "Hustle Launchpad" Empty State */
           <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-b from-white via-slate-50/80 to-indigo-50/30 dark:from-slate-900 dark:via-slate-900/90 dark:to-indigo-950/20 border border-slate-200/80 dark:border-white/10 shadow-2xl p-8 sm:p-12 md:p-16 text-center">
@@ -942,7 +1043,11 @@ const MarketplaceHome: React.FC = () => {
                     <>
                       <div className="relative w-full h-64 md:h-96 flex items-center justify-center overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-950">
                         <img
-                          src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${selectedItem.images[activeImgIndex]}`}
+                          src={
+                            selectedItem.images[activeImgIndex].startsWith('http://') || selectedItem.images[activeImgIndex].startsWith('https://')
+                              ? selectedItem.images[activeImgIndex]
+                              : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${selectedItem.images[activeImgIndex].startsWith('/') ? '' : '/'}${selectedItem.images[activeImgIndex]}`
+                          }
                           alt={selectedItem.title}
                           className="max-w-full max-h-full object-contain"
                         />
@@ -1282,7 +1387,15 @@ const MarketplaceHome: React.FC = () => {
                       {cart.map((item) => (
                         <div key={item.id} className="flex gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/30 border border-slate-150 dark:border-white/5 transition-all">
                           {item.image ? (
-                            <img src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${item.image}`} alt="" className="w-16 h-16 rounded-xl object-cover border border-slate-200 dark:border-white/10 shrink-0" />
+                            <img 
+                              src={
+                                item.image.startsWith('http://') || item.image.startsWith('https://')
+                                  ? item.image
+                                  : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${item.image.startsWith('/') ? '' : '/'}${item.image}`
+                              } 
+                              alt={item.title} 
+                              className="w-16 h-16 rounded-xl object-cover border border-slate-200 dark:border-white/10 shrink-0" 
+                            />
                           ) : (
                             <div className="w-16 h-16 rounded-xl bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-400 text-xs shrink-0">No Img</div>
                           )}

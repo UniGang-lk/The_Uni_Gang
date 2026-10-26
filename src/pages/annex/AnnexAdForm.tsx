@@ -89,9 +89,16 @@ const LeafletAdMapPicker = ({
     return getUniCoords(uniId);
   };
 
+  const [mapReady, setMapReady] = useState(false);
+
   useEffect(() => {
+    let retryTimer: any;
     const loadMap = () => {
-      if (!(window as any).L) return;
+      if (!(window as any).L) {
+        retryTimer = setTimeout(loadMap, 200);
+        return;
+      }
+      setMapReady(true);
       const L = (window as any).L;
 
       const container = L.DomUtil.get('details-map-picker-canvas');
@@ -145,6 +152,9 @@ const LeafletAdMapPicker = ({
     loadMap();
 
     return () => {
+      if (retryTimer) {
+        clearTimeout(retryTimer);
+      }
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -198,10 +208,18 @@ const LeafletAdMapPicker = ({
   }, [lat, lng]);
 
   return (
-    <div
-      id="details-map-picker-canvas"
-      className="w-full h-[280px] rounded-[1.8rem] border border-white/40 dark:border-slate-800 relative z-10"
-    />
+    <div className="relative w-full h-[280px] rounded-[1.8rem] overflow-hidden border border-white/40 dark:border-slate-800">
+      {!mapReady && (
+        <div className="absolute inset-0 bg-slate-100 dark:bg-slate-900 flex items-center justify-center gap-2 text-xs font-bold text-slate-500">
+          <span className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></span>
+          Loading Map Location Picker...
+        </div>
+      )}
+      <div
+        id="details-map-picker-canvas"
+        className="w-full h-full relative z-10"
+      />
+    </div>
   );
 };
 

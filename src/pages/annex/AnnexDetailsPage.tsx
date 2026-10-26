@@ -19,11 +19,18 @@ import toast from 'react-hot-toast';
 const LeafletDetailMap = ({ propertyLat, propertyLng, uniLat, uniLng, uniName, address }: {
   propertyLat: number; propertyLng: number; uniLat: number; uniLng: number; uniName: string; address: string;
 }) => {
+  const [mapReady, setMapReady] = useState(false);
+
   useEffect(() => {
     let map: any;
+    let retryTimer: any;
 
     function initMap() {
-      if (!(window as any).L) return;
+      if (!(window as any).L) {
+        retryTimer = setTimeout(initMap, 200);
+        return;
+      }
+      setMapReady(true);
       const L = (window as any).L;
 
       const container = L.DomUtil.get('details-map-canvas');
@@ -63,6 +70,9 @@ const LeafletDetailMap = ({ propertyLat, propertyLng, uniLat, uniLng, uniName, a
     initMap();
 
     return () => {
+      if (retryTimer) {
+        clearTimeout(retryTimer);
+      }
       if (map) {
         map.remove();
       }
@@ -70,10 +80,18 @@ const LeafletDetailMap = ({ propertyLat, propertyLng, uniLat, uniLng, uniName, a
   }, [propertyLat, propertyLng, uniLat, uniLng, address, uniName]);
 
   return (
-    <div 
-      id="details-map-canvas" 
-      className="w-full h-[320px] rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner z-10"
-    />
+    <div className="relative w-full h-[320px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-inner">
+      {!mapReady && (
+        <div className="absolute inset-0 bg-slate-100 dark:bg-slate-900 flex items-center justify-center gap-2 text-xs font-bold text-slate-500">
+          <span className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></span>
+          Loading Location Map...
+        </div>
+      )}
+      <div 
+        id="details-map-canvas" 
+        className="w-full h-full z-10 relative"
+      />
+    </div>
   );
 };
 
@@ -262,7 +280,7 @@ const AnnexDetailsPage = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 space-y-6"
+          className="w-full max-w-7xl 2xl:max-w-[1600px] 3xl:max-w-[1760px] mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-8 space-y-5 sm:space-y-6"
         >
           {/* Modern Top Breadcrumb Navigation */}
           <PageBreadcrumb
@@ -378,32 +396,32 @@ const AnnexDetailsPage = () => {
                 </div>
 
                 {/* Key Quick Info Grid */}
-                <div className="grid grid-cols-2 gap-2.5 text-xs font-bold pt-1">
-                  <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
-                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">Accommodation Type</span>
-                    <span className="text-slate-800 dark:text-slate-200 font-extrabold flex items-center gap-1.5">
-                      <LuHouse size={14} className="text-blue-600" />
-                      {annex.listing_type === 'ROOMMATE_WANTED' ? 'Roommate Finder' : 'Boarding / Annex'}
+                <div className="grid grid-cols-2 gap-2 sm:gap-2.5 text-xs font-bold pt-1">
+                  <div className="bg-slate-50 dark:bg-slate-800/50 p-2.5 sm:p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
+                    <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">Accommodation Type</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-extrabold flex items-center gap-1.5 text-[11px] sm:text-xs">
+                      <LuHouse size={14} className="text-blue-600 shrink-0" />
+                      <span className="truncate">{annex.listing_type === 'ROOMMATE_WANTED' ? 'Roommate Finder' : 'Boarding / Annex'}</span>
                     </span>
                   </div>
-                  <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
-                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">Walk to Campus</span>
-                    <span className="text-slate-800 dark:text-slate-200 font-extrabold flex items-center gap-1.5">
-                      <LuFootprints size={14} className="text-emerald-600" />
-                      {annex.walk_time_mins || annex.walkTimeMins || 5} Mins
+                  <div className="bg-slate-50 dark:bg-slate-800/50 p-2.5 sm:p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
+                    <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">Walk to Campus</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-extrabold flex items-center gap-1.5 text-[11px] sm:text-xs">
+                      <LuFootprints size={14} className="text-emerald-600 shrink-0" />
+                      <span>{annex.walk_time_mins || annex.walkTimeMins || 5} Mins</span>
                     </span>
                   </div>
-                  <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
-                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">Bedrooms & Bath</span>
-                    <span className="text-slate-800 dark:text-slate-200 font-extrabold">
+                  <div className="bg-slate-50 dark:bg-slate-800/50 p-2.5 sm:p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
+                    <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">Bedrooms & Bath</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-extrabold text-[11px] sm:text-xs truncate block">
                       {annex.beds || 1} Beds • {annex.bath || 'Shared Bath'}
                     </span>
                   </div>
-                  <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
-                    <span className="text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">Gender Policy</span>
-                    <span className="text-slate-800 dark:text-slate-200 font-extrabold flex items-center gap-1.5">
-                      <LuUsers size={14} className="text-pink-600" />
-                      {annex.gender_policy === 'GIRLS_ONLY' ? 'Girls Only' : annex.gender_policy === 'BOYS_ONLY' ? 'Boys Only' : 'Any Student'}
+                  <div className="bg-slate-50 dark:bg-slate-800/50 p-2.5 sm:p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
+                    <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">Gender Policy</span>
+                    <span className="text-slate-800 dark:text-slate-200 font-extrabold flex items-center gap-1.5 text-[11px] sm:text-xs">
+                      <LuUsers size={14} className="text-pink-600 shrink-0" />
+                      <span className="truncate">{annex.gender_policy === 'GIRLS_ONLY' ? 'Girls Only' : annex.gender_policy === 'BOYS_ONLY' ? 'Boys Only' : 'Any Student'}</span>
                     </span>
                   </div>
                 </div>
@@ -439,7 +457,7 @@ const AnnexDetailsPage = () => {
                         toast.error(err.message || 'Failed to send inquiry.');
                       }
                     }}
-                    className="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white rounded-2xl font-bold text-sm shadow-xl shadow-blue-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer border-none"
+                    className="w-full py-3.5 sm:py-4 px-4 sm:px-6 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white rounded-2xl font-bold text-xs sm:text-sm shadow-xl shadow-blue-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer border-none"
                   >
                     <LuMessageCircle size={18} />
                     <span>Send Inquiry to Landlord</span>
@@ -449,7 +467,7 @@ const AnnexDetailsPage = () => {
                     href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this student accommodation on The Uni Gang: ${annex.title}\n\nhttps://unigang.lk/share/annex/${annex.id}`)}`}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full py-3.5 px-6 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2 border border-emerald-200 dark:border-emerald-800 cursor-pointer"
+                    className="w-full py-3 sm:py-3.5 px-4 sm:px-6 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2 border border-emerald-200 dark:border-emerald-800 cursor-pointer"
                   >
                     <LuShare2 size={16} />
                     <span>Share on WhatsApp</span>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
     LuCalendar, LuMapPin, LuGraduationCap,
     LuClock, LuMessageCircle, LuArrowRight, LuSparkles,
-    LuTicket, LuPlus, LuSearch, LuX
+    LuTicket, LuPlus, LuSearch, LuX, LuChevronLeft, LuChevronRight
 } from "react-icons/lu";
 import { motion, AnimatePresence } from "framer-motion";
 import TiltCard from '../../components/ui/TiltCard';
@@ -15,6 +15,7 @@ import AdBanner from '../../components/advertise/AdBanner';
 import AdNativeFeed from '../../components/advertise/AdNativeFeed';
 import SEO from '../../components/SEO';
 import CreateEventModal from '../../components/events/CreateEventModal';
+import { subscribeToEventUpdates } from '../../services/realtime';
 
 const FloatingIcon = ({ icon: Icon, index }: { icon: React.ComponentType, index: number }) => (
     <motion.div
@@ -44,14 +45,22 @@ const FloatingIcon = ({ icon: Icon, index }: { icon: React.ComponentType, index:
 
 const EventList: React.FC = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [, setIsScrolled] = useState(false);
     const [loading, setLoading] = useState(true);
     const [events, setEvents] = useState<any[]>([]);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
+    const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
 
     const CATEGORY_TABS = ['All', 'Tech', 'Culture', 'Sports', 'Business', 'Academic', 'Lifestyle'];
+
+    useEffect(() => {
+        const cat = searchParams.get('category');
+        if (cat) setSelectedCategory(cat);
+        const q = searchParams.get('q');
+        if (q) setSearchTerm(q);
+    }, [searchParams]);
 
     const loadEvents = async (silent = false) => {
         try {
@@ -67,8 +76,14 @@ const EventList: React.FC = () => {
 
     useEffect(() => {
         loadEvents();
-        const interval = setInterval(() => loadEvents(true), 5000);
-        return () => clearInterval(interval);
+        const interval = setInterval(() => loadEvents(true), 15000);
+        const unsubscribe = subscribeToEventUpdates(() => {
+            loadEvents(true);
+        });
+        return () => {
+            clearInterval(interval);
+            unsubscribe();
+        };
     }, []);
 
     useEffect(() => {
@@ -76,6 +91,9 @@ const EventList: React.FC = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 9;
 
     const filteredEvents = events.filter((e) => {
         const term = searchTerm.toLowerCase().trim();
@@ -93,7 +111,16 @@ const EventList: React.FC = () => {
         return matchesSearch && matchesCategory;
     });
 
-    const displayEvents = filteredEvents;
+    // Reset to page 1 whenever filters change
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, selectedCategory]);
+
+    const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const paginatedEvents = filteredEvents.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+    const displayEvents = paginatedEvents;
     const featuredEvent = events[0] || null;
     const featuredImageUrl = featuredEvent?.image
         ? (featuredEvent.image.startsWith('http') ? featuredEvent.image : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${featuredEvent.image}`)
@@ -108,10 +135,10 @@ const EventList: React.FC = () => {
         }
         try {
             const chat = await api.startEventChat(eventId);
-            window.location.href = `/profile?tab=inbox&chatId=${chat.id}&type=event`;
+            navigate(`/profile?tab=inbox&chatId=${chat.id}&type=event`);
         } catch (err: any) {
             console.error(err);
-            toast.error(err.message || "Failed to start chat session.");
+            navigate(`/profile?tab=inbox&type=event&eventId=${eventId}`);
         }
     };
 
@@ -496,6 +523,58 @@ const EventList: React.FC = () => {
                                     })}
                                 </motion.div>
                             </AnimatePresence>
+
+                            {/* Pagination Controls */}
+                            {totalPages > 1 && (
+                                <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4 py-4 px-6 rounded-2xl bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 shadow-sm">
+                                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                        Showing <span className="font-bold text-slate-900 dark:text-white">{startIndex + 1}</span> to <span className="font-bold text-slate-900 dark:text-white">{Math.min(startIndex + ITEMS_PER_PAGE, filteredEvents.length)}</span> of <span className="font-bold text-slate-900 dark:text-white">{filteredEvents.length}</span> campus events
+                                    </p>
+
+                                    <div className="flex items-center gap-1.5">
+                                        <button
+                                            onClick={() => {
+                                                setCurrentPage(prev => Math.max(1, prev - 1));
+                                                window.scrollTo({ top: 400, behavior: 'smooth' });
+                                            }}
+                                            disabled={currentPage === 1}
+                                            className="p-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-700 transition-all cursor-pointer shadow-xs"
+                                            title="Previous Page"
+                                        >
+                                            <LuChevronLeft className="w-4 h-4" />
+                                        </button>
+
+                                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                            <button
+                                                key={page}
+                                                onClick={() => {
+                                                    setCurrentPage(page);
+                                                    window.scrollTo({ top: 400, behavior: 'smooth' });
+                                                }}
+                                                className={`min-w-[2.25rem] h-9 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                                                    currentPage === page
+                                                        ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/25'
+                                                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:border-blue-400/50'
+                                                }`}
+                                            >
+                                                {page}
+                                            </button>
+                                        ))}
+
+                                        <button
+                                            onClick={() => {
+                                                setCurrentPage(prev => Math.min(totalPages, prev + 1));
+                                                window.scrollTo({ top: 400, behavior: 'smooth' });
+                                            }}
+                                            disabled={currentPage === totalPages}
+                                            className="p-2 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-50 dark:hover:bg-slate-700 transition-all cursor-pointer shadow-xs"
+                                            title="Next Page"
+                                        >
+                                            <LuChevronRight className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Empty State */}
                             {displayEvents.length === 0 && (

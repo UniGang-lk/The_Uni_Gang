@@ -129,13 +129,13 @@ const Annex = () => {
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute -top-4 -left-4 px-4 py-3 bg-white dark:bg-slate-800 border border-slate-150 dark:border-slate-700 rounded-2xl shadow-[0_24px_48px_-12px_rgba(59,130,246,0.2)] flex items-center gap-3 z-30"
+                className="absolute -top-4 -left-4 px-4 py-3 bg-white/95 dark:bg-slate-850/95 backdrop-blur-md border border-slate-200/90 dark:border-white/10 rounded-2xl shadow-xl shadow-slate-900/5 dark:shadow-black/20 flex items-center gap-3 z-30"
               >
                 <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center">
                   <LuMapPin size={16} />
                 </div>
                 <div>
-                  <div className="text-[8px] uppercase tracking-wider text-slate-400 font-bold">Proximity</div>
+                  <div className="text-[8px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">Proximity</div>
                   <div className="text-xs font-black text-slate-800 dark:text-white">&lt; 1km to Campus</div>
                 </div>
               </motion.div>
@@ -144,13 +144,13 @@ const Annex = () => {
               <motion.div
                 animate={{ y: [0, -8, 0] }}
                 transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-                className="absolute -bottom-4 -right-4 px-4 py-3 bg-white dark:bg-slate-800 border border-slate-150 dark:border-slate-700 rounded-2xl shadow-[0_24px_48px_-12px_rgba(20,184,166,0.2)] flex items-center gap-3 z-30"
+                className="absolute -bottom-4 -right-4 px-4 py-3 bg-white/95 dark:bg-slate-850/95 backdrop-blur-md border border-slate-200/90 dark:border-white/10 rounded-2xl shadow-xl shadow-slate-900/5 dark:shadow-black/20 flex items-center gap-3 z-30"
               >
                 <div className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-500 flex items-center justify-center">
                   <LuUsers size={16} />
                 </div>
                 <div>
-                  <div className="text-[8px] uppercase tracking-wider text-slate-400 font-bold">Roommates</div>
+                  <div className="text-[8px] uppercase tracking-wider text-slate-400 dark:text-slate-500 font-bold">Roommates</div>
                   <div className="text-xs font-black text-slate-800 dark:text-white">Batchmate Matching</div>
                 </div>
               </motion.div>
@@ -168,42 +168,42 @@ const Annex = () => {
 
           {/* RIGHT: Descriptive Feature Progression (5/12 cols) */}
           <div className="lg:col-span-5 flex flex-col justify-between h-full min-h-[460px] gap-8">
-            <div className="space-y-6">
+            <div className="space-y-4">
 
               {/* Feature 1 */}
-              <div className="group flex gap-4 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800/80 hover:border-blue-500/30 hover:bg-white dark:hover:bg-slate-900/80 transition-all duration-300">
-                <div className="w-11 h-11 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+              <div className="group flex gap-4 p-5 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200/80 dark:border-white/10 shadow-md shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:border-blue-500/40 hover:-translate-y-0.5 transition-all duration-300">
+                <div className="w-11 h-11 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                   <FiHome size={20} />
                 </div>
                 <div>
-                  <h4 className="text-md font-bold text-slate-900 dark:text-white mb-1">Boarding Place Finder</h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                  <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1">Boarding Place Finder</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                     Filter by exact university, budget range, and room specs. Browse interactive maps and check authentic property photos.
                   </p>
                 </div>
               </div>
 
               {/* Feature 2 */}
-              <div className="group flex gap-4 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800/80 hover:border-teal-500/30 hover:bg-white dark:hover:bg-slate-900/80 transition-all duration-300">
-                <div className="w-11 h-11 rounded-xl bg-teal-500/10 text-teal-500 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+              <div className="group flex gap-4 p-5 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200/80 dark:border-white/10 shadow-md shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:border-teal-500/40 hover:-translate-y-0.5 transition-all duration-300">
+                <div className="w-11 h-11 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                   <LuUsers size={20} />
                 </div>
                 <div>
-                  <h4 className="text-md font-bold text-slate-900 dark:text-white mb-1">Roommate Hub Integration</h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                  <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1">Roommate Hub Integration</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                     Looking to split boarding costs? Create roommate request listings or connect directly with student batchmates.
                   </p>
                 </div>
               </div>
 
               {/* Feature 3 */}
-              <div className="group flex gap-4 p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800/80 hover:border-emerald-500/30 hover:bg-white dark:hover:bg-slate-900/80 transition-all duration-300">
-                <div className="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+              <div className="group flex gap-4 p-5 rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200/80 dark:border-white/10 shadow-md shadow-slate-200/50 dark:shadow-none hover:shadow-xl hover:border-emerald-500/40 hover:-translate-y-0.5 transition-all duration-300">
+                <div className="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                   <LuShieldCheck size={20} />
                 </div>
                 <div>
-                  <h4 className="text-md font-bold text-slate-900 dark:text-white mb-1">Zero Scams Verification</h4>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                  <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1">Zero Scams Verification</h4>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                     Every listing undergoes physical coordinates and landlord verification checks, supported by honest student reviews.
                   </p>
                 </div>

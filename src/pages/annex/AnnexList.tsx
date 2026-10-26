@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     LuArrowRight, LuGraduationCap, LuSearch, LuArrowLeft, LuPlus,
     LuHeart, LuMapPin, LuBedDouble, LuMap, LuHouse, LuShieldCheck,
-    LuBus, LuFootprints, LuZap, LuDroplets, LuUtensils
+    LuBus, LuFootprints, LuZap, LuDroplets, LuUtensils, LuChevronDown, LuX
 } from "react-icons/lu";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import universitiesData from "../../constants/annex/Universities.json";
 import PremiumPageLoader from "../../components/ui/PremiumPageLoader";
 import PageBreadcrumb from "../../components/ui/PageBreadcrumb";
@@ -15,11 +15,19 @@ import VerifiedBadge from "../../components/ui/VerifiedBadge";
 
 // Dynamic Leaflet map rendering component with Proximity Radius Circle overlay
 const LeafletListMap = ({ items, centerUniId, maxDistance }: { items: any[], centerUniId: string, maxDistance: string }) => {
+    const [mapReady, setMapReady] = useState(false);
+
     useEffect(() => {
         let map: any;
+        let retryTimer: any;
 
         function initMap() {
-            if (!(window as any).L) return;
+            if (!(window as any).L) {
+                // Retry if Leaflet script is still fetching
+                retryTimer = setTimeout(initMap, 200);
+                return;
+            }
+            setMapReady(true);
             const L = (window as any).L;
             
             const container = L.DomUtil.get('list-map-canvas');
@@ -111,6 +119,9 @@ const LeafletListMap = ({ items, centerUniId, maxDistance }: { items: any[], cen
         initMap();
 
         return () => {
+            if (retryTimer) {
+                clearTimeout(retryTimer);
+            }
             if (map) {
                 map.remove();
             }
@@ -118,38 +129,85 @@ const LeafletListMap = ({ items, centerUniId, maxDistance }: { items: any[], cen
     }, [items, centerUniId, maxDistance]);
 
     return (
-        <div 
-            id="list-map-canvas" 
-            className="w-full h-[520px] rounded-[2.5rem] shadow-2xl border border-white/40 dark:border-slate-800 relative z-10"
-        />
+        <div className="relative w-full h-[520px] rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/40 dark:border-slate-800">
+            {!mapReady && (
+                <div className="absolute inset-0 bg-slate-100 dark:bg-slate-900 flex items-center justify-center gap-2 text-xs font-bold text-slate-500">
+                    <span className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></span>
+                    Loading Interactive Campus Map...
+                </div>
+            )}
+            <div 
+                id="list-map-canvas" 
+                className="w-full h-full relative z-10"
+            />
+        </div>
     );
 };
 
 const AnnexList = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [currentPage, setCurrentPage] = useState(1);
     const [favorites, setFavorites] = useState<string[]>([]);
     const [mapView, setMapView] = useState(false);
 
+    // Read initial category from URL (?category=ROOMMATE_WANTED or LANDLORD_RENT)
+    const getInitialCategory = (): 'ALL' | 'LANDLORD_RENT' | 'ROOMMATE_WANTED' => {
+        const params = new URLSearchParams(location.search);
+        const cat = params.get('category');
+        if (cat === 'ROOMMATE_WANTED' || cat === 'LANDLORD_RENT') {
+            return cat;
+        }
+        return 'ALL';
+    };
+
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedUni, setSelectedUni] = useState("All Universities");
     const [maxDistance, setMaxDistance] = useState("Any Distance");
-    const [activeCategory, setActiveCategory] = useState<'ALL' | 'LANDLORD_RENT' | 'ROOMMATE_WANTED'>('ALL');
+    const [activeCategory, setActiveCategory] = useState<'ALL' | 'LANDLORD_RENT' | 'ROOMMATE_WANTED'>(getInitialCategory);
     const [loading, setLoading] = useState(true);
     const [annexes, setAnnexes] = useState<any[]>([]);
 
-    const fetchAnnexes = async () => {
+    // Custom Dropdown Open States & Search inputs
+    const [isUniDropdownOpen, setIsUniDropdownOpen] = useState(false);
+    const [isDistanceDropdownOpen, setIsDistanceDropdownOpen] = useState(false);
+    const [uniFilterQuery, setUniFilterQuery] = useState("");
+    const uniDropdownRef = useRef<HTMLDivElement>(null);
+    const distDropdownRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdowns on outside click
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (uniDropdownRef.current && !uniDropdownRef.current.contains(e.target as Node)) {
+                setIsUniDropdownOpen(false);
+            }
+            if (distDropdownRef.current && !distDropdownRef.current.contains(e.target as Node)) {
+                setIsDistanceDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // Stored active search query (only updated on Search Click)
+    const [appliedFilters, setAppliedFilters] = useState({
+        uni: "All Universities",
+        dist: "Any Distance",
+        search: ""
+    });
+
+    const fetchAnnexes = async (filtersToApply = appliedFilters, category = activeCategory) => {
         setLoading(true);
         try {
             const queryParams = new URLSearchParams();
-            if (selectedUni !== "All Universities") {
-                queryParams.append("universityId", selectedUni);
+            if (filtersToApply.uni !== "All Universities") {
+                queryParams.append("universityId", filtersToApply.uni);
             }
-            if (maxDistance !== "Any Distance" && selectedUni !== "All Universities") {
-                queryParams.append("maxDistance", maxDistance);
+            if (filtersToApply.dist !== "Any Distance" && filtersToApply.uni !== "All Universities") {
+                queryParams.append("maxDistance", filtersToApply.dist);
             }
-            if (activeCategory !== 'ALL') {
-                queryParams.append("listingType", activeCategory);
+            if (category !== 'ALL') {
+                queryParams.append("listingType", category);
             }
 
             const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/annexes?${queryParams.toString()}`);
@@ -157,8 +215,8 @@ const AnnexList = () => {
             
             const rawList = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
             let filtered = rawList;
-            if (searchTerm.trim() !== "") {
-                const query = searchTerm.toLowerCase();
+            if (filtersToApply.search.trim() !== "") {
+                const query = filtersToApply.search.toLowerCase();
                 const numericQuery = parseFloat(query);
                 const isNumeric = !isNaN(numericQuery);
 
@@ -183,14 +241,23 @@ const AnnexList = () => {
         }
     };
 
+    // Initial load and category change
     useEffect(() => {
         setCurrentPage(1);
-        fetchAnnexes();
-    }, [selectedUni, maxDistance, activeCategory]);
+        fetchAnnexes(appliedFilters, activeCategory);
+    }, [activeCategory]);
 
+    // Explicit Search Button Trigger
     const handleSearchClick = () => {
-        fetchAnnexes();
+        const nextFilters = {
+            uni: selectedUni,
+            dist: maxDistance,
+            search: searchTerm
+        };
+        setAppliedFilters(nextFilters);
         setCurrentPage(1);
+        fetchAnnexes(nextFilters, activeCategory);
+        document.getElementById('listing-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
     const safeAnnexes = Array.isArray(annexes) ? annexes : [];
@@ -259,7 +326,7 @@ const AnnexList = () => {
                         transition={{ duration: 0.5 }}
                     >
                         {/* Top Action Bar with Breadcrumbs */}
-                        <div className="max-w-7xl mx-auto px-4 md:px-8 pt-4 relative z-20">
+                        <div className="w-full max-w-7xl 2xl:max-w-[1600px] 3xl:max-w-[1760px] mx-auto px-4 md:px-8 pt-4 relative z-20">
                             <PageBreadcrumb
                                 items={[
                                     { label: 'Accommodations', active: true }
@@ -271,7 +338,7 @@ const AnnexList = () => {
                         </div>
 
                         {/* Hero Section */}
-                        <main className="pt-2 pb-10 px-4 md:px-8 max-w-7xl mx-auto">
+                        <main className="pt-2 pb-10 px-4 md:px-8 w-full max-w-7xl 2xl:max-w-[1600px] 3xl:max-w-[1760px] mx-auto">
                             <div className="grid lg:grid-cols-2 gap-16 items-center">
                                 {/* Left Content */}
                                 <div className="relative z-10 space-y-10">
@@ -375,92 +442,236 @@ const AnnexList = () => {
                                             <LuSearch className="text-blue-800 dark:text-blue-400" /> Keyword or Location
                                         </label>
                                         <input
-                                            className="w-full bg-transparent border-none focus:ring-0 focus:outline-none text-slate-900 dark:text-white font-bold placeholder:text-slate-400 dark:placeholder:text-slate-500 py-1"
+                                            className="w-full bg-transparent border-none focus:ring-0 focus:outline-none text-slate-900 dark:text-white font-bold placeholder:text-slate-400 dark:placeholder:text-slate-500 py-1 text-sm"
                                             placeholder="e.g. Colombo, attached bath..."
                                             type="text"
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleSearchClick()}
                                         />
                                     </div>
 
                                     {/* Vertical Divider */}
                                     <div className="h-12 w-[1px] bg-slate-200 dark:bg-slate-700 hidden lg:block self-center"></div>
 
-                                    {/* Stand 2: Nearest Campus */}
-                                    <div className="flex-1 w-full flex flex-col px-6 py-2 rounded-2xl hover:bg-white/50 dark:hover:bg-slate-800/30 transition-all">
+                                    {/* Stand 2: Nearest Campus Custom Dropdown */}
+                                    <div ref={uniDropdownRef} className="flex-1 w-full flex flex-col px-6 py-2 rounded-2xl hover:bg-white/50 dark:hover:bg-slate-800/30 transition-all relative">
                                         <label className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-1.5">
                                             <LuGraduationCap className="text-blue-800 dark:text-blue-400" /> Nearest Campus
                                         </label>
-                                        <select
-                                            className="w-full bg-transparent border-none focus:ring-0 focus:outline-none text-slate-900 dark:text-white font-bold cursor-pointer appearance-none py-1"
-                                            value={selectedUni}
-                                            onChange={(e) => {
-                                                setSelectedUni(e.target.value);
-                                                if (e.target.value === "All Universities") setMaxDistance("Any Distance");
+                                        
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setIsUniDropdownOpen(!isUniDropdownOpen);
+                                                setIsDistanceDropdownOpen(false);
                                             }}
+                                            className="w-full bg-transparent border-none p-0 flex items-center justify-between text-left text-slate-900 dark:text-white font-bold text-sm cursor-pointer py-1"
                                         >
-                                            <option className="text-slate-900 dark:bg-slate-800 font-bold" value="All Universities">All Universities</option>
-                                            {universitiesData.map(uni => (
-                                                <option key={uni.id} value={uni.id} className="text-slate-900 dark:bg-slate-800 font-bold">{uni.name}</option>
-                                            ))}
-                                        </select>
+                                            <span className="truncate pr-2">
+                                                {selectedUni === "All Universities" 
+                                                    ? "All Universities" 
+                                                    : universitiesData.find(u => String(u.id) === String(selectedUni))?.name || "All Universities"}
+                                            </span>
+                                            <LuChevronDown className={`text-slate-400 text-base transition-transform duration-200 shrink-0 ${isUniDropdownOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+
+                                        {/* Custom Floating Uni Dropdown Menu */}
+                                        <AnimatePresence>
+                                            {isUniDropdownOpen && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: 10, scale: 0.98 }}
+                                                    transition={{ duration: 0.15 }}
+                                                    className="absolute top-full left-0 right-0 sm:right-auto sm:w-[320px] mt-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-slate-200/80 dark:border-slate-800 p-2 z-50 overflow-hidden"
+                                                >
+                                                    {/* Search box inside dropdown */}
+                                                    <div className="p-2 border-b border-slate-100 dark:border-slate-800 mb-1 flex items-center gap-2">
+                                                        <LuSearch className="text-slate-400 text-xs shrink-0" />
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Search university..."
+                                                            value={uniFilterQuery}
+                                                            onChange={(e) => setUniFilterQuery(e.target.value)}
+                                                            className="w-full bg-transparent border-none text-xs font-semibold focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400"
+                                                            autoFocus
+                                                        />
+                                                        {uniFilterQuery && (
+                                                            <button 
+                                                                type="button" 
+                                                                onClick={() => setUniFilterQuery("")}
+                                                                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                                                            >
+                                                                <LuX size={12} />
+                                                            </button>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-0.5">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setSelectedUni("All Universities");
+                                                                setMaxDistance("Any Distance");
+                                                                setIsUniDropdownOpen(false);
+                                                                setUniFilterQuery("");
+                                                            }}
+                                                            className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-colors flex items-center justify-between ${
+                                                                selectedUni === "All Universities"
+                                                                    ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300'
+                                                                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                                                            }`}
+                                                        >
+                                                            <span>All Universities</span>
+                                                            {selectedUni === "All Universities" && <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>}
+                                                        </button>
+
+                                                        {universitiesData
+                                                            .filter(u => u.name.toLowerCase().includes(uniFilterQuery.toLowerCase()))
+                                                            .map((uni) => {
+                                                                const isSelected = String(selectedUni) === String(uni.id);
+                                                                return (
+                                                                    <button
+                                                                        type="button"
+                                                                        key={uni.id}
+                                                                        onClick={() => {
+                                                                            setSelectedUni(String(uni.id));
+                                                                            setIsUniDropdownOpen(false);
+                                                                            setUniFilterQuery("");
+                                                                        }}
+                                                                        className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-colors flex items-center justify-between ${
+                                                                            isSelected
+                                                                                ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300'
+                                                                                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                                                                        }`}
+                                                                    >
+                                                                        <span className="truncate pr-2">{uni.name}</span>
+                                                                        {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0"></span>}
+                                                                    </button>
+                                                                );
+                                                            })}
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
 
                                     {/* Vertical Divider */}
                                     <div className="h-12 w-[1px] bg-slate-200 dark:bg-slate-700 hidden lg:block self-center"></div>
 
-                                    {/* Stand 3: Proximity Limit */}
-                                    <div className="flex-1 w-full flex flex-col px-6 py-2 rounded-2xl hover:bg-white/50 dark:hover:bg-slate-800/30 transition-all">
+                                    {/* Stand 3: Proximity Limit Custom Dropdown */}
+                                    <div ref={distDropdownRef} className="flex-1 w-full flex flex-col px-6 py-2 rounded-2xl hover:bg-white/50 dark:hover:bg-slate-800/30 transition-all relative">
                                         <label className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-1.5">
                                             <LuMapPin className="text-blue-800 dark:text-blue-400 text-xs" /> Proximity Limit
                                         </label>
-                                        <select
-                                            className="w-full bg-transparent border-none focus:ring-0 focus:outline-none text-slate-900 dark:text-white font-bold cursor-pointer appearance-none py-1"
-                                            value={maxDistance}
-                                            onChange={(e) => setMaxDistance(e.target.value)}
+
+                                        <button
+                                            type="button"
                                             disabled={selectedUni === "All Universities"}
+                                            onClick={() => {
+                                                if (selectedUni !== "All Universities") {
+                                                    setIsDistanceDropdownOpen(!isDistanceDropdownOpen);
+                                                    setIsUniDropdownOpen(false);
+                                                }
+                                            }}
+                                            className={`w-full bg-transparent border-none p-0 flex items-center justify-between text-left font-bold text-sm py-1 ${
+                                                selectedUni === "All Universities"
+                                                    ? 'text-slate-400 cursor-not-allowed opacity-70'
+                                                    : 'text-slate-900 dark:text-white cursor-pointer'
+                                            }`}
                                         >
-                                            <option className="text-slate-900 dark:bg-slate-800 font-bold" value="Any Distance">
-                                                {selectedUni === "All Universities" ? "Select Campus First" : "Any Distance"}
-                                            </option>
-                                            <option className="text-slate-900 dark:bg-slate-800 font-bold" value="1">Within 1 km</option>
-                                            <option className="text-slate-900 dark:bg-slate-800 font-bold" value="2">Within 2 km</option>
-                                            <option className="text-slate-900 dark:bg-slate-800 font-bold" value="3">Within 3 km</option>
-                                            <option className="text-slate-900 dark:bg-slate-800 font-bold" value="5">Within 5 km</option>
-                                        </select>
+                                            <span className="truncate pr-2">
+                                                {selectedUni === "All Universities" 
+                                                    ? "Select Campus First" 
+                                                    : maxDistance === "Any Distance" 
+                                                        ? "Any Distance" 
+                                                        : `Within ${maxDistance} km`}
+                                            </span>
+                                            <LuChevronDown className={`text-slate-400 text-base transition-transform duration-200 shrink-0 ${isDistanceDropdownOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+
+                                        {/* Custom Floating Distance Dropdown Menu */}
+                                        <AnimatePresence>
+                                            {isDistanceDropdownOpen && selectedUni !== "All Universities" && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                    exit={{ opacity: 0, y: 10, scale: 0.98 }}
+                                                    transition={{ duration: 0.15 }}
+                                                    className="absolute top-full left-0 right-0 sm:right-auto sm:w-[220px] mt-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-slate-200/80 dark:border-slate-800 p-2 z-50 overflow-hidden"
+                                                >
+                                                    <div className="space-y-0.5">
+                                                        {[
+                                                            { val: "Any Distance", label: "Any Distance" },
+                                                            { val: "1", label: "Within 1 km" },
+                                                            { val: "2", label: "Within 2 km" },
+                                                            { val: "3", label: "Within 3 km" },
+                                                            { val: "5", label: "Within 5 km" }
+                                                        ].map(item => {
+                                                            const isSelected = maxDistance === item.val;
+                                                            return (
+                                                                <button
+                                                                    type="button"
+                                                                    key={item.val}
+                                                                    onClick={() => {
+                                                                        setMaxDistance(item.val);
+                                                                        setIsDistanceDropdownOpen(false);
+                                                                    }}
+                                                                    className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-colors flex items-center justify-between ${
+                                                                        isSelected
+                                                                            ? 'bg-blue-50 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300'
+                                                                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                                                                    }`}
+                                                                >
+                                                                    <span>{item.label}</span>
+                                                                    {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
 
                                     {/* Search Button */}
                                     <button
                                         onClick={handleSearchClick}
-                                        className="w-full lg:w-auto bg-blue-800 hover:bg-blue-900 text-white px-10 py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 group shadow-xl shadow-blue-800/20 flex-shrink-0 hover:scale-105 active:scale-95"
+                                        className="w-full lg:w-auto bg-blue-800 hover:bg-blue-900 text-white px-9 py-4 rounded-2xl font-black uppercase tracking-wider text-xs transition-all flex items-center justify-center gap-2 group shadow-xl shadow-blue-800/25 flex-shrink-0 hover:scale-105 active:scale-95 cursor-pointer"
                                     >
                                         Search Now
-                                        <LuArrowRight className="group-hover:translate-x-1 transition-transform text-lg" />
+                                        <LuArrowRight className="group-hover:translate-x-1 transition-transform text-base" />
                                     </button>
                                 </div>
                             </motion.div>
                         </main>
-
-                        {/* Annex Listings Section */}
-                        <section className="max-w-[1440px] mx-auto px-4 md:px-8 py-16" id="listing-grid">
-                            <div className="flex flex-col gap-8 mb-12">
+                        {/* Annex Listings Section */}
+                        <section className="w-full max-w-7xl 2xl:max-w-[1600px] 3xl:max-w-[1800px] mx-auto px-4 sm:px-6 md:px-8 py-14" id="listing-grid">
+                            <div className="flex flex-col gap-6 mb-10">
                                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                    <div className="space-y-2">
-                                        <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">Refined Accommodations</h2>
-                                        <p className="text-slate-500 dark:text-slate-400">The most coveted listings currently available near top campuses</p>
+                                    <div className="space-y-1.5">
+                                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-400 text-xs font-bold uppercase tracking-wider">
+                                            <LuGraduationCap className="text-sm" /> Campus Accommodations
+                                        </div>
+                                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-slate-900 dark:text-white">
+                                            Refined Accommodations
+                                        </h2>
+                                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                                            Verified boarding places and roommate requests near leading universities
+                                        </p>
                                     </div>
                                     <Link
                                         to="/post-ad"
-                                        className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-800 text-white rounded-full font-bold shadow-lg shadow-blue-800/30 hover:bg-blue-900 transition-all hover:scale-105 active:scale-95 w-full md:w-auto shrink-0"
+                                        className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-800 hover:bg-blue-900 text-white rounded-2xl font-bold text-sm shadow-xl shadow-blue-800/25 transition-all hover:scale-105 active:scale-95 w-full md:w-auto shrink-0"
                                     >
                                         <LuPlus className="text-lg" /> Post Advertisement
                                     </Link>
                                 </div>
 
-                                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pt-2">
                                     {/* Category Filter Tabs */}
-                                    <div className="flex p-1 bg-slate-100/80 dark:bg-slate-900/60 backdrop-blur-md border border-slate-200/50 dark:border-slate-800/80 rounded-2xl w-full lg:w-auto overflow-x-auto custom-scrollbar shrink-0 select-none">
+                                    <div className="flex p-1.5 bg-slate-100/90 dark:bg-slate-900/70 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/80 rounded-2xl w-full lg:w-auto overflow-x-auto custom-scrollbar shrink-0 select-none">
                                         {(['ALL', 'LANDLORD_RENT', 'ROOMMATE_WANTED'] as const).map((type) => (
                                             <button
                                                 key={type}
@@ -468,7 +679,7 @@ const AnnexList = () => {
                                                     setActiveCategory(type);
                                                     setCurrentPage(1);
                                                 }}
-                                                className={`flex-1 lg:flex-initial whitespace-nowrap px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all duration-300 border-none cursor-pointer ${
+                                                className={`flex-1 lg:flex-initial whitespace-nowrap px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 border-none cursor-pointer ${
                                                     activeCategory === type
                                                         ? 'bg-blue-800 text-white shadow-md shadow-blue-800/25'
                                                         : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200 bg-transparent'
@@ -481,17 +692,17 @@ const AnnexList = () => {
                                         ))}
                                     </div>
 
-                                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+                                    <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
                                         {/* Toggle Map View button */}
                                         <button
                                             onClick={() => setMapView(!mapView)}
-                                            className="flex items-center justify-center gap-2 px-6 py-3 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md rounded-full text-slate-700 dark:text-slate-300 font-bold border border-white/40 dark:border-slate-800 hover:bg-blue-50 dark:hover:bg-slate-800 transition-all hover:scale-105 active:scale-95 shadow-sm w-full sm:w-auto whitespace-nowrap"
+                                            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md rounded-2xl text-slate-700 dark:text-slate-300 font-bold text-xs border border-slate-200/70 dark:border-slate-800 hover:bg-blue-50 dark:hover:bg-slate-800 transition-all shadow-sm w-full sm:w-auto whitespace-nowrap"
                                         >
-                                            <LuMap className="text-lg" /> {mapView ? "Show Grid View" : "Show Map View"}
+                                            <LuMap className="text-base text-blue-600" /> {mapView ? "Show Grid View" : "Show Map View"}
                                         </button>
 
                                         {/* Pagination Context Info */}
-                                        <div className="text-sm font-semibold text-slate-500 bg-white/40 dark:bg-slate-900/40 px-4 py-3 rounded-full border border-slate-200 dark:border-slate-800 w-full sm:w-auto text-center whitespace-nowrap">
+                                        <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-white/60 dark:bg-slate-900/60 px-4 py-2.5 rounded-2xl border border-slate-200/70 dark:border-slate-800 w-full sm:w-auto text-center whitespace-nowrap">
                                             Showing {safeAnnexes.length > 0 ? ((currentPage - 1) * itemsPerPage) + 1 : 0} - {Math.min(currentPage * itemsPerPage, safeAnnexes.length)} of {safeAnnexes.length}
                                         </div>
                                     </div>
@@ -509,11 +720,11 @@ const AnnexList = () => {
                                     <LeafletListMap items={annexes} centerUniId={selectedUni} maxDistance={maxDistance} />
                                 </motion.div>
                             ) : (
-                                /* Animated Grid */
+                                /* Animated Responsive Grid for Large Screens (up to 4 cols on 2xl) */
                                 <motion.div
                                     id="listing-grid"
                                     layout
-                                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 scroll-mt-24"
+                                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 xl:gap-8 scroll-mt-24"
                                 >
                                     <AnimatePresence mode="popLayout">
                                         {paginatedData.map((item, index) => {
@@ -521,21 +732,26 @@ const AnnexList = () => {
                                             const coverImage = item.images && item.images.length > 0 
                                                 ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${item.images[0].imageUrl}` 
                                                 : "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
+
+                                            // Resolve University Name
+                                            const uniName = item.university?.name || 
+                                                (item.university_id ? universitiesData.find(u => String(u.id) === String(item.university_id))?.name : null);
                                                 
                                             return (
                                                 <React.Fragment key={item.id}>
                                                     <motion.div
                                                         layout
-                                                        initial={{ opacity: 0, y: 40 }}
+                                                        initial={{ opacity: 0, y: 30 }}
                                                         animate={{ opacity: 1, y: 0 }}
-                                                        exit={{ opacity: 0, scale: 0.9 }}
-                                                        transition={{ duration: 0.5, delay: index * 0.05 }}
-                                                        className="group relative h-full bg-white/45 dark:bg-slate-900/45 backdrop-blur-[24px] border border-white/40 dark:border-slate-800 rounded-[2.5rem] p-4 hover:shadow-[0_40px_80px_-20px_rgba(0,63,221,0.12)] transition-all duration-500 flex flex-col"
+                                                        exit={{ opacity: 0, scale: 0.95 }}
+                                                        transition={{ duration: 0.4, delay: index * 0.04 }}
+                                                        className="group relative h-full bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 rounded-[2rem] p-3.5 hover:shadow-[0_24px_50px_-15px_rgba(30,64,175,0.18)] hover:border-blue-500/40 dark:hover:border-blue-500/40 transition-all duration-300 flex flex-col"
                                                     >
-                                                        <div className="relative h-[280px] rounded-[2rem] overflow-hidden mb-6 bg-slate-100 dark:bg-slate-800">
+                                                        {/* Image Showcase */}
+                                                        <div className="relative h-[220px] rounded-[1.5rem] overflow-hidden mb-4 bg-slate-100 dark:bg-slate-800">
                                                             <img
                                                                 alt={item.title}
-                                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                                                 src={coverImage}
                                                                 onError={(e: any) => {
                                                                     e.currentTarget.onerror = null;
@@ -543,127 +759,172 @@ const AnnexList = () => {
                                                                 }}
                                                             />
 
-                                                            {/* Verified Badge */}
-                                                            {item.status === 'Approved' && (
-                                                                <div className="absolute top-4 left-4 bg-slate-950/80 dark:bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg border border-white/20 text-white">
-                                                                    <VerifiedBadge size={16} title="Verified Student Owner" />
-                                                                    <span className="text-[10px] font-extrabold uppercase tracking-wider">
-                                                                        {(item.owner?.is_verified_student || item.owner?.is_verified_landlord) ? 'Verified Owner' : 'Verified Annex'}
-                                                                    </span>
-                                                                </div>
-                                                            )}
+                                                            {/* Gradient Overlay for bottom text readability */}
+                                                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
 
-                                                            {/* Listing Type Tag */}
-                                                            <div className="absolute bottom-4 left-4 bg-slate-950/70 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1 border border-white/10 text-white shadow-lg">
-                                                                <span className="text-[9px] font-black uppercase tracking-widest flex items-center gap-1">
+                                                            {/* Top Badges */}
+                                                            <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 z-10 pointer-events-none">
+                                                                {/* Verified Badge */}
+                                                                {item.status === 'Approved' ? (
+                                                                    <div className="bg-slate-950/80 backdrop-blur-md px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md border border-white/20 text-white pointer-events-auto">
+                                                                        <VerifiedBadge size={14} title="Verified Owner" />
+                                                                        <span className="text-[9px] font-extrabold uppercase tracking-wider">Verified</span>
+                                                                    </div>
+                                                                ) : <div />}
+
+                                                                {/* Favorite Button */}
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        toggleFavorite(item.id);
+                                                                    }}
+                                                                    className="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md flex items-center justify-center transition-all hover:scale-110 active:scale-90 shadow-md border border-white/30 dark:border-slate-700 text-slate-700 dark:text-slate-200 pointer-events-auto cursor-pointer"
+                                                                >
+                                                                    <LuHeart className={`text-base transition-colors ${favorites.includes(item.id) ? 'fill-red-500 text-red-500' : 'text-slate-400 dark:text-slate-300'}`} />
+                                                                </button>
+                                                            </div>
+
+                                                            {/* Bottom Tag on Image (Listing Type) */}
+                                                            <div className="absolute bottom-3 left-3 z-10">
+                                                                <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg backdrop-blur-md shadow-md text-white border border-white/20 inline-flex items-center gap-1.5 bg-slate-950/70">
                                                                     {item.listing_type === 'ROOMMATE_WANTED' ? (
                                                                         <>
-                                                                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+                                                                            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-ping"></span>
                                                                             Roommate Finder
                                                                         </>
                                                                     ) : (
                                                                         <>
                                                                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                                                                            Landlord Annex
+                                                                            Boarding Place
                                                                         </>
                                                                     )}
                                                                 </span>
                                                             </div>
-
-                                                            {/* Favorite Button */}
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    toggleFavorite(item.id);
-                                                                }}
-                                                                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md flex items-center justify-center transition-all hover:scale-110 shadow-sm border border-white/20 dark:border-slate-700/50"
-                                                            >
-                                                                <LuHeart className={`text-xl transition-colors ${favorites.includes(item.id) ? 'fill-red-500 text-red-500' : 'text-slate-400 dark:text-slate-300'}`} />
-                                                            </button>
                                                         </div>
 
-                                                        <div className="px-3 space-y-4 flex-grow flex flex-col">
-                                                            <div className="flex justify-between items-start">
-                                                                <div>
-                                                                    <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-blue-800 dark:group-hover:text-blue-400 transition-colors uppercase tracking-tight line-clamp-1">
-                                                                        {item.title}
-                                                                    </h3>
-                                                                    <div className="flex flex-wrap items-center gap-2 mt-1">
-                                                                        <p className="text-slate-500 dark:text-slate-400 text-xs flex items-center gap-1 font-medium line-clamp-1">
-                                                                            <LuMapPin className="text-[14px] text-blue-800/60 dark:text-blue-400/60 flex-shrink-0" />
-                                                                            {item.address}
-                                                                        </p>
-                                                                        <span className="text-[10px] font-black bg-blue-500/10 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/20 inline-flex items-center gap-1">
-                                                                            <LuFootprints size={11} className="shrink-0" /> {item.walk_time_mins || item.walkTimeMins || 5} mins walk to gate
-                                                                            {(item.distance_to_uni || item.distanceToUni) ? ` (~${item.distance_to_uni || item.distanceToUni} km)` : ''}
-                                                                        </span>
-                                                                    </div>
+                                                        {/* Content Body */}
+                                                        <div className="px-1.5 space-y-3 flex-grow flex flex-col">
+                                                            {/* Target University Highlight Badge */}
+                                                            {uniName && (
+                                                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/50 border border-blue-200/60 dark:border-blue-900/50 text-blue-800 dark:text-blue-300 text-[11px] font-bold w-fit">
+                                                                    <LuGraduationCap className="text-blue-600 dark:text-blue-400 text-xs shrink-0" />
+                                                                    <span className="truncate max-w-[220px]">{uniName}</span>
                                                                 </div>
+                                                            )}
+
+                                                            <div>
+                                                                <h3 className="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors tracking-tight line-clamp-1" title={item.title}>
+                                                                    {item.title}
+                                                                </h3>
+                                                                <p className="text-slate-500 dark:text-slate-400 text-xs flex items-center gap-1 font-medium mt-1 line-clamp-1">
+                                                                    <LuMapPin className="text-xs text-blue-700 dark:text-blue-400 shrink-0" />
+                                                                    {item.address}
+                                                                </p>
                                                             </div>
-                                                            {/* Amenities & SL Utilities Chips */}
-                                                            <div className="flex flex-wrap items-center gap-2 py-3 border-y border-slate-200/50 dark:border-slate-800/50 mt-auto">
-                                                                <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1">
-                                                                    <LuBedDouble className="text-sm text-slate-400" /> {item.beds} Beds
+
+                                                            {/* Walk & Distance Info Pill */}
+                                                            <div className="flex flex-wrap items-center gap-1.5">
+                                                                <span className="text-[10px] font-bold bg-blue-500/10 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded-md border border-blue-500/20 inline-flex items-center gap-1">
+                                                                    <LuFootprints size={11} className="shrink-0 text-blue-600 dark:text-blue-400" /> 
+                                                                    {item.walk_time_mins || item.walkTimeMins || 5} mins walk
+                                                                    {(item.distance_to_uni || item.distanceToUni) ? ` (${item.distance_to_uni || item.distanceToUni} km)` : ''}
                                                                 </span>
+                                                                <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md flex items-center gap-1">
+                                                                    <LuBedDouble className="text-xs text-slate-400" /> {item.beds} {item.beds === 1 ? 'Bed' : 'Beds'}
+                                                                </span>
+                                                            </div>
+
+                                                            {/* Amenities & Facility Badges */}
+                                                            <div className="flex flex-wrap items-center gap-1.5 py-2.5 border-y border-slate-100 dark:border-slate-800/80 mt-auto">
                                                                 {item.landlordPresence === 'INDEPENDENT' || item.landlord_presence === 'INDEPENDENT' ? (
-                                                                    <span className="text-[9px] font-black bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                                                    <span className="text-[9px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
                                                                         <LuHouse size={11} /> Independent
                                                                     </span>
                                                                 ) : item.landlordPresence === 'ON_SITE' || item.landlord_presence === 'ON_SITE' ? (
-                                                                    <span className="text-[9px] font-black bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                                                    <span className="text-[9px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
                                                                         <LuShieldCheck size={11} /> On-Site Landlord
                                                                     </span>
                                                                 ) : null}
                                                                 {item.busRoute || item.bus_route ? (
-                                                                    <span className="text-[9px] font-black bg-blue-500/10 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-md line-clamp-1 max-w-[180px] inline-flex items-center gap-1">
-                                                                        <LuBus size={11} /> {item.busRoute || item.bus_route}
+                                                                    <span className="text-[9px] font-bold bg-blue-500/10 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-md truncate max-w-[130px] inline-flex items-center gap-1" title={item.busRoute || item.bus_route}>
+                                                                        <LuBus size={11} className="shrink-0" /> {item.busRoute || item.bus_route}
                                                                     </span>
                                                                 ) : null}
                                                                 {item.has_power_backup || item.hasPowerBackup ? (
-                                                                    <span className="text-[9px] font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
-                                                                        <LuZap size={11} /> Generator/UPS
+                                                                    <span className="text-[9px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                                                        <LuZap size={11} /> Power Backup
                                                                     </span>
                                                                 ) : null}
                                                                 {(item.has_water_tank !== false && item.hasWaterTank !== false) ? (
-                                                                    <span className="text-[9px] font-black bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                                                    <span className="text-[9px] font-bold bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
                                                                         <LuDroplets size={11} /> Water Tank
                                                                     </span>
                                                                 ) : null}
                                                                 {(item.is_cooking_allowed !== false && item.isCookingAllowed !== false) ? (
-                                                                    <span className="text-[9px] font-black bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                                                    <span className="text-[9px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
                                                                         <LuUtensils size={11} /> Cooking Allowed
                                                                     </span>
                                                                 ) : null}
                                                             </div>
 
-                                                            {/* Action Button */}
-                                                            <div className="mt-auto pt-4 flex flex-row items-end justify-between gap-2 border-t border-slate-100 dark:border-slate-800/50">
-                                                                <div className="flex flex-col">
-                                                                    <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-slate-400 mb-0.5">Monthly Fee</span>
-                                                                    <span className="text-xl md:text-2xl font-extrabold text-blue-800 dark:text-blue-400 leading-none">
-                                                                        <span className="text-xs mr-0.5">Rs.</span>{parseFloat(item.price).toLocaleString()}
+                                                            {/* Action & Price Bottom Row */}
+                                                            <div className="mt-auto pt-3 flex items-center justify-between gap-2 border-t border-slate-100 dark:border-slate-800/80">
+                                                                <div>
+                                                                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 block leading-tight">Monthly Fee</span>
+                                                                    <span className="text-lg md:text-xl font-black text-blue-800 dark:text-blue-400 leading-none">
+                                                                        <span className="text-xs mr-0.5 font-bold">Rs.</span>{parseFloat(item.price).toLocaleString()}
                                                                     </span>
                                                                 </div>
-                                                                <motion.button
-                                                                    whileHover={{ scale: 1.05 }}
-                                                                    whileTap={{ scale: 0.95 }}
+                                                                <button
                                                                     onClick={() => navigate(`/annex/${item.id}`)}
-                                                                    className="w-auto text-[11px] md:text-sm bg-blue-50 dark:bg-slate-800/80 hover:bg-blue-800 hover:text-white dark:hover:bg-blue-800 text-blue-800 dark:text-blue-300 border border-blue-100 dark:border-slate-700 px-4 md:px-6 py-2.5 rounded-xl font-bold transition-all shadow-sm flex items-center justify-center"
+                                                                    className="px-4 py-2 bg-blue-800 hover:bg-blue-900 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-800/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
                                                                 >
                                                                     Details
-                                                                </motion.button>
+                                                                    <LuArrowRight className="text-xs" />
+                                                                </button>
                                                             </div>
                                                         </div>
                                                     </motion.div>
-                                                    {(index + 1) % 6 === 0 && (
-                                                        <div className="col-span-1 md:col-span-2 lg:col-span-3">
-                                                            <AdNativeFeed adIndex={Math.floor((index + 1) / 6) - 1} />
+                                                    {(index + 1) % 8 === 0 && (
+                                                        <div className="col-span-1 sm:col-span-2 lg:col-span-3 2xl:col-span-4">
+                                                            <AdNativeFeed adIndex={Math.floor((index + 1) / 8) - 1} />
                                                         </div>
                                                     )}
                                                 </React.Fragment>
                                             );
                                         })}
                                     </AnimatePresence>
+                                </motion.div>
+                            )}
+
+                            {/* Empty State when no annexes match criteria */}
+                            {!mapView && safeAnnexes.length === 0 && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="py-16 px-4 text-center flex flex-col items-center justify-center max-w-md mx-auto"
+                                >
+                                    <div className="w-20 h-20 rounded-3xl bg-blue-50 dark:bg-slate-900 border border-blue-100 dark:border-slate-800 flex items-center justify-center text-blue-600 mb-5 shadow-lg shadow-blue-500/10">
+                                        <LuHouse className="text-3xl" />
+                                    </div>
+                                    <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">No Accommodations Found</h3>
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+                                        We couldn't find any annexes matching your search filters. Try adjusting your proximity distance or university campus.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setSelectedUni("All Universities");
+                                            setMaxDistance("Any Distance");
+                                            setSearchTerm("");
+                                            const cleared = { uni: "All Universities", dist: "Any Distance", search: "" };
+                                            setAppliedFilters(cleared);
+                                            fetchAnnexes(cleared, activeCategory);
+                                        }}
+                                        className="px-6 py-3 bg-blue-800 hover:bg-blue-900 text-white rounded-2xl font-bold text-xs shadow-lg shadow-blue-800/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                                    >
+                                        Reset All Filters
+                                    </button>
                                 </motion.div>
                             )}
 

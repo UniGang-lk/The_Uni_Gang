@@ -56,6 +56,18 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
+  // Lock background scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   // Reset auth gate & preview when modal closes
   useEffect(() => {
     if (!isOpen) {
@@ -91,19 +103,24 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     const form = e.currentTarget;
     const formData = new FormData(form);
 
-    const title = formData.get('title') as string;
-    const uni = formData.get('uni') as string;
+    const title = ((formData.get('title') as string) || '').trim();
+    const uni = ((formData.get('uni') as string) || '').trim();
     const category = formData.get('category') as string;
-    const location = formData.get('location') as string;
-    const price = formData.get('price') as string;
-    const date = formData.get('date') as string;
-    const time = formData.get('time') as string;
-    const contact = formData.get('contact') as string;
-    const capacity = formData.get('capacity') as string;
-    const requirements = formData.get('requirements') as string;
-    const extra = formData.get('extra') as string;
-    const description = formData.get('description') as string;
+    const location = ((formData.get('location') as string) || '').trim();
+    const price = ((formData.get('price') as string) || 'Free').trim();
+    const date = ((formData.get('date') as string) || '').trim();
+    const time = ((formData.get('time') as string) || '09:00 AM').trim();
+    const contact = ((formData.get('contact') as string) || '').trim();
+    const capacity = ((formData.get('capacity') as string) || '').trim();
+    const requirements = ((formData.get('requirements') as string) || '').trim();
+    const extra = ((formData.get('extra') as string) || '').trim();
+    const description = ((formData.get('description') as string) || '').trim();
     const flyerFile = fileInputRef.current?.files?.[0];
+
+    if (!title || !uni || !location || !date || !contact || !description) {
+      toast.error('Please fill in all required fields marked with *');
+      return;
+    }
 
     const token = localStorage.getItem('userToken');
 
@@ -461,6 +478,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
                         required
                         name="contact"
                         type="tel"
+                        defaultValue={localStorage.getItem('userPhoneNumber') || ''}
                         placeholder="+94 7X XXX XXXX"
                         className="w-full px-4 py-3 rounded-xl bg-slate-50/80 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm font-semibold"
                       />

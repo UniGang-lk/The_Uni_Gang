@@ -4,21 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuArrowLeft,
   LuStar,
-  LuShare2,
   LuShoppingBag,
-  LuSend,
-  LuShieldCheck,
-  LuClock,
-  LuBadgeCheck,
-  LuChevronRight,
-  LuSparkles,
-  LuMinus,
-  LuPlus,
-  LuX,
-  LuPackage,
-  LuMapPin
+  LuPackage
 } from 'react-icons/lu';
-import { FaWhatsapp } from 'react-icons/fa6';
 import { formatDistanceToNow } from 'date-fns';
 import { api } from '../../api';
 import SEO from '../../components/SEO';
@@ -171,8 +159,9 @@ const MarketItemDetailPage: React.FC = () => {
     }
   };
 
-  const addToCart = (openDrawer = false) => {
-    if (!item) return;
+  const addToCart = (openDrawer = false, targetItem?: any) => {
+    const itemToAdd = targetItem || item;
+    if (!itemToAdd) return;
     const userId = localStorage.getItem('userId');
     if (!userId) {
       toast.error('Please log in to add items to your cart.');
@@ -187,23 +176,24 @@ const MarketItemDetailPage: React.FC = () => {
       cart = [];
     }
 
-    const existing = cart.find(i => String(i.id) === String(item.id));
+    const qtyToAdd = targetItem ? 1 : quantity;
+    const existing = cart.find(i => String(i.id) === String(itemToAdd.id));
     let newCart = [];
     if (existing) {
-      newCart = cart.map(i => String(i.id) === String(item.id) ? { ...i, quantity: i.quantity + quantity } : i);
+      newCart = cart.map(i => String(i.id) === String(itemToAdd.id) ? { ...i, quantity: i.quantity + qtyToAdd } : i);
     } else {
       newCart = [...cart, {
-        id: item.id,
-        title: item.title,
-        price: parseFloat(item.price),
-        image: item.images && item.images.length > 0 ? item.images[0] : null,
-        quantity: quantity
+        id: itemToAdd.id,
+        title: itemToAdd.title,
+        price: parseFloat(itemToAdd.price),
+        image: itemToAdd.images && itemToAdd.images.length > 0 ? itemToAdd.images[0] : null,
+        quantity: qtyToAdd
       }];
     }
 
     localStorage.setItem('company_store_cart', JSON.stringify(newCart));
     window.dispatchEvent(new Event('cart-update'));
-    toast.success(`"${item.title}" added to cart!`, {
+    toast.success(`"${itemToAdd.title}" added to cart!`, {
       style: { borderRadius: '16px', background: '#1e293b', color: '#fff' }
     });
 
@@ -212,12 +202,7 @@ const MarketItemDetailPage: React.FC = () => {
     }
   };
 
-  const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast.success('Listing link copied to clipboard!', {
-      style: { borderRadius: '16px', background: '#1e293b', color: '#fff' }
-    });
-  };
+
 
   if (loading) {
     return <PremiumPageLoader isLoading={true} message="Loading item details..." />;
@@ -242,7 +227,7 @@ const MarketItemDetailPage: React.FC = () => {
   }
 
   const images = item.images && item.images.length > 0
-    ? item.images.map((img: string) => img.startsWith('http') ? img : `${BASE_URL}${img}`)
+    ? item.images.map((img: string) => img.startsWith('http') ? img : `${BASE_URL}${img.startsWith('/') ? '' : '/'}${img}`)
     : ['https://images.unsplash.com/photo-1521556906631-0c58e7ce65e5?q=80&w=800&auto=format&fit=crop'];
 
   const displayPrice = parseFloat(String(item.price || 0)).toLocaleString();
@@ -670,7 +655,7 @@ const MarketItemDetailPage: React.FC = () => {
                   item={relItem}
                   onClick={() => navigate(`/market/${relItem.id}`)}
                   onAddToCart={() => {
-                    addToCart(false);
+                    addToCart(false, relItem);
                   }}
                 />
               ))}

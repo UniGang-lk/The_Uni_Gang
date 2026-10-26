@@ -15,6 +15,7 @@ import SEO from '../../components/SEO';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import AdBanner from '../../components/advertise/AdBanner';
+import { subscribeToEventUpdates } from '../../services/realtime';
 
 interface EventData {
   id: number | string;
@@ -159,6 +160,16 @@ const EventDetailPage: React.FC = () => {
     };
 
     fetchEventDetails();
+
+    const unsubscribe = subscribeToEventUpdates((data) => {
+      if (data?.eventId && String(data.eventId) === String(id)) {
+        fetchEventDetails();
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, [id]);
 
   const handleRsvp = async () => {
@@ -175,6 +186,23 @@ const EventDetailPage: React.FC = () => {
       const attending = res.isAttending ?? res.rsvpd ?? !isInterested;
       setIsInterested(attending);
       setAttendeeCount(prev => attending ? prev + 1 : Math.max(0, prev - 1));
+
+      // Synchronize attendees list in local event state
+      const userName = localStorage.getItem('userName') || 'Student Member';
+      const userEmail = localStorage.getItem('userEmail') || '';
+      setEvent(prev => {
+        if (!prev) return prev;
+        let updatedAttendees = [...(prev.attendees || [])];
+        if (attending) {
+          if (!updatedAttendees.some(a => a.email && a.email.toLowerCase() === userEmail.toLowerCase())) {
+            updatedAttendees.push({ name: userName, email: userEmail });
+          }
+        } else {
+          updatedAttendees = updatedAttendees.filter(a => a.email?.toLowerCase() !== userEmail.toLowerCase());
+        }
+        return { ...prev, attendees: updatedAttendees };
+      });
+
       if (attending) {
         confetti({
           particleCount: 90,
@@ -199,22 +227,30 @@ const EventDetailPage: React.FC = () => {
     }
     try {
       const chat = await api.startEventChat(event.id.toString());
-      window.location.href = `/profile?tab=inbox&chatId=${chat.id}&type=event`;
+      navigate(`/profile?tab=inbox&chatId=${chat.id}&type=event`);
     } catch {
       toast.success("Opening chat with event organizer...");
-      window.location.href = `/profile?tab=inbox&type=event&eventId=${event.id}`;
+      navigate(`/profile?tab=inbox&type=event&eventId=${event.id}`);
     }
   };
 
   const handleAddToCalendar = () => {
     if (!event) return;
     const startDate = new Date(event.date);
-    const startStr = isNaN(startDate.getTime()) ? new Date().toISOString().replace(/-|:|\.\d\d\d/g, "") : startDate.toISOString().replace(/-|:|\.\d\d\d/g, "");
+    const isValidDate = !isNaN(startDate.getTime());
+    const startStr = isValidDate
+      ? startDate.toISOString().replace(/-|:|\.\d\d\d/g, "")
+      : new Date().toISOString().replace(/-|:|\.\d\d\d/g, "");
+    // Default to a 3-hour event duration
+    const endDate = isValidDate
+      ? new Date(startDate.getTime() + 3 * 60 * 60 * 1000)
+      : new Date(Date.now() + 3 * 60 * 60 * 1000);
+    const endStr = endDate.toISOString().replace(/-|:|\.\d\d\d/g, "");
     const details = encodeURIComponent(`${event.description}\n\nEvent Link: ${window.location.href}`);
     const location = encodeURIComponent(event.location);
     const title = encodeURIComponent(event.title);
 
-    const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${startStr}&details=${details}&location=${location}`;
+    const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}&location=${location}`;
     window.open(googleCalUrl, '_blank');
   };
 
@@ -264,8 +300,8 @@ const EventDetailPage: React.FC = () => {
           <PageBreadcrumb
             items={[
               { label: 'Campus Events', to: '/event-list' },
-              { label: event.category || 'Event', to: '/event-list', active: true },
-              { label: event.title }
+              { label: event.category || 'Event', to: `/event-list?category=${encodeURIComponent(event.category || 'All')}` },
+              { label: event.title, active: true }
             ]}
             backTo="/event-list"
             backLabel="Back to Events"
@@ -374,7 +410,7 @@ const EventDetailPage: React.FC = () => {
                 {event.contact && (
                   <div className="space-y-2 pt-2">
                     <a
-                      href={`https://wa.me/${event.contact.replace(/[^0-9]/g, '')}`}
+                      href={`https://wa.me/${event.contact.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi, I'm reaching out regarding your event "${event.title}" on The Uni Gang!`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer text-decoration-none"
@@ -652,7 +688,7 @@ const EventDetailPage: React.FC = () => {
                   >
                     <div className="relative h-44 rounded-2xl overflow-hidden mb-3 bg-slate-950">
                       <img 
-                        src={rel.image || 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=600'} 
+                        src={rel.image ? (rel.image.startsWith('http') ? rel.image : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${rel.image}`) : 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=600'} 
                         alt={rel.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                       />
