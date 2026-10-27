@@ -224,7 +224,9 @@ export const AdTrackModal: React.FC<AdTrackModalProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => {
-                                    navigator.clipboard.writeText(adIdStr);
+                                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                                      navigator.clipboard.writeText(adIdStr).catch(() => {});
+                                    }
                                     setCopiedId(adIdStr);
                                     setTimeout(() => setCopiedId(null), 2000);
                                   }}
