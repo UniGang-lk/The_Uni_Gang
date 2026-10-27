@@ -158,6 +158,9 @@ export default function AdSubmissionForm() {
           const trimmed = value.trim();
           const normalized = trimmed ? (trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`) : '';
           data.append('target_link', normalized);
+        } else if (key === 'contact_phone') {
+          const clean = value.replace(/[^0-9+]/g, '');
+          data.append('contact_phone', clean);
         } else if (key === 'placement_type' && selectedTier) {
           if (selectedTier.toLowerCase().includes('starter')) {
             data.append('placement_type', 'Campus Starter (SIDEBAR)');

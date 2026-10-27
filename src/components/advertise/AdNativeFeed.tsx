@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LuMegaphone, LuArrowRight } from 'react-icons/lu';
 import { api } from '../../api';
@@ -96,12 +97,12 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
             <p className="text-[11px] text-slate-500 font-medium">High conversion ad placements for institutes, deals & services.</p>
           </div>
         </div>
-        <a
-          href="/advertise"
+        <Link
+          to="/advertise"
           className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md hover:scale-105 transition-all shrink-0"
         >
           Advertise Here
-        </a>
+        </Link>
       </motion.div>
     );
   }

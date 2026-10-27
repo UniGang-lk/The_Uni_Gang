@@ -141,14 +141,16 @@ export default function AdPopup() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md"
+          onClick={handleClose}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md cursor-pointer"
         >
           <motion.div
             initial={{ scale: 0.9, y: 25 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 25 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200/50 dark:border-white/5"
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200/50 dark:border-white/5 cursor-default"
           >
             {/* Smooth Spinning Gradient Border Accent */}
             <motion.div
