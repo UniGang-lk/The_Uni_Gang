@@ -80,6 +80,15 @@ export default function AdSidebarWidget() {
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className="relative overflow-hidden rounded-[2rem] bg-white/70 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 shadow-lg hover:shadow-2xl hover:shadow-indigo-500/5 dark:hover:shadow-none transition-all mb-8 w-full max-w-[320px] mx-auto select-none cursor-pointer group"
       onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
+      tabIndex={0}
+      role="link"
+      aria-label={`Advertisement: ${ad.ad_title || ad.company_name}`}
     >
       {ad.image_url && (
         <div className="relative aspect-video overflow-hidden border-b border-slate-200/40 dark:border-white/5 bg-slate-900/10">

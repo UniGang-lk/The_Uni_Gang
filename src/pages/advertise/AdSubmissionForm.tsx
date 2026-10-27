@@ -84,15 +84,29 @@ export default function AdSubmissionForm() {
         toast.error('Image file size must be less than 8MB');
         return;
       }
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
       setImageFile(file);
       setImagePreview(URL.createObjectURL(file));
     }
   };
 
   const removeImage = () => {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
     setImageFile(null);
     setImagePreview(null);
   };
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -28,7 +28,7 @@ export default function AdPopup() {
     const lastShown = localStorage.getItem(storageKey);
     const COOLDOWN_MS = 10 * 60 * 1000; // 10 minutes
 
-    if (lastShown && (Date.now() - Number(lastShown) < COOLDOWN_MS)) {
+    if (lastShown && !isNaN(Number(lastShown)) && (Date.now() - Number(lastShown) < COOLDOWN_MS)) {
       setHasShownThisSession(true);
       return;
     }
@@ -103,6 +103,18 @@ export default function AdPopup() {
       handleClose();
     }
   }, [isVisible, timeLeft]);
+
+  // Escape key handler
+  useEffect(() => {
+    if (!isVisible) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isVisible]);
 
   const handleClose = () => {
     setIsVisible(false);

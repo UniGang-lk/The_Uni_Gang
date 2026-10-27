@@ -62,6 +62,15 @@ export default function AdvertiseLanding() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!showMediaKit) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowMediaKit(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showMediaKit]);
+
   const pricingTiers = [
     {
       name: 'Campus Starter',

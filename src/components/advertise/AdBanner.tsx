@@ -82,6 +82,15 @@ export default function AdBanner({ placement = 'BANNER' }: { placement?: string 
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
       className="w-full relative overflow-hidden rounded-[1.8rem] md:rounded-[2.2rem] cursor-pointer group border border-slate-200/50 dark:border-white/10 shadow-xl shadow-slate-200/50 dark:shadow-none bg-slate-950 mb-8 h-28 sm:h-36"
       onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
+      tabIndex={0}
+      role="link"
+      aria-label={`Banner advertisement: ${ad.ad_title || ad.company_name}`}
     >
       {/* Blurred Duplicate Background Layer (For aspect-ratio clipping correction) */}
       {ad.image_url && (

@@ -117,9 +117,10 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
     ? (rawImg.startsWith('http') ? rawImg : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`)
     : '';
 
-  const targetHref = ad.target_link
+  const hasTarget = !!(ad.target_link && ad.target_link.trim());
+  const targetHref = hasTarget
     ? (ad.target_link.trim().startsWith('http://') || ad.target_link.trim().startsWith('https://') ? ad.target_link.trim() : `https://${ad.target_link.trim()}`)
-    : '#';
+    : undefined;
 
   return (
     <motion.div
@@ -133,8 +134,11 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
     >
       <a
         href={targetHref}
-        target={ad.target_link ? "_blank" : "_self"}
-        rel="noopener noreferrer"
+        onClick={(e) => {
+          if (!hasTarget) e.preventDefault();
+        }}
+        target={hasTarget ? "_blank" : undefined}
+        rel={hasTarget ? "noopener noreferrer" : undefined}
         className="block"
       >
         {/* Floating Neon Badge */}
