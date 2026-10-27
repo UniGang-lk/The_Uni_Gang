@@ -62,6 +62,8 @@ export default function AdSidebarWidget() {
     api.trackAdClick(ad.id);
     if (ad.target_link) {
       const trimmed = ad.target_link.trim();
+      const lower = trimmed.toLowerCase();
+      if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:')) return;
       const href = trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`;
       window.open(href, '_blank', 'noopener,noreferrer');
     }

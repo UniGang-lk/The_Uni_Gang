@@ -17,7 +17,7 @@ const placementData = {
     bgHighlight: 'bg-blue-500/10',
     textColor: 'text-blue-400',
     description: 'Premium placement at the top of every page. Maximum visibility as the first thing students see when they open UniGang.',
-    reach: '~45K daily views',
+    reach: '~3,500 daily reach',
   },
   sidebar: {
     icon: LuPanelRight,
@@ -30,7 +30,7 @@ const placementData = {
     bgHighlight: 'bg-emerald-500/10',
     textColor: 'text-emerald-400',
     description: 'Stays visible as students scroll through content. Perfect for longer campaigns that need sustained attention.',
-    reach: '~30K daily views',
+    reach: '~2,100 daily reach',
   },
   infeed: {
     icon: LuRss,
@@ -43,7 +43,7 @@ const placementData = {
     bgHighlight: 'bg-amber-500/10',
     textColor: 'text-amber-400',
     description: 'Blends naturally into the content feed between student posts. Highest engagement rate due to native feel.',
-    reach: '~38K daily views',
+    reach: '~2,800 daily reach',
   },
   popup: {
     icon: LuMaximize,
@@ -56,7 +56,7 @@ const placementData = {
     bgHighlight: 'bg-purple-500/10',
     textColor: 'text-purple-400',
     description: 'Full-screen overlay with a powerful call-to-action. Best for major launches, events, and time-sensitive promotions.',
-    reach: '~50K daily views',
+    reach: '~5,000 daily reach',
   },
 };
 

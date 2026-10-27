@@ -138,10 +138,28 @@ export default function AdSubmissionForm() {
       toast.error('Please enter Offer Highlights or Description');
       return;
     }
-    if (!formData.target_link.trim()) {
+    const rawTarget = formData.target_link.trim();
+    if (!rawTarget) {
       toast.error('Please enter your Destination URL or WhatsApp link');
       return;
     }
+    const lowerTarget = rawTarget.toLowerCase();
+    if (lowerTarget.startsWith('javascript:') || lowerTarget.startsWith('data:') || lowerTarget.startsWith('vbscript:')) {
+      toast.error('Please enter a valid website or WhatsApp link (e.g. https://yourbrand.com or https://wa.me/...)');
+      return;
+    }
+    const normalizedTarget = rawTarget.startsWith('http://') || rawTarget.startsWith('https://') ? rawTarget : `https://${rawTarget}`;
+    try {
+      const parsed = new URL(normalizedTarget);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+        toast.error('Destination URL must use http:// or https://');
+        return;
+      }
+    } catch {
+      toast.error('Please enter a valid destination website URL or WhatsApp link');
+      return;
+    }
+
     if (!imageFile) {
       toast.error('Ad banner artwork image is required!');
       return;
@@ -157,9 +175,7 @@ export default function AdSubmissionForm() {
           return;
         }
         if (key === 'target_link') {
-          const trimmed = value.trim();
-          const normalized = trimmed ? (trimmed.startsWith('http://') || trimmed.startsWith('https://') ? trimmed : `https://${trimmed}`) : '';
-          data.append('target_link', normalized);
+          data.append('target_link', normalizedTarget);
         } else if (key === 'contact_phone') {
           const clean = value.replace(/[^0-9+]/g, '');
           data.append('contact_phone', clean);

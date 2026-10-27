@@ -333,7 +333,7 @@ export const AdTrackModal: React.FC<AdTrackModalProps> = ({
                           (Ends: {new Date(ad.end_date || ad.EndDate).toLocaleDateString()})
                         </span>
                       )}
-                      {targetLink && (
+                      {targetLink && !targetLink.toLowerCase().startsWith('javascript:') && !targetLink.toLowerCase().startsWith('data:') && (
                         <>
                           <span>•</span>
                           <a

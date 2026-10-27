@@ -988,20 +988,24 @@ const AdminDashboard = () => {
                                   <span className="font-bold text-cyan-400 truncate max-w-[150px]">{ad.target_campus}</span>
                                 </div>
                               )}
-                              {ad.target_link && (
-                                <div className="flex justify-between items-center gap-2">
-                                  <span className="text-slate-500">Destination:</span>
-                                  <a
-                                    href={ad.target_link.startsWith('http') ? ad.target_link : `https://${ad.target_link}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="font-bold text-indigo-400 hover:underline truncate max-w-[160px] inline-flex items-center gap-1"
-                                    title={ad.target_link}
-                                  >
-                                    {ad.target_link.replace(/^https?:\/\//, '')} <LuExternalLink size={11} />
-                                  </a>
-                                </div>
-                              )}
+                              {ad.target_link && (() => {
+                                const isSafeLink = !ad.target_link.toLowerCase().startsWith('javascript:') && !ad.target_link.toLowerCase().startsWith('data:');
+                                if (!isSafeLink) return null;
+                                return (
+                                  <div className="flex justify-between items-center gap-2">
+                                    <span className="text-slate-500">Destination:</span>
+                                    <a
+                                      href={ad.target_link.startsWith('http') ? ad.target_link : `https://${ad.target_link}`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="font-bold text-indigo-400 hover:underline truncate max-w-[160px] inline-flex items-center gap-1"
+                                      title={ad.target_link}
+                                    >
+                                      {ad.target_link.replace(/^https?:\/\//, '')} <LuExternalLink size={11} />
+                                    </a>
+                                  </div>
+                                );
+                              })()}
                               {ad.end_date && (
                                 <div className="flex justify-between">
                                   <span className="text-slate-500">Expires:</span>
@@ -1060,7 +1064,7 @@ const AdminDashboard = () => {
                                   Pause
                                 </button>
                               )}
-                              {status === 'PENDING' && (
+                              {(status === 'PENDING' || status === 'PAUSED') && (
                                 <button
                                   onClick={() => handleAdStatus(ad.id, 'REJECTED')}
                                   className="px-3 py-1.5 rounded-xl bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"

@@ -118,9 +118,12 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
     ? (rawImg.startsWith('http') ? rawImg : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`)
     : '';
 
-  const hasTarget = !!(ad.target_link && ad.target_link.trim());
+  const rawTarget = (ad.target_link || '').trim();
+  const lowerTarget = rawTarget.toLowerCase();
+  const isSafeScheme = !lowerTarget.startsWith('javascript:') && !lowerTarget.startsWith('data:') && !lowerTarget.startsWith('vbscript:');
+  const hasTarget = !!rawTarget && isSafeScheme;
   const targetHref = hasTarget
-    ? (ad.target_link.trim().startsWith('http://') || ad.target_link.trim().startsWith('https://') ? ad.target_link.trim() : `https://${ad.target_link.trim()}`)
+    ? (rawTarget.startsWith('http://') || rawTarget.startsWith('https://') ? rawTarget : `https://${rawTarget}`)
     : undefined;
 
   return (
