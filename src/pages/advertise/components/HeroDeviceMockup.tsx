@@ -8,11 +8,10 @@ export default function HeroDeviceMockup() {
   const [index, setIndex] = useState(0);
   const current = PLACEMENTS[index];
 
-  // Restart the timer whenever the user picks a placement manually
   useEffect(() => {
     const t = setInterval(() => setIndex((i) => (i + 1) % PLACEMENTS.length), 3200);
     return () => clearInterval(t);
-  }, [index]);
+  }, []);
 
   return (
     <motion.div

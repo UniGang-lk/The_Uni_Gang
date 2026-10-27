@@ -96,6 +96,30 @@ export default function AdSubmissionForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.company_name.trim()) {
+      toast.error('Please enter your Company / Organization Name');
+      return;
+    }
+    if (!formData.contact_email.trim() || !formData.contact_email.includes('@')) {
+      toast.error('Please enter a valid Contact Email');
+      return;
+    }
+    if (!formData.contact_phone.trim()) {
+      toast.error('Please enter your WhatsApp or Phone Number');
+      return;
+    }
+    if (!formData.ad_title.trim()) {
+      toast.error('Please enter a Campaign Headline / Title');
+      return;
+    }
+    if (!formData.ad_description.trim()) {
+      toast.error('Please enter Offer Highlights or Description');
+      return;
+    }
+    if (!formData.target_link.trim()) {
+      toast.error('Please enter your Destination URL or WhatsApp link');
+      return;
+    }
     if (!imageFile) {
       toast.error('Ad banner artwork image is required!');
       return;
@@ -266,9 +290,9 @@ export default function AdSubmissionForm() {
 
         {/* Header Hero Section */}
         <div className="text-center space-y-3 pt-2 pb-4 max-w-3xl mx-auto">
-          {/* <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-black uppercase tracking-widest shadow-xs">
-            <LuSparkles className="w-3.5 h-3.5 text-blue-500 animate-pulse" /> Self-Serve Ad Manager
-          </div> */}
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-black uppercase tracking-widest shadow-xs">
+            <LuSparkles className="w-3.5 h-3.5 text-blue-500 animate-pulse" /> Self-Serve Ad Studio
+          </div>
 
           <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
             Launch Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500">Ad Campaign</span>

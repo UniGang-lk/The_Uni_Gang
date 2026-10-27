@@ -991,19 +991,23 @@ const AdminDashboard = () => {
                             {/* Contact Row */}
                             <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] space-y-1">
                               <p className="text-slate-400 truncate">📧 {ad.contact_email}</p>
-                              {ad.contact_phone && (
-                                <p className="text-slate-400">
-                                  📱 {ad.contact_phone}{' '}
-                                  <a
-                                    href={`https://wa.me/${ad.contact_phone.replace(/[^0-9]/g, '')}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-emerald-400 font-bold ml-1 hover:underline"
-                                  >
-                                    (WhatsApp)
-                                  </a>
-                                </p>
-                              )}
+                              {ad.contact_phone && (() => {
+                                const clean = ad.contact_phone.replace(/[^0-9]/g, '');
+                                const waNum = clean.startsWith('0') ? `94${clean.slice(1)}` : clean;
+                                return (
+                                  <p className="text-slate-400">
+                                    📱 {ad.contact_phone}{' '}
+                                    <a
+                                      href={`https://wa.me/${waNum}`}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="text-emerald-400 font-bold ml-1 hover:underline"
+                                    >
+                                      (WhatsApp)
+                                    </a>
+                                  </p>
+                                );
+                              })()}
                             </div>
                           </div>
 

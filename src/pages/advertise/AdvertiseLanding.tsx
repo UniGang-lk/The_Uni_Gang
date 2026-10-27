@@ -571,7 +571,12 @@ export default function AdvertiseLanding() {
       {/* Ad Tracking Modal */}
       <AdTrackModal
         isOpen={showTrackModal}
-        onClose={() => setShowTrackModal(false)}
+        onClose={() => {
+          setShowTrackModal(false);
+          if (window.location.search.includes('track') || window.location.search.includes('id')) {
+            navigate('/advertise', { replace: true });
+          }
+        }}
         initialQuery={new URLSearchParams(window.location.search).get('id') || undefined}
       />
 

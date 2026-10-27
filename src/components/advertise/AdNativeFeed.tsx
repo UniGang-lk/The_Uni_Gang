@@ -23,9 +23,11 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
   const [currentAdIndex, setCurrentAdIndex] = useState(adIndex !== undefined ? adIndex : 0);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchAds = async () => {
       try {
         const activeAds = await api.getActiveAds();
+        if (!isMounted) return;
         const nativeAds = activeAds.filter((a: any) => {
           const p = (a.placement_type || '').toUpperCase();
           return p === 'NATIVE_FEED' || p.includes('NATIVE') || p.includes('FEED') || p.includes('HERO') || p.includes('ULTIMATE') || p.includes('STARTER');
@@ -44,12 +46,17 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
           return { ...adItem, _weight: w };
         }).sort((a: any, b: any) => (b._weight || 1) - (a._weight || 1));
 
-        setAds(scored);
+        if (isMounted) {
+          setAds(scored);
+        }
       } catch (err) {
         console.error('Failed to load native ads', err);
       }
     };
     fetchAds();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useEffect(() => {

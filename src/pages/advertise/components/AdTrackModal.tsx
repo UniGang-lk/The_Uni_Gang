@@ -301,7 +301,7 @@ export const AdTrackModal: React.FC<AdTrackModalProps> = ({
                     </div>
                     
                     <a
-                      href={`https://wa.me/94724478148?text=Hi%20UniGang!%20I%20am%20checking%20status%20for%20Ad%20ID:%20${ad.id}`}
+                      href={`https://wa.me/94724478148?text=${encodeURIComponent(`Hi UniGang! I am checking status for Ad ID: ${ad.id}`)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1.5 text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 font-semibold"

@@ -609,7 +609,9 @@
     - **🛡️ Deep Lifecycle Hardening & React Cleanups:**
       - Expired campaigns reactivate වන විට Database හි `start_date` සහ `end_date` ස්වයංක්‍රීයව අලුත් වීම ([advertisement_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/advertisement_controller.go)).
       - `AdPopup.tsx`, `AdBanner.tsx`, සහ `AdSidebarWidget.tsx` තුළ unmounted async state updates වැළැක්වීමට `isMounted` guards සහ timer cleanups එක් කිරීම.
-      - Ad Submission Form හි සියලුම inputs සඳහා auto-trimming ආරක්ෂාව යෙදීම.
+      - Ad Submission Form හි සියලුම inputs සඳහා auto-trimming ආරක්ෂාව සහ interactive validation toasts යෙදීම.
+      - Admin Dashboard හි advertiser WhatsApp direct chat link එක `94` international country code එක සහිතව sanitize කිරීම.
+      - Modal close එකේදී URL search params auto-cleanup වීම සහ custom placement priority weights (Popup: 5, Banner: 3, Feed: 2, Sidebar: 1) server-side සමතුලිත කිරීම.
     - **✅ Zero Build & Compile Errors:** `npx tsc --noEmit` සහ `go vet ./...` මගින් Website සහ Backend 100% clean, error-free සහ production-ready බව තහවුරු කරන ලදී.
 
 ---
