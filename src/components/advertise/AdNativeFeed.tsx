@@ -140,7 +140,10 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
         }}
         target={hasTarget ? "_blank" : undefined}
         rel={hasTarget ? "noopener noreferrer" : undefined}
-        className="block"
+        tabIndex={0}
+        role="link"
+        aria-label={`Sponsored: ${ad.ad_title || ad.company_name}`}
+        className="block focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-[2rem]"
       >
         {/* Floating Neon Badge */}
         <div className="absolute top-4 right-4 z-20 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-black uppercase text-[8px] tracking-widest px-3 py-1 rounded-full shadow-lg shadow-blue-500/20 flex items-center gap-1 border border-white/10">

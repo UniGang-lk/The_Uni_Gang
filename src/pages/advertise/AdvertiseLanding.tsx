@@ -532,7 +532,7 @@ export default function AdvertiseLanding() {
                   Campus Distribution Breakdown
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {['University of Moratuwa (UOM)', 'University of Colombo (UOC)', 'SLIIT Malabe', 'University of Sri Jayewardenepura (USJ)', 'University of Kelaniya', 'University of Peradeniya', 'NSBM Green University', 'IIT Colombo'].map(uni => (
+                  {['University of Moratuwa (UOM)', 'University of Colombo (UOC)', 'SLIIT Malabe', 'University of Sri Jayewardenepura (USJ)', 'University of Kelaniya', 'University of Peradeniya', 'University of Ruhuna (UOR)', 'University of Jaffna (UOJ)', 'NSBM Green University', 'IIT Colombo', 'CINEC Campus'].map(uni => (
                     <span key={uni} className="px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-700 dark:text-slate-300">
                       {uni}
                     </span>

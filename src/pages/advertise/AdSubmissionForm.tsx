@@ -6,7 +6,7 @@ import {
   LuLink, LuImage, LuCalendar, LuMegaphone,
   LuUpload, LuTrash2, LuLayers, LuShieldCheck,
   LuGraduationCap, LuCheck, LuSparkles, LuEye,
-  LuZap, LuClock, LuExternalLink
+  LuZap, LuClock, LuExternalLink, LuMessageCircle
 } from 'react-icons/lu';
 import { api } from '../../api';
 import toast from 'react-hot-toast';
@@ -621,7 +621,7 @@ export default function AdSubmissionForm() {
                   </label>
                 ) : (
                   <div className="relative rounded-3xl overflow-hidden border-2 border-blue-500/60 bg-slate-950 shadow-2xl group">
-                    <img src={imagePreview} alt="Ad Artwork Preview" className="w-full max-h-72 object-contain mx-auto py-2" onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }} />
+                    <img src={imagePreview} alt="Ad Artwork Preview" className="w-full max-h-72 object-contain mx-auto py-2" />
                     <div className="absolute top-4 right-4 flex items-center gap-2">
                       <label className="px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-900 text-white border border-white/20 text-xs font-bold uppercase tracking-wider cursor-pointer shadow-lg transition-all backdrop-blur-md">
                         Change File
@@ -814,7 +814,7 @@ export default function AdSubmissionForm() {
                   {/* Banner Creative Display */}
                   <div className="relative aspect-[16/8] bg-slate-800 flex items-center justify-center overflow-hidden">
                     {imagePreview ? (
-                      <img src={imagePreview} alt="Mock Preview" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }} />
+                      <img src={imagePreview} alt="Mock Preview" className="w-full h-full object-cover" />
                     ) : (
                       <div className="text-center p-4 space-y-2">
                         <LuImage className="w-8 h-8 text-slate-500 mx-auto opacity-40 animate-pulse" />
@@ -949,6 +949,15 @@ export default function AdSubmissionForm() {
                   <p className="text-center text-[11px] text-slate-400 font-medium">
                     🔒 No payment required now. Our desk verifies your artwork and sends payment instructions upon approval.
                   </p>
+
+                  <a
+                    href={`https://wa.me/94724478148?text=${encodeURIComponent('Hi UniGang! I am on the advertising submission form and have a question about my campaign.')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-1 text-center text-[11px] text-emerald-400 hover:text-emerald-300 font-bold transition-colors inline-flex items-center justify-center gap-1.5"
+                  >
+                    <LuMessageCircle className="w-3.5 h-3.5" /> Have questions? Chat with WhatsApp Ad Desk
+                  </a>
                 </div>
               </div>
 
