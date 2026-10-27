@@ -218,6 +218,7 @@ export default function AdPopup() {
                     src={ad.image_url.startsWith('http') ? ad.image_url : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${ad.image_url.startsWith('/') ? '' : '/'}${ad.image_url}`} 
                     alt={ad.ad_title} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+                    onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent pointer-events-none" />
                 </div>

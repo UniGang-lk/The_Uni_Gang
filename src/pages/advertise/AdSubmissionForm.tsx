@@ -621,7 +621,7 @@ export default function AdSubmissionForm() {
                   </label>
                 ) : (
                   <div className="relative rounded-3xl overflow-hidden border-2 border-blue-500/60 bg-slate-950 shadow-2xl group">
-                    <img src={imagePreview} alt="Ad Artwork Preview" className="w-full max-h-72 object-contain mx-auto py-2" />
+                    <img src={imagePreview} alt="Ad Artwork Preview" className="w-full max-h-72 object-contain mx-auto py-2" onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }} />
                     <div className="absolute top-4 right-4 flex items-center gap-2">
                       <label className="px-3.5 py-2 rounded-xl bg-slate-900/80 hover:bg-slate-900 text-white border border-white/20 text-xs font-bold uppercase tracking-wider cursor-pointer shadow-lg transition-all backdrop-blur-md">
                         Change File
@@ -814,7 +814,7 @@ export default function AdSubmissionForm() {
                   {/* Banner Creative Display */}
                   <div className="relative aspect-[16/8] bg-slate-800 flex items-center justify-center overflow-hidden">
                     {imagePreview ? (
-                      <img src={imagePreview} alt="Mock Preview" className="w-full h-full object-cover" />
+                      <img src={imagePreview} alt="Mock Preview" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }} />
                     ) : (
                       <div className="text-center p-4 space-y-2">
                         <LuImage className="w-8 h-8 text-slate-500 mx-auto opacity-40 animate-pulse" />

@@ -96,6 +96,7 @@ export default function AdSidebarWidget() {
             src={adImgSrc} 
             alt={ad.ad_title} 
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+            onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
           />
           {/* Floating Neon Badge */}
           <div className="absolute top-3 right-3 z-15 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-black uppercase text-[8px] tracking-widest px-2.5 py-1 rounded-full shadow-lg shadow-indigo-500/20 flex items-center gap-1 border border-white/10">

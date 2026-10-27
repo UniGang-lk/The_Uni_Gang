@@ -127,6 +127,7 @@ export default function AdBanner({ placement = 'BANNER' }: { placement?: string 
               src={adImgSrc}
               alt={ad.ad_title}
               className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700 relative z-10"
+              onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
             />
             {/* Dark gradient to blend image into text pane */}
             <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black/80 to-transparent z-20 pointer-events-none" />

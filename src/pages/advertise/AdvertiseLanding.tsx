@@ -474,7 +474,7 @@ export default function AdvertiseLanding() {
                         <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase bg-blue-500/15 text-blue-600 dark:text-cyan-400">1200 x 400 px</span>
                       </div>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                        Full-width placement at the header of major sections. First touchpoint for all campus visitors (~45K daily views).
+                        Full-width placement at the header of major sections. First touchpoint for all campus visitors (~3,500 daily reach • ~100K monthly views).
                       </p>
                     </div>
                   </div>
@@ -489,7 +489,7 @@ export default function AdvertiseLanding() {
                         <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">300 x 300 px</span>
                       </div>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                        Persistent square ad card that remains anchored as students scroll through feeds (~30K daily views).
+                        Persistent square ad card that remains anchored as students scroll through feeds (~2,100 daily reach • ~60K monthly views).
                       </p>
                     </div>
                   </div>
@@ -504,7 +504,7 @@ export default function AdvertiseLanding() {
                         <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase bg-amber-500/15 text-amber-600 dark:text-amber-400">800 x 450 px</span>
                       </div>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                        In-stream organic banner integrated naturally between listings and stories. Highest organic CTR (~38K daily views).
+                        In-stream organic banner integrated naturally between listings and stories. Highest organic CTR (~2,800 daily reach • ~80K monthly views).
                       </p>
                     </div>
                   </div>
@@ -519,7 +519,7 @@ export default function AdvertiseLanding() {
                         <span className="px-2 py-0.5 rounded-md text-[9px] font-black uppercase bg-purple-500/15 text-purple-600 dark:text-purple-400">600 x 600 px</span>
                       </div>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                        High-impact interstitial overlay with automatic 10s countdown timer. Guaranteed 100% impression rate (~50K daily views).
+                        High-impact interstitial overlay with automatic 10s countdown timer. Guaranteed 100% impression rate (~5,000 daily reach • ~150K monthly views).
                       </p>
                     </div>
                   </div>

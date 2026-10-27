@@ -934,7 +934,7 @@ const AdminDashboard = () => {
                             {/* Artwork Image */}
                             {imgSrc && (
                               <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-slate-950 border border-slate-800 relative group">
-                                <img src={imgSrc} alt={ad.ad_title} className="w-full h-full object-contain" />
+                                <img src={imgSrc} alt={ad.ad_title} className="w-full h-full object-contain" onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }} />
                                 <a
                                   href={imgSrc}
                                   target="_blank"

@@ -163,6 +163,7 @@ const AdNativeFeed: React.FC<AdNativeFeedProps> = ({ adIndex }) => {
                 src={adImgSrc} 
                 alt={ad.ad_title} 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 pointer-events-none"
+                onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
               />
               <div className="absolute inset-0 bg-gradient-to-t sm:bg-gradient-to-r from-black/40 to-transparent pointer-events-none" />
             </div>
