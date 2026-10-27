@@ -698,8 +698,8 @@ export default function AdSubmissionForm() {
                             </div>
                           </div>
                           <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-2">{option.desc}</p>
-                          <div className="mt-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest border-t border-slate-200/50 dark:border-slate-800 pt-2 flex justify-between">
-                            <span>{option.specs}</span>
+                          <div className="mt-3 text-[11px] font-bold text-slate-400 uppercase tracking-widest border-t border-slate-200/50 dark:border-slate-800 pt-2 flex justify-between items-center">
+                            <span>{option.specs} • ~{option.dailyImpressions.toLocaleString()} views</span>
                             <span className="text-blue-600 dark:text-blue-400 font-black">LKR {option.rate}/day</span>
                           </div>
                         </div>

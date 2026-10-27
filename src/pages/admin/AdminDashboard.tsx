@@ -915,6 +915,7 @@ const AdminDashboard = () => {
                       const status = (ad.status || '').toUpperCase();
                       const isPending = status === 'PENDING';
                       const isActive = status === 'ACTIVE';
+                      const isPaused = status === 'PAUSED';
                       const isExpired = status === 'EXPIRED';
 
                       const rawImg = ad.image_url;
@@ -956,6 +957,8 @@ const AdminDashboard = () => {
                                     ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                                     : isPending
                                     ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                    : isPaused
+                                    ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
                                     : isExpired
                                     ? 'bg-slate-700/50 text-slate-400 border border-slate-700'
                                     : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
@@ -1044,7 +1047,7 @@ const AdminDashboard = () => {
                                   onClick={() => handleAdStatus(ad.id, 'ACTIVE')}
                                   className="px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
                                 >
-                                  <LuCheck size={13} /> Activate Live
+                                  <LuCheck size={13} /> {status === 'PAUSED' ? 'Resume Campaign' : 'Activate Live'}
                                 </button>
                               )}
                               {status === 'ACTIVE' && (

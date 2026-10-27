@@ -13,6 +13,7 @@ import {
   LuTrendingUp,
   LuCopy,
   LuCheck,
+  LuExternalLink,
 } from 'react-icons/lu';
 import { api } from '../../../api';
 
@@ -181,8 +182,10 @@ export const AdTrackModal: React.FC<AdTrackModalProps> = ({
               const status = (ad.status || ad.Status || '').toUpperCase();
               const isApproved = status === 'ACTIVE' || status === 'APPROVED';
               const isPending = status === 'PENDING';
+              const isPaused = status === 'PAUSED';
               const isRejected = status === 'REJECTED';
               const isExpired = status === 'EXPIRED';
+              const targetLink = ad.target_link || ad.TargetLink;
 
               const rawImg = ad.image_url || ad.ImageURL;
               const imgSrc = rawImg
@@ -269,6 +272,11 @@ export const AdTrackModal: React.FC<AdTrackModalProps> = ({
                           <LuClock className="w-3.5 h-3.5" />
                           UNDER REVIEW
                         </span>
+                      ) : isPaused ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 dark:bg-orange-950/60 dark:text-orange-300 border border-orange-300 dark:border-orange-800">
+                          <LuClock className="w-3.5 h-3.5" />
+                          PAUSED
+                        </span>
                       ) : isRejected ? (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 dark:bg-red-950/60 dark:text-red-300 border border-red-300 dark:border-red-800">
                           REJECTED
@@ -315,13 +323,30 @@ export const AdTrackModal: React.FC<AdTrackModalProps> = ({
 
                   {/* Details Footer */}
                   <div className="flex flex-wrap items-center justify-between gap-3 text-xs pt-1 border-t border-slate-200/50 dark:border-slate-800/50">
-                    <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-                      <LuCalendar className="w-3.5 h-3.5 text-slate-400" />
-                      Duration: {ad.duration_days || ad.DurationDays || 7} Days
+                    <div className="flex flex-wrap items-center gap-2 text-slate-500 dark:text-slate-400">
+                      <div className="flex items-center gap-1">
+                        <LuCalendar className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Duration: {ad.duration_days || ad.DurationDays || 7} Days</span>
+                      </div>
                       {(ad.end_date || ad.EndDate) && (
                         <span>
                           (Ends: {new Date(ad.end_date || ad.EndDate).toLocaleDateString()})
                         </span>
+                      )}
+                      {targetLink && (
+                        <>
+                          <span>•</span>
+                          <a
+                            href={targetLink.startsWith('http') ? targetLink : `https://${targetLink}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-cyan-600 dark:text-cyan-400 font-semibold hover:underline truncate max-w-[160px]"
+                            title={targetLink}
+                          >
+                            <LuExternalLink className="w-3 h-3 flex-shrink-0" />
+                            {targetLink.replace(/^https?:\/\//, '')}
+                          </a>
+                        </>
                       )}
                     </div>
                     
