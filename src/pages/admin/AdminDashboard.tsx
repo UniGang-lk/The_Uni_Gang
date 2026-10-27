@@ -900,9 +900,11 @@ const AdminDashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {advertisements
                     .filter(a => {
-                      const q = searchQuery.toLowerCase();
+                      const q = searchQuery.toLowerCase().trim();
+                      const cleanQ = q.startsWith('ad-') ? q.replace(/^ad-/, '') : q;
                       return (
                         (a.id || '').toLowerCase().includes(q) ||
+                        (a.id || '').toLowerCase().includes(cleanQ) ||
                         (a.company_name || '').toLowerCase().includes(q) ||
                         (a.ad_title || '').toLowerCase().includes(q) ||
                         (a.contact_email || '').toLowerCase().includes(q) ||

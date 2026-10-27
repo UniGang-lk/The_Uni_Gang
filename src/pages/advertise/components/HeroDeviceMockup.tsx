@@ -46,12 +46,15 @@ export default function HeroDeviceMockup() {
       </motion.div>
 
       {/* Placement switcher */}
-      <div className="relative mt-14 flex flex-wrap justify-center gap-2">
+      <div className="relative mt-14 flex flex-wrap justify-center gap-2" role="tablist" aria-label="Placement preview switcher">
         {PLACEMENTS.map((p, i) => (
           <button
             key={p.id}
             id={`hero-placement-${p.id.toLowerCase()}`}
             type="button"
+            role="tab"
+            aria-selected={i === index}
+            aria-label={`View ${p.title} placement`}
             onClick={() => setIndex(i)}
             className={`px-3.5 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer ${
               i === index

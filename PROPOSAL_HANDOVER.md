@@ -634,7 +634,9 @@
     - **🛡️ Round 51 Advertising Ecosystem Full-Depth Hardening:**
       - **Global Ad Popup Outside Backdrop Click Dismissal ([AdPopup.tsx](file:///e:/The-Uni-Gang/Website/src/components/advertise/AdPopup.tsx)):** Popup Interstitial එක විවෘතව ඇති විට පරිශීලකයා card එකෙන් පිටත අඳුරු backdrop එක click කළ විට ස්වයංක්‍රීයව popup එක dismiss වීමට `onClick={handleClose}` සහ inner card එකට `onClick={(e) => e.stopPropagation()}` එක් කරන ලදී.
       - **Native Feed Fallback SPA Navigation ([AdNativeFeed.tsx](file:///e:/The-Uni-Gang/Website/src/components/advertise/AdNativeFeed.tsx)):** "Advertise Here" fallback card එකේ browser reload වන සාම්ප්‍රදායික `<a href="/advertise">` වෙනුවට `react-router-dom` හි `<Link to="/advertise">` සම්බන්ධ කර fluid SPA navigation තහවුරු කිරීම.
-      - **Client-Side Phone Number Normalization in Form Submit ([AdSubmissionForm.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/AdSubmissionForm.tsx)):** `handleSubmit` FormData build වීමේදී `contact_phone` හි spaces සහ formatting අක්ෂර ඉවත් කර sanitized number එක (e.g. `0771234567`) Backend එකට යැවීම. එමගින් Admin Dashboard හි One-Click WhatsApp routing link එක 100% ක් නිවැරදිව ක්‍රියාත්මක වීම.
+    - **🛡️ Round 52 Advertising Ecosystem Full-Depth Hardening:**
+      - **Hero Device Mockup ARIA & Keyboard Accessibility ([HeroDeviceMockup.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/components/HeroDeviceMockup.tsx)):** Placement switcher buttons වලට `role="tablist"`, `role="tab"`, `aria-selected` සහ descriptive `aria-label` එක් කර screen reader සහ keyboard accessibility 100% ක් සම්පූර්ණ කිරීම.
+      - **Admin Search AD- Prefix Tolerance ([AdminDashboard.tsx](file:///e:/The-Uni-Gang/Website/src/pages/admin/AdminDashboard.tsx)):** Admin Dashboard හි search query එක `ad-` prefix එක සහිතව (e.g. `AD-1234` හෝ `ad-1234`) හෝ රහිතව type කළද, underlying campaign UUID හෝ ID එක නිවැරදිව match වන ලෙස clean query normalizer එකක් එක් කිරීම.
     - **✅ Zero Build & Compile Errors:** `npx tsc --noEmit` සහ `go vet ./...` මගින් Website සහ Backend 100% clean, error-free සහ production-ready බව තහවුරු කරන ලදී.
 
 ---
