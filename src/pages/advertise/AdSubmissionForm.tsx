@@ -80,6 +80,10 @@ export default function AdSubmissionForm() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please upload an image file (PNG, JPG, or WebP)');
+        return;
+      }
       if (file.size > 8 * 1024 * 1024) {
         toast.error('Image file size must be less than 8MB');
         return;
@@ -114,12 +118,14 @@ export default function AdSubmissionForm() {
       toast.error('Please enter your Company / Organization Name');
       return;
     }
-    if (!formData.contact_email.trim() || !formData.contact_email.includes('@')) {
-      toast.error('Please enter a valid Contact Email');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.contact_email.trim() || !emailRegex.test(formData.contact_email.trim())) {
+      toast.error('Please enter a valid Contact Email (e.g. ads@company.com)');
       return;
     }
-    if (!formData.contact_phone.trim()) {
-      toast.error('Please enter your WhatsApp or Phone Number');
+    const cleanPhone = formData.contact_phone.replace(/[^0-9+]/g, '');
+    if (!cleanPhone || cleanPhone.length < 9) {
+      toast.error('Please enter a valid Phone / WhatsApp number (e.g. 077 123 4567)');
       return;
     }
     if (!formData.ad_title.trim()) {
@@ -291,8 +297,15 @@ export default function AdSubmissionForm() {
     if (campus.includes('NSBM')) return 'NSBM';
     if (campus.includes('UOK') || campus.includes('Kelaniya')) return 'Kelaniya';
     if (campus.includes('UOP') || campus.includes('Peradeniya')) return 'Peradeniya';
+    if (campus.includes('UOR') || campus.includes('Ruhuna')) return 'Ruhuna';
+    if (campus.includes('UOJ') || campus.includes('Jaffna')) return 'Jaffna';
+    if (campus.includes('RUSL') || campus.includes('Rajarata')) return 'Rajarata';
+    if (campus.includes('SUSL') || campus.includes('Sabaragamuwa')) return 'Sabaragamuwa';
+    if (campus.includes('WUSL') || campus.includes('Wayamba')) return 'Wayamba';
     if (campus.includes('IIT')) return 'IIT';
     if (campus.includes('KDU')) return 'KDU';
+    if (campus.includes('CINEC')) return 'CINEC';
+    if (campus.includes('ICBT')) return 'ICBT';
     return campus.split(' ')[0];
   };
 
@@ -535,8 +548,15 @@ export default function AdSubmissionForm() {
                         <option value="NSBM Green University">🌿 NSBM Green University</option>
                         <option value="University of Kelaniya (UOK)">🏛️ University of Kelaniya (UOK)</option>
                         <option value="University of Peradeniya (UOP)">🏛️ University of Peradeniya (UOP)</option>
+                        <option value="University of Ruhuna (UOR)">🏛️ University of Ruhuna (UOR)</option>
+                        <option value="University of Jaffna (UOJ)">🏛️ University of Jaffna (UOJ)</option>
+                        <option value="Rajarata University of Sri Lanka (RUSL)">🏛️ Rajarata University (RUSL)</option>
+                        <option value="Sabaragamuwa University (SUSL)">🏛️ Sabaragamuwa University (SUSL)</option>
+                        <option value="Wayamba University of Sri Lanka (WUSL)">🏛️ Wayamba University (WUSL)</option>
                         <option value="IIT - Informatics Institute of Technology">💻 IIT Campus (Informatics)</option>
                         <option value="General Sir John Kotelawala Defence University (KDU)">🎖️ KDU Campus</option>
+                        <option value="CINEC Campus">⚓ CINEC Campus (Malabe)</option>
+                        <option value="ICBT Campus">🎓 ICBT Campus</option>
                       </select>
                       <div className="absolute right-4 top-4 pointer-events-none text-slate-400 text-xs">▼</div>
                     </div>
@@ -822,9 +842,18 @@ export default function AdSubmissionForm() {
                       <span className="text-slate-400 font-medium truncate max-w-[140px]">
                         {formData.target_link ? formData.target_link.replace(/^https?:\/\//, '') : 'yourwebsite.com'}
                       </span>
-                      <span className="inline-flex items-center gap-1 font-black text-blue-600 dark:text-blue-400 uppercase text-[10px]">
+                      <a
+                        href={formData.target_link ? (formData.target_link.startsWith('http') ? formData.target_link : `https://${formData.target_link}`) : '#'}
+                        target={formData.target_link ? "_blank" : undefined}
+                        rel={formData.target_link ? "noopener noreferrer" : undefined}
+                        onClick={(e) => {
+                          if (!formData.target_link) e.preventDefault();
+                        }}
+                        className="inline-flex items-center gap-1 font-black text-blue-600 dark:text-blue-400 uppercase text-[10px] hover:underline"
+                        title="Test Destination Link"
+                      >
                         Open Link <LuExternalLink className="w-3 h-3" />
-                      </span>
+                      </a>
                     </div>
                   </div>
                 </div>

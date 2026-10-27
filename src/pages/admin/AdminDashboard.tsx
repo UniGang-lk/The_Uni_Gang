@@ -980,6 +980,28 @@ const AdminDashboard = () => {
                                   <span className="font-bold text-cyan-400 truncate max-w-[150px]">{ad.target_campus}</span>
                                 </div>
                               )}
+                              {ad.target_link && (
+                                <div className="flex justify-between items-center gap-2">
+                                  <span className="text-slate-500">Destination:</span>
+                                  <a
+                                    href={ad.target_link.startsWith('http') ? ad.target_link : `https://${ad.target_link}`}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="font-bold text-indigo-400 hover:underline truncate max-w-[160px] inline-flex items-center gap-1"
+                                    title={ad.target_link}
+                                  >
+                                    {ad.target_link.replace(/^https?:\/\//, '')} <LuExternalLink size={11} />
+                                  </a>
+                                </div>
+                              )}
+                              {ad.end_date && (
+                                <div className="flex justify-between">
+                                  <span className="text-slate-500">Expires:</span>
+                                  <span className="font-bold text-slate-300">
+                                    {new Date(ad.end_date).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              )}
                               <div className="flex justify-between">
                                 <span className="text-slate-500">Stats:</span>
                                 <span className="font-bold text-slate-200">
