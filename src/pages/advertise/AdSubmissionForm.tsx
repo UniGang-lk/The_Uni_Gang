@@ -125,7 +125,7 @@ export default function AdSubmissionForm() {
             data.append('placement_type', `${selectedTier} (${value})`);
           }
         } else {
-          data.append(key, value);
+          data.append(key, typeof value === 'string' ? value.trim() : value);
         }
       });
       if (imageFile) {

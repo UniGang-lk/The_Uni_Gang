@@ -606,6 +606,10 @@
       - 24.5" ඩෙස්ක්ටොප් මොනිටර් වල (2XL screens) Layout එක කැඩී නොයන ලෙස `2xl:max-w-[1536px]` සහ grid columns සමතුලිත කිරීම.
       - ජංගම දුරකථන වල scroll කරන විට පහළින් මතුවන Sleek Mobile Sticky CTA Bar එක ([MobileStickyCta.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/components/MobileStickyCta.tsx)).
       - 10-second automatic countdown timer badge එක සහ progress bar එක සහිත Global Popup Interstitial ([AdPopup.tsx](file:///e:/The-Uni-Gang/Website/src/components/advertise/AdPopup.tsx)).
+    - **🛡️ Deep Lifecycle Hardening & React Cleanups:**
+      - Expired campaigns reactivate වන විට Database හි `start_date` සහ `end_date` ස්වයංක්‍රීයව අලුත් වීම ([advertisement_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/advertisement_controller.go)).
+      - `AdPopup.tsx`, `AdBanner.tsx`, සහ `AdSidebarWidget.tsx` තුළ unmounted async state updates වැළැක්වීමට `isMounted` guards සහ timer cleanups එක් කිරීම.
+      - Ad Submission Form හි සියලුම inputs සඳහා auto-trimming ආරක්ෂාව යෙදීම.
     - **✅ Zero Build & Compile Errors:** `npx tsc --noEmit` සහ `go vet ./...` මගින් Website සහ Backend 100% clean, error-free සහ production-ready බව තහවුරු කරන ලදී.
 
 ---

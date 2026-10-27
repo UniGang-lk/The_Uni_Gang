@@ -7,9 +7,11 @@ export default function AdBanner({ placement = 'BANNER' }: { placement?: string 
   const [ad, setAd] = useState<any>(null);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchAd = async () => {
       try {
         const ads = await api.getActiveAds();
+        if (!isMounted) return;
         const bannerAds = ads.filter(a => {
           const p = (a.placement_type || '').toUpperCase();
           const target = (placement || 'BANNER').toUpperCase();
@@ -39,9 +41,11 @@ export default function AdBanner({ placement = 'BANNER' }: { placement?: string 
             }
             random -= it.w;
           }
-          setAd(chosen);
-          if (chosen && chosen.id) {
-            api.trackAdImpression(chosen.id);
+          if (isMounted) {
+            setAd(chosen);
+            if (chosen && chosen.id) {
+              api.trackAdImpression(chosen.id);
+            }
           }
         }
       } catch (error) {
@@ -49,6 +53,9 @@ export default function AdBanner({ placement = 'BANNER' }: { placement?: string 
       }
     };
     fetchAd();
+    return () => {
+      isMounted = false;
+    };
   }, [placement]);
 
   if (!ad) return null;

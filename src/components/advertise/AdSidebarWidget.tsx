@@ -7,9 +7,11 @@ export default function AdSidebarWidget() {
   const [ad, setAd] = useState<any>(null);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchAd = async () => {
       try {
         const ads = await api.getActiveAds();
+        if (!isMounted) return;
         const sidebarAds = ads.filter(a => {
           const p = (a.placement_type || '').toUpperCase();
           return p === 'SIDEBAR' || p.includes('SIDEBAR') || p.includes('STARTER') || p.includes('ULTIMATE');
@@ -37,9 +39,11 @@ export default function AdSidebarWidget() {
             }
             random -= it.w;
           }
-          setAd(chosen);
-          if (chosen && chosen.id) {
-            api.trackAdImpression(chosen.id);
+          if (isMounted) {
+            setAd(chosen);
+            if (chosen && chosen.id) {
+              api.trackAdImpression(chosen.id);
+            }
           }
         }
       } catch (error) {
@@ -47,6 +51,9 @@ export default function AdSidebarWidget() {
       }
     };
     fetchAd();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   if (!ad) return null;

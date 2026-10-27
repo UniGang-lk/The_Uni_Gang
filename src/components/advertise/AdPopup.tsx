@@ -20,6 +20,9 @@ export default function AdPopup() {
   const [hasShownThisSession, setHasShownThisSession] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
+    let popupTimer: NodeJS.Timeout | null = null;
+
     // 10-minute cooldown tracking using localStorage
     const storageKey = 'lastAdPopupShownAt';
     const lastShown = localStorage.getItem(storageKey);
@@ -33,6 +36,8 @@ export default function AdPopup() {
     const fetchPopupAd = async () => {
       try {
         const ads = await api.getActiveAds();
+        if (!isMounted) return;
+
         const popupAds = ads.filter((a: Ad) => {
           const p = (a.placement_type || '').toUpperCase();
           return p === 'POPUP' || p.includes('POPUP') || p.includes('ULTIMATE');
@@ -61,9 +66,11 @@ export default function AdPopup() {
             }
             random -= it.w;
           }
+          if (!isMounted) return;
           setAd(chosen);
           
-          setTimeout(() => {
+          popupTimer = setTimeout(() => {
+            if (!isMounted) return;
             setTimeLeft(10);
             setIsVisible(true);
             if (chosen && chosen.id) {
@@ -78,6 +85,11 @@ export default function AdPopup() {
     };
 
     fetchPopupAd();
+
+    return () => {
+      isMounted = false;
+      if (popupTimer) clearTimeout(popupTimer);
+    };
   }, []);
 
   // Timer logic

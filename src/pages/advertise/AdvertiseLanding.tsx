@@ -126,7 +126,7 @@ export default function AdvertiseLanding() {
     },
     {
       q: 'What banner image dimensions are recommended?',
-      a: 'Top Banners: 1200x400 px. Sidebar Widgets: 300x300 or 300x250 px. Native Feed Cards: 800x450 px. PNG or JPG files under 5MB.'
+      a: 'Top Banners: 1200x400 px. Sidebar Widgets: 300x300 px. Native Feed Cards: 800x450 px. Global Popup: 600x600 px. High-resolution PNG, JPG or WebP files up to 8MB.'
     }
   ];
 
