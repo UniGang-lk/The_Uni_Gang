@@ -57,7 +57,7 @@ export default function AdvertiseLanding() {
     });
 
     const params = new URLSearchParams(window.location.search);
-    if (params.get('track') === 'true' || params.get('id')) {
+    if (params.get('track') === 'true' || params.get('id') || params.get('email')) {
       setShowTrackModal(true);
     }
   }, []);
@@ -580,11 +580,11 @@ export default function AdvertiseLanding() {
         isOpen={showTrackModal}
         onClose={() => {
           setShowTrackModal(false);
-          if (window.location.search.includes('track') || window.location.search.includes('id')) {
+          if (window.location.search.includes('track') || window.location.search.includes('id') || window.location.search.includes('email')) {
             navigate('/advertise', { replace: true });
           }
         }}
-        initialQuery={new URLSearchParams(window.location.search).get('id') || undefined}
+        initialQuery={new URLSearchParams(window.location.search).get('id') || new URLSearchParams(window.location.search).get('email') || undefined}
       />
 
     </div>

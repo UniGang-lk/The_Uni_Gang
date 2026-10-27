@@ -268,6 +268,20 @@ export default function AdSubmissionForm() {
     };
   };
 
+  const getShortCampusName = (campus: string) => {
+    if (!campus || campus.includes('All Campuses')) return 'All Campuses';
+    if (campus.includes('UOM') || campus.includes('Moratuwa')) return 'UOM';
+    if (campus.includes('UOC') || campus.includes('Colombo')) return 'UOC';
+    if (campus.includes('USJ') || campus.includes('Jayewardenepura')) return 'USJ';
+    if (campus.includes('SLIIT')) return 'SLIIT';
+    if (campus.includes('NSBM')) return 'NSBM';
+    if (campus.includes('UOK') || campus.includes('Kelaniya')) return 'Kelaniya';
+    if (campus.includes('UOP') || campus.includes('Peradeniya')) return 'Peradeniya';
+    if (campus.includes('IIT')) return 'IIT';
+    if (campus.includes('KDU')) return 'KDU';
+    return campus.split(' ')[0];
+  };
+
   const currentPackage = getPackageDetails();
 
   return (
@@ -541,7 +555,7 @@ export default function AdSubmissionForm() {
                     </div>
                   </div>
                   <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-[11px] font-bold text-slate-600 dark:text-slate-300">
-                    <LuImage className="w-3.5 h-3.5 text-blue-500" /> {currentPackage.specs.split(' ')[0]}
+                    <LuImage className="w-3.5 h-3.5 text-blue-500" /> {currentPackage.specs.split('(')[0].trim()}
                   </div>
                 </div>
 
@@ -773,7 +787,7 @@ export default function AdSubmissionForm() {
                     </span>
                     {formData.target_campus !== 'All Campuses (Island-wide)' && (
                       <span className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md bg-blue-600/90 text-white text-[9px] font-black uppercase tracking-widest backdrop-blur-sm">
-                        {formData.target_campus.split(' ')[0]}
+                        {getShortCampusName(formData.target_campus)}
                       </span>
                     )}
                   </div>
@@ -851,7 +865,7 @@ export default function AdSubmissionForm() {
                       <div className="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-[10px] shrink-0">
                         <LuGraduationCap className="w-3 h-3" />
                       </div>
-                      <span className="truncate">Campus: {formData.target_campus.split(' ')[0]}</span>
+                      <span className="truncate">Target: {getShortCampusName(formData.target_campus)}</span>
                     </li>
                   </ul>
                 </div>

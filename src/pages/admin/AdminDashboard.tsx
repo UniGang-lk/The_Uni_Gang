@@ -168,9 +168,9 @@ const AdminDashboard = () => {
   const handleAdStatus = async (id: string, status: string) => {
     if (!token) return;
     try {
-      await api.updateAdminAdStatus(id, status, token);
+      const updated = await api.updateAdminAdStatus(id, status, token);
       toast.success(`Ad status updated to ${status}`);
-      setAdvertisements(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+      setAdvertisements(prev => prev.map(a => a.id === id ? { ...a, ...(updated && updated.id ? updated : {}), status } : a));
     } catch (err: any) {
       toast.error(err.message || 'Failed to update ad status');
     }

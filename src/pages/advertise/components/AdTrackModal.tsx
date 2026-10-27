@@ -190,28 +190,35 @@ export const AdTrackModal: React.FC<AdTrackModalProps> = ({
                       )}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span
-                            className="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/50 px-2 py-0.5 rounded border border-cyan-200 dark:border-cyan-800"
-                            title={`Full System ID: ${ad.id}`}
-                          >
-                            AD-{ad.id.length > 8 ? ad.id.slice(0, 8).toUpperCase() : ad.id}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              navigator.clipboard.writeText(ad.id);
-                              setCopiedId(ad.id);
-                              setTimeout(() => setCopiedId(null), 2000);
-                            }}
-                            className="p-1 rounded text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-950 transition-colors cursor-pointer"
-                            title="Copy full tracking ID"
-                          >
-                            {copiedId === ad.id ? (
-                              <LuCheck className="w-3.5 h-3.5 text-emerald-500" />
-                            ) : (
-                              <LuCopy className="w-3.5 h-3.5" />
-                            )}
-                          </button>
+                          {(() => {
+                            const adIdStr = String(ad.id || '');
+                            return (
+                              <>
+                                <span
+                                  className="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/50 px-2 py-0.5 rounded border border-cyan-200 dark:border-cyan-800"
+                                  title={`Full System ID: ${adIdStr}`}
+                                >
+                                  AD-{adIdStr.length > 8 ? adIdStr.slice(0, 8).toUpperCase() : adIdStr}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(adIdStr);
+                                    setCopiedId(adIdStr);
+                                    setTimeout(() => setCopiedId(null), 2000);
+                                  }}
+                                  className="p-1 rounded text-slate-400 hover:text-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-950 transition-colors cursor-pointer"
+                                  title="Copy full tracking ID"
+                                >
+                                  {copiedId === adIdStr ? (
+                                    <LuCheck className="w-3.5 h-3.5 text-emerald-500" />
+                                  ) : (
+                                    <LuCopy className="w-3.5 h-3.5" />
+                                  )}
+                                </button>
+                              </>
+                            );
+                          })()}
                           <span className="text-xs text-slate-400">
                             • {new Date(ad.createdAt || ad.CreatedAt || Date.now()).toLocaleDateString()}
                           </span>
@@ -293,7 +300,7 @@ export const AdTrackModal: React.FC<AdTrackModalProps> = ({
                     <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
                       <LuCalendar className="w-3.5 h-3.5 text-slate-400" />
                       Duration: {ad.duration_days || ad.DurationDays || 7} Days
-                      {ad.start_date && (
+                      {(ad.end_date || ad.EndDate) && (
                         <span>
                           (Ends: {new Date(ad.end_date || ad.EndDate).toLocaleDateString()})
                         </span>

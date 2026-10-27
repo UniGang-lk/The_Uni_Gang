@@ -606,13 +606,15 @@
       - 24.5" ඩෙස්ක්ටොප් මොනිටර් වල (2XL screens) Layout එක කැඩී නොයන ලෙස `2xl:max-w-[1536px]` සහ grid columns සමතුලිත කිරීම.
       - ජංගම දුරකථන වල scroll කරන විට පහළින් මතුවන Sleek Mobile Sticky CTA Bar එක ([MobileStickyCta.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/components/MobileStickyCta.tsx)).
       - 10-second automatic countdown timer badge එක සහ progress bar එක සහිත Global Popup Interstitial ([AdPopup.tsx](file:///e:/The-Uni-Gang/Website/src/components/advertise/AdPopup.tsx)).
-    - **🛡️ Deep Lifecycle Hardening & React Cleanups:**
-      - Expired campaigns reactivate වන විට Database හි `start_date` සහ `end_date` ස්වයංක්‍රීයව අලුත් වීම ([advertisement_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/advertisement_controller.go)).
-      - `AdPopup.tsx`, `AdBanner.tsx`, සහ `AdSidebarWidget.tsx` තුළ unmounted async state updates වැළැක්වීමට `isMounted` guards සහ timer cleanups එක් කිරීම.
-      - Ad Submission Form හි සියලුම inputs සඳහා auto-trimming ආරක්ෂාව සහ interactive validation toasts යෙදීම.
-      - Admin Dashboard හි advertiser WhatsApp direct chat link එක `94` international country code එක සහිතව sanitize කිරීම.
-      - Modal close එකේදී URL search params auto-cleanup වීම සහ custom placement priority weights (Popup: 5, Banner: 3, Feed: 2, Sidebar: 1) server-side සමතුලිත කිරීම.
-      - Pricing section `#pricing` anchor scroll alignment සහ custom mode switch එකේදී browser URL query auto-replace handling.
+    - **🛡️ Deep Lifecycle Hardening & React Cleanups (Round 45 & Round 46 Comprehensive Audit):**
+      - **Backend Expiration on Startup ([cron_service.go](file:///e:/The-Uni-Gang/Backend/internal/service/cron_service.go)):** සර්වරය reboot හෝ restart වූ විගස `go expireAds()` මගින් offline කාලය තුළ කල් ඉකුත් වූ දැන්වීම් ක්ෂණිකව `status = 'EXPIRED'` බවට පත් කිරීම (පැයක් යනතුරු cron job එක ප්‍රමාද වීම වැළැක්වීම).
+      - **Backend Admin Update Ad Dates Sync ([advertisement_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/advertisement_controller.go)):** Admin කෙනෙක් Edit Modal හෝ Multipart Form මගින් දැන්වීමක් `ACTIVE` කළ විට, `StartDate` සහ `EndDate` ස්වයංක්‍රීයව අලුත් වී active window එක ගණනය වීම.
+      - **Admin Dashboard Instant State Merge ([AdminDashboard.tsx](file:///e:/The-Uni-Gang/Website/src/pages/admin/AdminDashboard.tsx)):** Admin විසින් ad status වෙනස් කළ පසු server response එකේ ලැබෙන `start_date` සහ `end_date` ක්ෂණිකව state එකට merge කිරීම.
+      - **Campus Short Badge Bug Resolution ([AdSubmissionForm.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/AdSubmissionForm.tsx)):** `target_campus.split(' ')[0]` නිසා University of Moratuwa/Colombo ආදියෙහි `"University"` ලෙස පළ වූ bug එක `getShortCampusName()` මගින් `"UOM"`, `"UOC"`, `"USJ"`, `"SLIIT"`, `"NSBM"`, `"Kelaniya"`, `"Peradeniya"`, `"IIT"`, `"KDU"` හෝ `"All Campuses"` ලෙස නිවැරදි කිරීම.
+      - **Specs Cutoff Fix ([AdSubmissionForm.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/AdSubmissionForm.tsx)):** `specs.split(' ')[0]` වෙනුවට `specs.split('(')[0].trim()` යොදා `"1200 x 400 px"` සම්පූර්ණ dimension එක පෙන්වීම.
+      - **Ad Tracking Safe String & End Date Handling ([AdTrackModal.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/components/AdTrackModal.tsx)):** `ad.id` string cast ආරක්ෂාව සහ `ad.end_date` නොමැති අවස්ථාවල 1970 වැරදි date display වීම වැළැක්වීම.
+      - **Email Deep Linking ([AdvertiseLanding.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/AdvertiseLanding.tsx)):** `?email=...` URL parameter එක හරහාද Tracking modal auto-open වීම සහ query auto-fill වීම.
+      - **Homepage Mockup Specs Sync ([Advertise.tsx](file:///e:/The-Uni-Gang/Website/src/components/advertise/Advertise.tsx)):** Homepage interactive mockup එකේ පැරණි dimensions `970×90` සහ `300×250` වෙනුවට නිවැරදි `1200×400` සහ `300×300` ලෙස යාවත්කාලීන කිරීම.
     - **✅ Zero Build & Compile Errors:** `npx tsc --noEmit` සහ `go vet ./...` මගින් Website සහ Backend 100% clean, error-free සහ production-ready බව තහවුරු කරන ලදී.
 
 ---

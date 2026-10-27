@@ -244,7 +244,7 @@ export default function AdvertiseSection() {
                       </div>
                       <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${activePlacement === 'banner' ? 'bg-white/20 text-white' : 'bg-blue-500/15 text-blue-500'
                         }`}>
-                        970×90
+                        1200×400
                       </span>
                     </div>
                     {/* Pulsing indicator */}
@@ -340,7 +340,7 @@ export default function AdvertiseSection() {
                         </span>
                         <span className={`text-[7px] font-bold px-1.5 py-0.5 rounded-full ${activePlacement === 'sidebar' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-slate-700 text-slate-400'
                           }`}>
-                          300×250
+                          300×300
                         </span>
                         {/* Mini placeholder blocks */}
                         <div className="w-full space-y-1 mt-1">
