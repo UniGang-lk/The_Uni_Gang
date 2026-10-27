@@ -47,6 +47,8 @@ export default function AdSubmissionForm() {
       } else if (tier.toLowerCase().includes('ultimate')) {
         setFormData(prev => ({ ...prev, placement_type: 'POPUP', duration_days: '30' }));
       }
+    } else {
+      setSelectedTier(null);
     }
 
     // Pre-fill from Reach Calculator (?placement=BANNER&days=14)

@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LuLayers, LuCheck } from 'react-icons/lu';
+import { LuLayers, LuCheck, LuArrowRight } from 'react-icons/lu';
 import AdMockScreen from './AdMockScreen';
 import { PLACEMENTS, getPlacement, formatLKR, type PlacementId } from './placements';
 
 export default function PlacementExplorer() {
+  const navigate = useNavigate();
   const [active, setActive] = useState<PlacementId>('BANNER');
   const info = getPlacement(active);
 
@@ -98,6 +100,17 @@ export default function PlacementExplorer() {
               ))}
             </motion.div>
           </AnimatePresence>
+
+          <div className="pt-1">
+            <button
+              id={`book-placement-${active.toLowerCase()}`}
+              type="button"
+              onClick={() => navigate(`/advertise/submit?placement=${active}`)}
+              className="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs uppercase tracking-wider transition-all shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+            >
+              Book {info.title} Placement <LuArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </section>
