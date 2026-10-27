@@ -647,10 +647,11 @@
       - **Frontend Submission Studio URL Scheme & Protocol Validation ([AdSubmissionForm.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/AdSubmissionForm.tsx)):** දැන්වීම්කරු destination URL එක ඇතුළත් කරන විට, client-side මට්ටමින් `javascript:` හෝ `data:` schemes අවහිර කර, `new URL()` parser එක මගින් වලංගු `http:` / `https:` link එකක් බවට තහවුරු කරගැනීම.
       - **Admin Dashboard Paused Campaign Moderation & Safe Destination Preview ([AdminDashboard.tsx](file:///e:/The-Uni-Gang/Website/src/pages/admin/AdminDashboard.tsx)):** Admin Dashboard moderation cards වල `PAUSED` status එකේ පවතින campaigns සඳහා "Resume Campaign" බොත්තමට අමතරව කෙලින්ම "Reject" කිරීමේ පහසුකම එක් කර admin පාලනය 100% ක් නම්‍යශීලී කිරීම. එමෙන්ම Admin destination link එක preview කිරීමේදී unsafe schemes වලින් ආරක්ෂා කිරීම.
       - **Display & Tracking Components Safe Click Handlers ([AdTrackModal.tsx](file:///e:/The-Uni-Gang/Website/src/pages/advertise/components/AdTrackModal.tsx), [AdBanner.tsx](file:///e:/The-Uni-Gang/Website/src/components/advertise/AdBanner.tsx), [AdSidebarWidget.tsx](file:///e:/The-Uni-Gang/Website/src/components/advertise/AdSidebarWidget.tsx), [AdPopup.tsx](file:///e:/The-Uni-Gang/Website/src/components/advertise/AdPopup.tsx), [AdNativeFeed.tsx](file:///e:/The-Uni-Gang/Website/src/components/advertise/AdNativeFeed.tsx)):** සියලුම ad placement cards, click handlers, සහ anchor tags තුළ `target_link` එක render හෝ `window.open` කිරීමට පෙර safe scheme verification එකක් එක් කර, අනාරක්ෂිත protocol links ක්‍රියාත්මක වීම වළක්වාලීම.
-    - **🛡️ Round 57 Artwork Upload Failure Handlers & Contact Phone Enforcement:**
-      - **Artwork Upload Failure Protection ([advertisement_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/advertisement_controller.go)):** `SubmitAdRequest` සහ `UpdateAdvertisement` යන handlers දෙකෙහිදීම `middleware.SaveUploadedFile` වෙතින් error එකක් ලැබුණහොත්, එය නිහඬව නොසලකා හැරීම වෙනුවට `500 Internal Server Error` ලබා දී දැන්වීම්කරුගේ artwork image එක database එකට link නොවී data loss වීම වැළැක්වීම.
-      - **Strict Backend Contact Phone Number Enforcement ([advertisement_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/advertisement_controller.go)):** `contact_phone` field එක backend validation එකට ඇතුළත් කර, අවම වශයෙන් ඉලක්කම් 9ක් සහිත වලංගු දුරකථන අංකයක් පැමිණීම අනිවාර්ය කිරීම මගින්, Admin review desk එකට WhatsApp මගින් දැන්වීම්කරු සම්බන්ධ කරගැනීමේ හැකියාව 100% ක් තහවුරු කිරීම.
-      - **Campaign Duration Boundary & Activation Fallback Guard ([advertisement_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/advertisement_controller.go)):** `SubmitAdRequest`, `UpdateAdvertisement`, සහ `UpdateAdStatus` තුළ `DurationDays` උපරිම දින 365 කට සීමා කර, `0` හෝ ඊට අඩු අගයක් පැමිණියහොත් ස්වයංක්‍රීයව දින 7 ක default fallback එකක් ලබා දී campaigns ක්ෂණිකව expire වීමේ bugs සම්පූර්ණයෙන්ම වළක්වාලීම.
+    - **🛡️ Round 58 Full Team Comprehensive Line-By-Line Audit & 100% Release-Ready Polish:**
+      - **Dual-Binding (JSON + Multipart FormData) Support ([advertisement_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/advertisement_controller.go)):** `SubmitAdRequest` සහ `UpdateAdvertisement` handlers තුළ `Content-Type: application/json` සහ `multipart/form-data` යන ආකෘති දෙකම එක හා සමානව භාර ගැනීමට හැකිවන පරිදි dual-binding engine එකක් ස්ථාපිත කරන ලදී.
+      - **Prefix & Hash-Tolerant Ad Tracking Engine ([advertisement_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/advertisement_controller.go)):** `TrackAdImpression`, `TrackAdClick`, සහ `TrackAdById` endpoints වලදී `#AD-...`, `AD-...`, හෝ `#uuid` ලෙස input එක ලැබුණද `#` සහ `AD-` prefixes ස්වයංක්‍රීයව strip කර 100% නිවැරදිව metric counts සහ retrieval සිදු කිරීම.
+      - **Frontend API Client Complete Parity ([api.ts](file:///e:/The-Uni-Gang/Website/src/api.ts)):** Frontend client library එකට `updateAdminAdvertisement(id, formDataOrData, token)` method එක එක් කර Backend PUT `/api/advertisements/:id` සමග 100% API completeness තහවුරු කිරීම.
+      - **Admin Moderation Zero-Match Empty State ([AdminDashboard.tsx](file:///e:/The-Uni-Gang/Website/src/pages/admin/AdminDashboard.tsx)):** Campaign ads tab එක තුළ filter හෝ search query එකකට අදාළව දැන්වීම් නොමැති විට පෙන්වන styled empty state card එකක් එක් කිරීම.
     - **✅ Zero Build & Compile Errors:** `npx tsc --noEmit` සහ `go vet ./...` මගින් Website සහ Backend 100% clean, error-free සහ production-ready බව තහවුරු කරන ලදී.
 
 ---
@@ -666,6 +667,7 @@
 
 ## 💬 3. ඊළඟ Session එක ආරම්භ කරන විට යොදන Prompt එක (Resume Prompt)
 > **"mcn api PROPOSAL_HANDOVER.md eke liyapu handover eka balala, ethanin issarahata ad section, proposal saha annex section eke weda tika karagena yamu."**
+
 
 
 

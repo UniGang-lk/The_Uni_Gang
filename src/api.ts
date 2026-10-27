@@ -646,6 +646,23 @@ export const api = {
     return response.json();
   },
 
+  updateAdminAdvertisement: async (id: string, formDataOrData: FormData | Record<string, any>, token: string): Promise<any> => {
+    const isFormData = formDataOrData instanceof FormData;
+    const response = await fetch(`${BASE_URL}/api/advertisements/${id}`, {
+      method: 'PUT',
+      headers: {
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+        Authorization: `Bearer ${token}`
+      },
+      body: isFormData ? formDataOrData : JSON.stringify(formDataOrData)
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to update advertisement');
+    }
+    return response.json();
+  },
+
   deleteAdminAdvertisement: async (id: string, token: string): Promise<any> => {
     const response = await fetch(`${BASE_URL}/api/advertisements/${id}`, {
       method: 'DELETE',

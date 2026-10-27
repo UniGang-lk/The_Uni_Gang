@@ -897,195 +897,212 @@ const AdminDashboard = () => {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {advertisements
-                    .filter(a => {
-                      const q = searchQuery.toLowerCase().trim();
-                      const cleanQ = q.startsWith('ad-') ? q.replace(/^ad-/, '') : q;
-                      return (
-                        (a.id || '').toLowerCase().includes(q) ||
-                        (a.id || '').toLowerCase().includes(cleanQ) ||
-                        (a.company_name || '').toLowerCase().includes(q) ||
-                        (a.ad_title || '').toLowerCase().includes(q) ||
-                        (a.contact_email || '').toLowerCase().includes(q) ||
-                        (a.contact_phone || '').toLowerCase().includes(q) ||
-                        (a.placement_type || '').toLowerCase().includes(q) ||
-                        (a.target_campus || '').toLowerCase().includes(q)
-                      );
-                    })
-                    .map(ad => {
-                      const status = (ad.status || '').toUpperCase();
-                      const isPending = status === 'PENDING';
-                      const isActive = status === 'ACTIVE';
-                      const isPaused = status === 'PAUSED';
-                      const isExpired = status === 'EXPIRED';
+                {(() => {
+                  const filteredAds = advertisements.filter(a => {
+                    const q = searchQuery.toLowerCase().trim();
+                    const cleanQ = q.startsWith('ad-') ? q.replace(/^ad-/, '') : q;
+                    return (
+                      (a.id || '').toLowerCase().includes(q) ||
+                      (a.id || '').toLowerCase().includes(cleanQ) ||
+                      (a.company_name || '').toLowerCase().includes(q) ||
+                      (a.ad_title || '').toLowerCase().includes(q) ||
+                      (a.contact_email || '').toLowerCase().includes(q) ||
+                      (a.contact_phone || '').toLowerCase().includes(q) ||
+                      (a.placement_type || '').toLowerCase().includes(q) ||
+                      (a.target_campus || '').toLowerCase().includes(q)
+                    );
+                  });
 
-                      const rawImg = ad.image_url;
-                      const imgSrc = rawImg
-                        ? (rawImg.startsWith('http') ? rawImg : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`)
-                        : null;
+                  if (filteredAds.length === 0) {
+                    return (
+                      <div className="p-12 text-center rounded-2xl bg-slate-900/40 border border-slate-800 text-slate-400 space-y-2">
+                        <LuMegaphone className="w-10 h-10 mx-auto text-slate-600 mb-2 opacity-60" />
+                        <p className="text-base font-bold text-slate-300">No advertisement campaigns found</p>
+                        <p className="text-xs text-slate-500">
+                          {searchQuery ? 'Try adjusting your search keywords' : 'Advertiser submissions will appear here for review.'}
+                        </p>
+                      </div>
+                    );
+                  }
 
-                      return (
-                        <div
-                          key={ad.id}
-                          className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition-all space-y-4"
-                        >
-                          <div className="space-y-3">
-                            {/* Artwork Image */}
-                            {imgSrc && (
-                              <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-slate-950 border border-slate-800 relative group">
-                                <img src={imgSrc} alt={ad.ad_title} className="w-full h-full object-contain" onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }} />
-                                <a
-                                  href={imgSrc}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold gap-1 transition-opacity"
-                                >
-                                  <LuExternalLink size={14} /> Full View Artwork
-                                </a>
-                              </div>
-                            )}
+                  return (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredAds.map(ad => {
+                        const status = (ad.status || '').toUpperCase();
+                        const isPending = status === 'PENDING';
+                        const isActive = status === 'ACTIVE';
+                        const isPaused = status === 'PAUSED';
+                        const isExpired = status === 'EXPIRED';
 
-                            <div className="flex items-start justify-between gap-2">
-                              <div>
-                                <span className="text-[10px] font-black uppercase text-indigo-400 tracking-wider">
-                                  {ad.company_name}
-                                </span>
-                                <h4 className="text-base font-bold text-white mt-0.5 line-clamp-1">{ad.ad_title}</h4>
-                              </div>
-                              <span
-                                className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shrink-0 ${
-                                  isActive
-                                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                                    : isPending
-                                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                                    : isPaused
-                                    ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
-                                    : isExpired
-                                    ? 'bg-slate-700/50 text-slate-400 border border-slate-700'
-                                    : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
-                                }`}
-                              >
-                                {status}
-                              </span>
-                            </div>
+                        const rawImg = ad.image_url;
+                        const imgSrc = rawImg
+                          ? (rawImg.startsWith('http') ? rawImg : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${rawImg.startsWith('/') ? '' : '/'}${rawImg}`)
+                          : null;
 
-                            <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{ad.ad_description}</p>
-
-                            {/* Details Chips */}
-                            <div className="space-y-1.5 pt-2 border-t border-slate-800/80 text-xs text-slate-300">
-                              <div className="flex justify-between">
-                                <span className="text-slate-500">Placement:</span>
-                                <span className="font-bold text-indigo-300">{ad.placement_type}</span>
-                              </div>
-                              <div className="flex justify-between">
-                                <span className="text-slate-500">Duration:</span>
-                                <span className="font-bold">{ad.duration_days} Days</span>
-                              </div>
-                              {ad.target_campus && (
-                                <div className="flex justify-between">
-                                  <span className="text-slate-500">Target Campus:</span>
-                                  <span className="font-bold text-cyan-400 truncate max-w-[150px]">{ad.target_campus}</span>
+                        return (
+                          <div
+                            key={ad.id}
+                            className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col justify-between hover:border-slate-700 transition-all space-y-4"
+                          >
+                            <div className="space-y-3">
+                              {/* Artwork Image */}
+                              {imgSrc && (
+                                <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-slate-950 border border-slate-800 relative group">
+                                  <img src={imgSrc} alt={ad.ad_title} className="w-full h-full object-contain" onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }} />
+                                  <a
+                                    href={imgSrc}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-bold gap-1 transition-opacity"
+                                  >
+                                    <LuExternalLink size={14} /> Full View Artwork
+                                  </a>
                                 </div>
                               )}
-                              {ad.target_link && (() => {
-                                const isSafeLink = !ad.target_link.toLowerCase().startsWith('javascript:') && !ad.target_link.toLowerCase().startsWith('data:');
-                                if (!isSafeLink) return null;
-                                return (
-                                  <div className="flex justify-between items-center gap-2">
-                                    <span className="text-slate-500">Destination:</span>
-                                    <a
-                                      href={ad.target_link.startsWith('http') ? ad.target_link : `https://${ad.target_link}`}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                      className="font-bold text-indigo-400 hover:underline truncate max-w-[160px] inline-flex items-center gap-1"
-                                      title={ad.target_link}
-                                    >
-                                      {ad.target_link.replace(/^https?:\/\//, '')} <LuExternalLink size={11} />
-                                    </a>
-                                  </div>
-                                );
-                              })()}
-                              {ad.end_date && (
+
+                              <div className="flex items-start justify-between gap-2">
+                                <div>
+                                  <span className="text-[10px] font-black uppercase text-indigo-400 tracking-wider">
+                                    {ad.company_name}
+                                  </span>
+                                  <h4 className="text-base font-bold text-white mt-0.5 line-clamp-1">{ad.ad_title}</h4>
+                                </div>
+                                <span
+                                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider shrink-0 ${
+                                    isActive
+                                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                      : isPending
+                                      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                      : isPaused
+                                      ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
+                                      : isExpired
+                                      ? 'bg-slate-700/50 text-slate-400 border border-slate-700'
+                                      : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                                  }`}
+                                >
+                                  {status}
+                                </span>
+                              </div>
+
+                              <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{ad.ad_description}</p>
+
+                              {/* Details Chips */}
+                              <div className="space-y-1.5 pt-2 border-t border-slate-800/80 text-xs text-slate-300">
                                 <div className="flex justify-between">
-                                  <span className="text-slate-500">Expires:</span>
-                                  <span className="font-bold text-slate-300">
-                                    {new Date(ad.end_date).toLocaleDateString()}
+                                  <span className="text-slate-500">Placement:</span>
+                                  <span className="font-bold text-indigo-300">{ad.placement_type}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-slate-500">Duration:</span>
+                                  <span className="font-bold">{ad.duration_days} Days</span>
+                                </div>
+                                {ad.target_campus && (
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-500">Target Campus:</span>
+                                    <span className="font-bold text-cyan-400 truncate max-w-[150px]">{ad.target_campus}</span>
+                                  </div>
+                                )}
+                                {ad.target_link && (() => {
+                                  const isSafeLink = !ad.target_link.toLowerCase().startsWith('javascript:') && !ad.target_link.toLowerCase().startsWith('data:');
+                                  if (!isSafeLink) return null;
+                                  return (
+                                    <div className="flex justify-between items-center gap-2">
+                                      <span className="text-slate-500">Destination:</span>
+                                      <a
+                                        href={ad.target_link.startsWith('http') ? ad.target_link : `https://${ad.target_link}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="font-bold text-indigo-400 hover:underline truncate max-w-[160px] inline-flex items-center gap-1"
+                                        title={ad.target_link}
+                                      >
+                                        {ad.target_link.replace(/^https?:\/\//, '')} <LuExternalLink size={11} />
+                                      </a>
+                                    </div>
+                                  );
+                                })()}
+                                {ad.end_date && (
+                                  <div className="flex justify-between">
+                                    <span className="text-slate-500">Expires:</span>
+                                    <span className="font-bold text-slate-300">
+                                      {new Date(ad.end_date).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                )}
+                                <div className="flex justify-between">
+                                  <span className="text-slate-500">Stats:</span>
+                                  <span className="font-bold text-slate-200">
+                                    {ad.views || 0} views • {ad.clicks || 0} clicks
                                   </span>
                                 </div>
-                              )}
-                              <div className="flex justify-between">
-                                <span className="text-slate-500">Stats:</span>
-                                <span className="font-bold text-slate-200">
-                                  {ad.views || 0} views • {ad.clicks || 0} clicks
-                                </span>
+                              </div>
+
+                              {/* Contact Row */}
+                              <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] space-y-1">
+                                <p className="text-slate-400 truncate">📧 {ad.contact_email}</p>
+                                {ad.contact_phone && (() => {
+                                  const clean = ad.contact_phone.replace(/[^0-9]/g, '');
+                                  const waNum = clean.startsWith('0') ? `94${clean.slice(1)}` : clean;
+                                  return (
+                                    <p className="text-slate-400">
+                                      📱 {ad.contact_phone}{' '}
+                                      <a
+                                        href={`https://wa.me/${waNum}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-emerald-400 font-bold ml-1 hover:underline"
+                                      >
+                                        (WhatsApp)
+                                      </a>
+                                    </p>
+                                  );
+                                })()}
                               </div>
                             </div>
 
-                            {/* Contact Row */}
-                            <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] space-y-1">
-                              <p className="text-slate-400 truncate">📧 {ad.contact_email}</p>
-                              {ad.contact_phone && (() => {
-                                const clean = ad.contact_phone.replace(/[^0-9]/g, '');
-                                const waNum = clean.startsWith('0') ? `94${clean.slice(1)}` : clean;
-                                return (
-                                  <p className="text-slate-400">
-                                    📱 {ad.contact_phone}{' '}
-                                    <a
-                                      href={`https://wa.me/${waNum}`}
-                                      target="_blank"
-                                      rel="noreferrer"
-                                      className="text-emerald-400 font-bold ml-1 hover:underline"
-                                    >
-                                      (WhatsApp)
-                                    </a>
-                                  </p>
-                                );
-                              })()}
+                            {/* Action Buttons */}
+                            <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
+                              <div className="flex gap-2">
+                                {status !== 'ACTIVE' && (
+                                  <button
+                                    onClick={() => handleAdStatus(ad.id, 'ACTIVE')}
+                                    className="px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                                  >
+                                    <LuCheck size={13} /> {status === 'PAUSED' ? 'Resume Campaign' : 'Activate Live'}
+                                  </button>
+                                )}
+                                {status === 'ACTIVE' && (
+                                  <button
+                                    onClick={() => handleAdStatus(ad.id, 'PAUSED')}
+                                    className="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white border border-amber-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                                  >
+                                    Pause
+                                  </button>
+                                )}
+                                {(status === 'PENDING' || status === 'PAUSED') && (
+                                  <button
+                                    onClick={() => handleAdStatus(ad.id, 'REJECTED')}
+                                    className="px-3 py-1.5 rounded-xl bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                                  >
+                                    <LuX size={13} /> Reject
+                                  </button>
+                                )}
+                              </div>
+
+                              <button
+                                onClick={() => handleDeleteAd(ad.id)}
+                                className="p-2 rounded-xl bg-slate-800 hover:bg-rose-600 hover:text-white text-slate-400 transition-all cursor-pointer"
+                                title="Delete Campaign"
+                              >
+                                <LuTrash2 size={14} />
+                              </button>
                             </div>
                           </div>
-
-                          {/* Action Buttons */}
-                          <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
-                            <div className="flex gap-2">
-                              {status !== 'ACTIVE' && (
-                                <button
-                                  onClick={() => handleAdStatus(ad.id, 'ACTIVE')}
-                                  className="px-3 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
-                                >
-                                  <LuCheck size={13} /> {status === 'PAUSED' ? 'Resume Campaign' : 'Activate Live'}
-                                </button>
-                              )}
-                              {status === 'ACTIVE' && (
-                                <button
-                                  onClick={() => handleAdStatus(ad.id, 'PAUSED')}
-                                  className="px-3 py-1.5 rounded-xl bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white border border-amber-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
-                                >
-                                  Pause
-                                </button>
-                              )}
-                              {(status === 'PENDING' || status === 'PAUSED') && (
-                                <button
-                                  onClick={() => handleAdStatus(ad.id, 'REJECTED')}
-                                  className="px-3 py-1.5 rounded-xl bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
-                                >
-                                  <LuX size={13} /> Reject
-                                </button>
-                              )}
-                            </div>
-
-                            <button
-                              onClick={() => handleDeleteAd(ad.id)}
-                              className="p-2 rounded-xl bg-slate-800 hover:bg-rose-600 hover:text-white text-slate-400 transition-all cursor-pointer"
-                              title="Delete Campaign"
-                            >
-                              <LuTrash2 size={14} />
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
+              </div>
               </div>
             )}
           </div>
