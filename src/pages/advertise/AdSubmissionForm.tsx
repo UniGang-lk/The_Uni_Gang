@@ -867,18 +867,26 @@ export default function AdSubmissionForm() {
                       <span className="text-slate-400 font-medium truncate max-w-[140px]">
                         {formData.target_link ? formData.target_link.replace(/^https?:\/\//, '') : 'yourwebsite.com'}
                       </span>
-                      <a
-                        href={formData.target_link ? (formData.target_link.startsWith('http') ? formData.target_link : `https://${formData.target_link}`) : '#'}
-                        target={formData.target_link ? "_blank" : undefined}
-                        rel={formData.target_link ? "noopener noreferrer" : undefined}
-                        onClick={(e) => {
-                          if (!formData.target_link) e.preventDefault();
-                        }}
-                        className="inline-flex items-center gap-1 font-black text-blue-600 dark:text-blue-400 uppercase text-[10px] hover:underline"
-                        title="Test Destination Link"
-                      >
-                        Open Link <LuExternalLink className="w-3 h-3" />
-                      </a>
+                      {(() => {
+                        const raw = formData.target_link.trim();
+                        const lower = raw.toLowerCase();
+                        const isSafe = !lower.startsWith('javascript:') && !lower.startsWith('data:') && !lower.startsWith('vbscript:');
+                        const previewHref = raw && isSafe ? (raw.startsWith('http') ? raw : `https://${raw}`) : '#';
+                        return (
+                          <a
+                            href={previewHref}
+                            target={raw && isSafe ? "_blank" : undefined}
+                            rel={raw && isSafe ? "noopener noreferrer" : undefined}
+                            onClick={(e) => {
+                              if (!raw || !isSafe) e.preventDefault();
+                            }}
+                            className="inline-flex items-center gap-1 font-black text-blue-600 dark:text-blue-400 uppercase text-[10px] hover:underline"
+                            title="Test Destination Link"
+                          >
+                            Open Link <LuExternalLink className="w-3 h-3" />
+                          </a>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
