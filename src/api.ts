@@ -593,7 +593,7 @@ export const api = {
       body: formData
     });
     if (!response.ok) {
-      const err = await response.json();
+      const err = await response.json().catch(() => ({}));
       throw new Error(err.message || 'Failed to submit advertisement request');
     }
     return response.json();

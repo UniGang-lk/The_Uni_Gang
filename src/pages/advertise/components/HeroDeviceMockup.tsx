@@ -3,21 +3,25 @@ import { motion } from 'framer-motion';
 import AdMockScreen from './AdMockScreen';
 import { PLACEMENTS } from './placements';
 
-/** Laptop + phone mockup that auto-rotates through every ad placement. */
+/** Laptop + phone mockup that auto-rotates through every ad placement with hover pause. */
 export default function HeroDeviceMockup() {
   const [index, setIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const current = PLACEMENTS[index];
 
   useEffect(() => {
+    if (isPaused) return;
     const t = setInterval(() => setIndex((i) => (i + 1) % PLACEMENTS.length), 3200);
     return () => clearInterval(t);
-  }, []);
+  }, [isPaused]);
 
   return (
     <motion.div
       initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.25, duration: 0.6 }}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
       className="relative w-full max-w-xl mx-auto"
     >
       {/* Glow */}

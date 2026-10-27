@@ -902,10 +902,13 @@ const AdminDashboard = () => {
                     .filter(a => {
                       const q = searchQuery.toLowerCase();
                       return (
+                        (a.id || '').toLowerCase().includes(q) ||
                         (a.company_name || '').toLowerCase().includes(q) ||
                         (a.ad_title || '').toLowerCase().includes(q) ||
                         (a.contact_email || '').toLowerCase().includes(q) ||
-                        (a.placement_type || '').toLowerCase().includes(q)
+                        (a.contact_phone || '').toLowerCase().includes(q) ||
+                        (a.placement_type || '').toLowerCase().includes(q) ||
+                        (a.target_campus || '').toLowerCase().includes(q)
                       );
                     })
                     .map(ad => {

@@ -201,7 +201,8 @@ export default function AdSubmissionForm() {
       desc: 'High visibility header banner displayed across major feed views.',
       badge: 'High Impact',
       specs: '1200 x 400 px',
-      rate: 1000
+      rate: 1000,
+      dailyImpressions: 3500
     },
     {
       id: 'SIDEBAR',
@@ -209,7 +210,8 @@ export default function AdSubmissionForm() {
       desc: 'Persistent widget that stays in view while students scroll.',
       badge: 'Continuous Exposure',
       specs: '300 x 300 px',
-      rate: 600
+      rate: 600,
+      dailyImpressions: 2100
     },
     {
       id: 'NATIVE_FEED',
@@ -217,7 +219,8 @@ export default function AdSubmissionForm() {
       desc: 'In-stream card integrated directly into student feed lists.',
       badge: 'High Engagement',
       specs: '800 x 450 px',
-      rate: 800
+      rate: 800,
+      dailyImpressions: 2800
     },
     {
       id: 'POPUP',
@@ -225,7 +228,8 @@ export default function AdSubmissionForm() {
       desc: 'Full-screen overlay pop-up for massive event or deal launches.',
       badge: 'Maximum Reach',
       specs: '600 x 600 px',
-      rate: 1500
+      rate: 1500,
+      dailyImpressions: 5000
     }
   ];
 
@@ -276,7 +280,7 @@ export default function AdSubmissionForm() {
       name: `${currentPlacement.title} Custom`,
       priceText: `LKR ${finalCost.toLocaleString()}`,
       durationText: `${days} Days`,
-      reachText: `~${(days * 3000).toLocaleString()} Impressions`,
+      reachText: `~${(days * (currentPlacement.dailyImpressions || 3000)).toLocaleString()} Impressions`,
       specs: currentPlacement.specs,
       badge: 'Custom Placement',
       benefits: [
