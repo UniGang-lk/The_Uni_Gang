@@ -169,6 +169,11 @@ export default function AdSubmissionForm() {
     }
   };
 
+  const handleSwitchToCustom = () => {
+    setSelectedTier(null);
+    navigate('/advertise/submit', { replace: true });
+  };
+
   const placementOptions = [
     {
       id: 'BANNER',
@@ -688,7 +693,7 @@ export default function AdSubmissionForm() {
                     </div>
                     <button
                       type="button"
-                      onClick={() => setSelectedTier(null)}
+                      onClick={handleSwitchToCustom}
                       className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-blue-600 hover:text-white text-white text-xs font-black uppercase tracking-wider transition-all cursor-pointer shrink-0 border border-slate-700"
                     >
                       Switch to Custom Days
@@ -870,7 +875,7 @@ export default function AdSubmissionForm() {
                   {selectedTier && (
                     <button
                       type="button"
-                      onClick={() => setSelectedTier(null)}
+                      onClick={handleSwitchToCustom}
                       className="w-full py-2 text-center text-xs text-slate-400 hover:text-white font-bold transition-colors cursor-pointer"
                     >
                       Switch to Custom Placement Mode

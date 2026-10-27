@@ -42,7 +42,14 @@ export default function AdvertiseLanding() {
   });
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    if (window.location.hash) {
+      setTimeout(() => {
+        const el = document.querySelector(window.location.hash);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
     api.getPublicStats().then((data) => {
       if (data && data.estimatedReach) {
         setLiveStats(data);
@@ -259,7 +266,7 @@ export default function AdvertiseLanding() {
         <ReachCalculator />
 
         {/* Pricing Tiers Section */}
-        <div className="space-y-12">
+        <section id="pricing" className="space-y-12 scroll-mt-24">
           <div className="text-center space-y-4 max-w-3xl mx-auto">
             <span className="text-xs font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest flex items-center justify-center gap-2">
               <LuTrendingUp /> B2B Pricing Plans
@@ -331,7 +338,7 @@ export default function AdvertiseLanding() {
               </motion.div>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* Advertiser FAQ Section */}
         <FaqAccordion faqs={faqs} />

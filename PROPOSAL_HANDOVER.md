@@ -612,6 +612,7 @@
       - Ad Submission Form හි සියලුම inputs සඳහා auto-trimming ආරක්ෂාව සහ interactive validation toasts යෙදීම.
       - Admin Dashboard හි advertiser WhatsApp direct chat link එක `94` international country code එක සහිතව sanitize කිරීම.
       - Modal close එකේදී URL search params auto-cleanup වීම සහ custom placement priority weights (Popup: 5, Banner: 3, Feed: 2, Sidebar: 1) server-side සමතුලිත කිරීම.
+      - Pricing section `#pricing` anchor scroll alignment සහ custom mode switch එකේදී browser URL query auto-replace handling.
     - **✅ Zero Build & Compile Errors:** `npx tsc --noEmit` සහ `go vet ./...` මගින් Website සහ Backend 100% clean, error-free සහ production-ready බව තහවුරු කරන ලදී.
 
 ---
