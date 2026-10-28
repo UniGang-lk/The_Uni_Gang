@@ -99,6 +99,28 @@ const Contact = () => {
     // Copy states
     const [copiedItem, setCopiedItem] = useState<string | null>(null);
 
+    // Auto-populate logged in user information
+    useEffect(() => {
+        const savedName = localStorage.getItem('userName');
+        const savedEmail = localStorage.getItem('userEmail');
+        if (savedName) {
+            setName(savedName);
+            setFeedbackName(savedName);
+        }
+        if (savedEmail) {
+            setEmail(savedEmail);
+        }
+    }, []);
+
+    // Cleanup avatar preview URL
+    useEffect(() => {
+        return () => {
+            if (avatarPreview && avatarPreview.startsWith('blob:')) {
+                URL.revokeObjectURL(avatarPreview);
+            }
+        };
+    }, [avatarPreview]);
+
     // Fetch approved feedbacks from database
     useEffect(() => {
         const fetchFeedbacks = async () => {
@@ -149,25 +171,25 @@ const Contact = () => {
             return;
         }
 
-        const token = localStorage.getItem('userToken');
-        if (!token) {
-            toast.error("Please login to report a problem.");
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.trim())) {
+            toast.error("Please enter a valid email address");
             return;
         }
 
         try {
             await api.submitSupportProblem({
-                name,
-                email,
+                name: name.trim(),
+                email: email.trim(),
                 inquiryType,
-                message
+                message: message.trim()
             });
 
             toast.success("Problem reported successfully to the admin team!");
-            setName('');
-            setEmail('');
             setInquiryType('');
             setMessage('');
+            if (!localStorage.getItem('userName')) setName('');
+            if (!localStorage.getItem('userEmail')) setEmail('');
         } catch (err: any) {
             toast.error(err.message || "Failed to submit problem report");
         }
@@ -181,9 +203,9 @@ const Contact = () => {
 
         try {
             const formData = new FormData();
-            formData.append('name', feedbackName);
-            formData.append('institution', feedbackInstitution);
-            formData.append('comment', feedbackText);
+            formData.append('name', feedbackName.trim());
+            formData.append('institution', feedbackInstitution.trim());
+            formData.append('comment', feedbackText.trim());
             formData.append('rating', String(rating));
             if (avatarFile) {
                 formData.append('avatar', avatarFile);
@@ -195,10 +217,13 @@ const Contact = () => {
             toast.success("Feedback posted successfully!");
             setTimeout(() => {
                 setFeedbackSuccess(false);
-                setFeedbackName('');
+                if (!localStorage.getItem('userName')) setFeedbackName('');
                 setFeedbackInstitution('');
                 setFeedbackText('');
                 setRating(0);
+                if (avatarPreview && avatarPreview.startsWith('blob:')) {
+                    URL.revokeObjectURL(avatarPreview);
+                }
                 setAvatarPreview(null);
                 setAvatarFile(null);
             }, 3000);
@@ -402,8 +427,20 @@ const Contact = () => {
                                                         className="sr-only"
                                                         onChange={(e) => {
                                                             if (e.target.files && e.target.files[0]) {
-                                                                setAvatarPreview(URL.createObjectURL(e.target.files[0]));
-                                                                setAvatarFile(e.target.files[0]);
+                                                                const file = e.target.files[0];
+                                                                if (file.size > 5 * 1024 * 1024) {
+                                                                    toast.error("Avatar image must be smaller than 5MB");
+                                                                    return;
+                                                                }
+                                                                if (!file.type.startsWith('image/')) {
+                                                                    toast.error("Please upload a valid image file");
+                                                                    return;
+                                                                }
+                                                                if (avatarPreview && avatarPreview.startsWith('blob:')) {
+                                                                    URL.revokeObjectURL(avatarPreview);
+                                                                }
+                                                                setAvatarPreview(URL.createObjectURL(file));
+                                                                setAvatarFile(file);
                                                             }
                                                         }}
                                                     />

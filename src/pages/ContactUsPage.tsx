@@ -19,6 +19,10 @@ const ContactUsPage = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 300);
+    const savedName = localStorage.getItem('userName');
+    const savedEmail = localStorage.getItem('userEmail');
+    if (savedName) setName(savedName);
+    if (savedEmail) setEmail(savedEmail);
     return () => clearTimeout(timer);
   }, []);
 
@@ -26,6 +30,11 @@ const ContactUsPage = () => {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !message.trim()) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      toast.error('Please enter a valid email address');
       return;
     }
     setSubmitting(true);
@@ -36,9 +45,9 @@ const ContactUsPage = () => {
         inquiryType: 'General Support Inquiry',
         message: message.trim()
       });
-      setName('');
-      setEmail('');
       setMessage('');
+      if (!localStorage.getItem('userName')) setName('');
+      if (!localStorage.getItem('userEmail')) setEmail('');
       toast.success('🎉 Message sent successfully! Our support team will contact you shortly.');
     } catch (err: any) {
       toast.error(err.message || 'Failed to send message. Please try again.');
@@ -140,7 +149,7 @@ const ContactUsPage = () => {
               <div>
                 <h3 className="font-bold text-slate-900 dark:text-white mb-1">Email</h3>
                 <p className="text-slate-500 dark:text-slate-400 mb-1">Our friendly team is here to help.</p>
-                <a href="mailto:support@theunigang.com" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline text-lg">uniganglk@gmail.com</a>
+                <a href="mailto:uniganglk@gmail.com" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline text-lg">uniganglk@gmail.com</a>
               </div>
             </div>
 
