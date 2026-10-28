@@ -147,26 +147,26 @@ export default function AdvertiseLanding() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-20 pb-24 px-4 sm:px-6 lg:px-8 2xl:px-16 overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-0 pb-20 overflow-x-hidden">
       <SEO
         title="Advertise to University Students in Sri Lanka - The Uni Gang"
         description="Reach Sri Lankan university students with banner, feed, sidebar and popup ads. Estimate your reach and launch a campaign in minutes."
       />
-      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto space-y-20 lg:space-y-28">
+      <div className="max-w-7xl 2xl:max-w-[1536px] mx-auto">
         {/* Top Breadcrumb Navigation */}
-        <div className="pt-2">
-          <PageBreadcrumb
-            items={[
-              { label: 'Advertise', active: true }
-            ]}
-            backTo="/"
-            backLabel="Back to Home"
-            shareTitle="Advertise on The Uni Gang - Reach 50,000+ Sri Lankan University Students"
-          />
-        </div>
+        <PageBreadcrumb
+          items={[
+            { label: 'Advertise', active: true }
+          ]}
+          backTo="/"
+          backLabel="Back to Home"
+          shareTitle="Advertise on The Uni Gang - Reach 50,000+ Sri Lankan University Students"
+          className="mb-4 sm:mb-6"
+        />
 
-        {/* Hero Section */}
-        <section id="advertise-hero" className="relative grid lg:grid-cols-2 gap-14 lg:gap-10 items-center pt-6">
+        <div className="space-y-16 sm:space-y-20 lg:space-y-24">
+          {/* Hero Section */}
+          <section id="advertise-hero" className="relative grid lg:grid-cols-2 gap-10 lg:gap-10 items-center pt-1 sm:pt-2">
           <div className="absolute -top-24 -left-24 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="relative text-center lg:text-left space-y-7">
 
@@ -368,6 +368,7 @@ export default function AdvertiseLanding() {
           </div>
         </div>
 
+        </div>
       </div>
 
       <MobileStickyCta />

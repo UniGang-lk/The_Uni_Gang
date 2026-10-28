@@ -337,7 +337,7 @@ export default function AdSubmissionForm() {
   const currentPackage = getPackageDetails();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100/60 to-slate-50 dark:from-slate-950 dark:via-slate-900/60 dark:to-slate-950 pt-20 pb-24 px-4 sm:px-6 lg:px-8 2xl:px-12 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100/60 to-slate-50 dark:from-slate-950 dark:via-slate-900/60 dark:to-slate-950 pt-0 sm:pt-2 pb-20 px-4 sm:px-6 lg:px-8 2xl:px-12 relative overflow-hidden">
       <SEO
         title="Launch Ad Campaign - The Uni Gang"
         description="Target 50,000+ Sri Lankan university students across 15+ campuses. Create your advertisement campaign."
@@ -357,10 +357,11 @@ export default function AdSubmissionForm() {
           ]}
           backTo="/advertise"
           backLabel="Back to Advertise"
+          className="mb-4 sm:mb-6"
         />
 
         {/* Header Hero Section */}
-        <div className="text-center space-y-3 pt-2 pb-4 max-w-3xl mx-auto">
+        <div className="text-center space-y-3 pt-1 pb-4 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-black uppercase tracking-widest shadow-xs">
             <LuSparkles className="w-3.5 h-3.5 text-blue-500 animate-pulse" /> Self-Serve Ad Studio
           </div>
