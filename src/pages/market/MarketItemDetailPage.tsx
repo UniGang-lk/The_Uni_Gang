@@ -107,7 +107,7 @@ const MarketItemDetailPage: React.FC = () => {
       toast.error('Please log in to rate this listing.');
       return;
     }
-    if (item.seller_id === userId) {
+    if (String(item.seller_id) === String(userId)) {
       toast.error('You cannot rate your own listing.');
       return;
     }
@@ -138,7 +138,7 @@ const MarketItemDetailPage: React.FC = () => {
       toast.error('Please log in to contact the seller.');
       return;
     }
-    if (item.seller_id === userId) {
+    if (String(item.seller_id) === String(userId)) {
       toast.error('This is your own listing.');
       return;
     }

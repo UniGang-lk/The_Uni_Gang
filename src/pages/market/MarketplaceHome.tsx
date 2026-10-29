@@ -170,6 +170,10 @@ const MarketplaceHome: React.FC = () => {
       toast.error('Please enter your delivery address / hostel location.');
       return;
     }
+    if (cartPayment === 'BANK_TRANSFER' && !uploadedReceipt) {
+      toast.error('Please upload your bank transfer slip or receipt to proceed.');
+      return;
+    }
     setIsSubmittingCheckout(true);
     try {
       const formData = new FormData();
@@ -308,15 +312,25 @@ const MarketplaceHome: React.FC = () => {
   }, []);
 
   const handleRate = async (itemId: string, score: number) => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      toast.error('Please log in to rate this listing.');
+      return;
+    }
+    const targetItem = items.find(i => String(i.id) === String(itemId)) || selectedItem;
+    if (targetItem && String(targetItem.seller_id) === String(userId)) {
+      toast.error('You cannot rate your own listing.');
+      return;
+    }
     try {
       const data = await api.rateListing(itemId, score);
-      setItems(prev => prev.map(item => item.id === itemId ? { ...item, rating: data.rating, rating_count: data.rating_count } : item));
-      if (selectedItem && selectedItem.id === itemId) {
+      setItems(prev => prev.map(item => String(item.id) === String(itemId) ? { ...item, rating: data.rating, rating_count: data.rating_count } : item));
+      if (selectedItem && String(selectedItem.id) === String(itemId)) {
         setSelectedItem((prev: any) => ({ ...prev, rating: data.rating, rating_count: data.rating_count }));
       }
       toast.success('Rating submitted successfully!');
     } catch (err: any) {
-      toast.error(err.message || 'Failed to submit rating. You cannot rate your own listing.');
+      toast.error(err.message || 'Failed to submit rating.');
     }
   };
 
@@ -326,7 +340,7 @@ const MarketplaceHome: React.FC = () => {
       toast.error('Please log in to contact the seller.');
       return;
     }
-    if (item.seller_id === userId) {
+    if (String(item.seller_id) === String(userId)) {
       toast.error('This is your own listing.');
       return;
     }
@@ -334,13 +348,13 @@ const MarketplaceHome: React.FC = () => {
       setLoadingChat(true);
       const chat = await api.startMarketplaceChat(item.id);
 
-      const partner = item.seller;
+      const partner = item.seller || { name: 'Seller' };
       chat.partner = partner;
       chat.item = item;
 
       setActiveChat(chat);
       setSelectedItem(null);
-      toast.success(`Chat started with ${partner.name}!`);
+      toast.success(`Chat started with ${partner.name || 'Seller'}!`);
     } catch (err: any) {
       toast.error(err.message || 'Failed to start conversation.');
     } finally {
