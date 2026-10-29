@@ -940,7 +940,6 @@ const Profile = () => {
     const storedEmail = localStorage.getItem('userEmail') || '';
     const storedPhoneNumber = localStorage.getItem('userPhoneNumber') || '';
     const storedUniversity = localStorage.getItem('userUniversity') || '';
-    const storedPassword = localStorage.getItem('userPassword') || '';
     const storedProfilePic = localStorage.getItem('userProfilePicture');
     const storedFb = localStorage.getItem('userFbHandle') || '';
     const storedLinkedin = localStorage.getItem('userLinkedinHandle') || '';
@@ -950,7 +949,6 @@ const Profile = () => {
     setEmail(storedEmail);
     setPhoneNumber(storedPhoneNumber);
     setUniversity(storedUniversity);
-    setPassword(storedPassword);
     setProfilePicture(storedProfilePic);
     setFbHandle(storedFb);
     setLinkedinHandle(storedLinkedin);
@@ -1052,7 +1050,6 @@ const Profile = () => {
     localStorage.setItem('userEmail', email);
     localStorage.setItem('userPhoneNumber', phoneNumber);
     localStorage.setItem('userUniversity', university);
-    localStorage.setItem('userPassword', password);
     localStorage.setItem('userFbHandle', fbHandle);
     localStorage.setItem('userLinkedinHandle', linkedinHandle);
 

@@ -5,7 +5,17 @@ import {
   LuArrowLeft,
   LuStar,
   LuShoppingBag,
-  LuPackage
+  LuPackage,
+  LuBadgeCheck,
+  LuShieldCheck,
+  LuMapPin,
+  LuSparkles,
+  LuClock,
+  LuMinus,
+  LuPlus,
+  LuSend,
+  LuChevronRight,
+  LuX
 } from 'react-icons/lu';
 import { formatDistanceToNow } from 'date-fns';
 import { api } from '../../api';
