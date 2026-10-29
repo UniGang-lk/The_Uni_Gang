@@ -410,13 +410,13 @@ const Contact = () => {
                                             </p>
                                         </motion.div>
                                     ) : activeTab === 'contact' ? (
-                                        <>
+                                        <form onSubmit={(e) => { e.preventDefault(); handleSendInquiry(); }} className="flex flex-col gap-4 flex-grow">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                                                 <div className="group">
-                                                    <input required value={name} onChange={(e) => setName(e.target.value)} type="text" placeholder="Full Name" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
+                                                    <input required maxLength={255} value={name} onChange={(e) => setName(e.target.value)} type="text" placeholder="Full Name" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
                                                 </div>
                                                 <div className="group">
-                                                    <input required value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Email Address" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
+                                                    <input required maxLength={255} value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Email Address" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
                                                 </div>
                                             </div>
                                             <div className="relative group mb-5">
@@ -431,20 +431,20 @@ const Contact = () => {
                                                 <LuChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-focus-within:text-primary transition-colors" />
                                             </div>
                                             <div className="group mb-6">
-                                                <textarea required value={message} onChange={(e) => setMessage(e.target.value)} rows={5} placeholder="Tell us about your problem, question, or request..." className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
+                                                <textarea required maxLength={3000} value={message} onChange={(e) => setMessage(e.target.value)} rows={5} placeholder="Tell us about your problem, question, or request..." className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
                                             </div>
                                             <motion.button
+                                                type="submit"
                                                 disabled={isSubmittingInquiry}
-                                                onClick={handleSendInquiry}
                                                 whileHover={!isSubmittingInquiry ? { scale: 1.02, y: -2, boxShadow: "0 20px 40px -10px rgba(79, 70, 229, 0.4)" } : {}}
                                                 whileTap={!isSubmittingInquiry ? { scale: 0.98 } : {}}
                                                 className="w-full mt-auto py-4 rounded-[1.25rem] text-white text-[11px] font-black uppercase tracking-[0.2em] bg-gradient-to-r from-blue-600 to-primary flex items-center justify-center gap-3 transition-all disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
                                             >
                                                 {isSubmittingInquiry ? 'Sending Inquiry...' : <>Send Message <LuSend size={14} /></>}
                                             </motion.button>
-                                        </>
+                                        </form>
                                     ) : (
-                                        <>
+                                        <form onSubmit={(e) => { e.preventDefault(); handleSendFeedback(); }} className="flex flex-col gap-4 flex-grow">
                                             <div className="flex items-center gap-6 p-6 rounded-2xl bg-slate-100/50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50">
                                                 <label className="relative cursor-pointer group">
                                                     <input
@@ -485,10 +485,10 @@ const Contact = () => {
                                             </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="group">
-                                                    <input required value={feedbackName} onChange={(e) => setFeedbackName(e.target.value)} type="text" placeholder="Your Name" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-[#E91E63] focus:ring-4 focus:ring-[#E91E63]/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
+                                                    <input required maxLength={255} value={feedbackName} onChange={(e) => setFeedbackName(e.target.value)} type="text" placeholder="Your Name" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-[#E91E63] focus:ring-4 focus:ring-[#E91E63]/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
                                                 </div>
                                                 <div className="group">
-                                                    <input required value={feedbackInstitution} onChange={(e) => setFeedbackInstitution(e.target.value)} type="text" placeholder="Club / University" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-[#E91E63] focus:ring-4 focus:ring-[#E91E63]/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
+                                                    <input maxLength={255} value={feedbackInstitution} onChange={(e) => setFeedbackInstitution(e.target.value)} type="text" placeholder="Club / University" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-[#E91E63] focus:ring-4 focus:ring-[#E91E63]/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
                                                 </div>
                                             </div>
                                             <div className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-slate-100/50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 shadow-sm relative overflow-hidden group">
@@ -527,17 +527,17 @@ const Contact = () => {
                                                     </motion.p>
                                                 </AnimatePresence>
                                             </div>
-                                            <textarea required value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} rows={3} placeholder="Tell your Feedback..." className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-[#E91E63] focus:ring-4 focus:ring-[#E91E63]/10 outline-none resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
+                                            <textarea required maxLength={3000} value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} rows={3} placeholder="Tell your Feedback..." className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-[#E91E63] focus:ring-4 focus:ring-[#E91E63]/10 outline-none resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
                                             <motion.button
+                                                type="submit"
                                                 disabled={isSubmittingFeedback}
-                                                onClick={handleSendFeedback}
                                                 whileHover={!isSubmittingFeedback ? { scale: 1.02, y: -2, boxShadow: "0 20px 40px -10px rgba(233, 30, 99, 0.4)" } : {}}
                                                 whileTap={!isSubmittingFeedback ? { scale: 0.98 } : {}}
                                                 className="w-full py-4 mt-auto rounded-[1.25rem] text-white text-[11px] font-black uppercase tracking-[0.2em] bg-gradient-to-r from-[#E91E63] to-[#880E4F] flex items-center justify-center gap-3 transition-all disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
                                             >
                                                 {isSubmittingFeedback ? 'Posting Review...' : <>Post Feedback <LuMessageSquareQuote size={14} /></>}
                                             </motion.button>
-                                        </>
+                                        </form>
                                     )}
                                 </motion.div>
                             </AnimatePresence>

@@ -13,6 +13,7 @@ import { api } from '../api';
 const ContactUsPage = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [inquiryType, setInquiryType] = useState('General Inquiry');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -42,7 +43,7 @@ const ContactUsPage = () => {
       await api.submitSupportProblem({
         name: name.trim(),
         email: email.trim(),
-        inquiryType: 'General Support Inquiry',
+        inquiryType: inquiryType.trim(),
         message: message.trim()
       });
       setMessage('');
@@ -88,6 +89,7 @@ const ContactUsPage = () => {
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Your Name</label>
               <input
                 type="text"
+                maxLength={255}
                 className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-none text-slate-800 dark:text-white"
                 placeholder="John Doe"
                 value={name}
@@ -99,6 +101,7 @@ const ContactUsPage = () => {
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Email Address</label>
               <input
                 type="email"
+                maxLength={255}
                 className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-none text-slate-800 dark:text-white"
                 placeholder="john@example.com"
                 value={email}
@@ -107,9 +110,24 @@ const ContactUsPage = () => {
               />
             </div>
             <div>
+              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Subject / Inquiry Type</label>
+              <select
+                value={inquiryType}
+                onChange={(e) => setInquiryType(e.target.value)}
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-none text-slate-800 dark:text-white cursor-pointer"
+              >
+                <option value="General Inquiry">General Inquiry</option>
+                <option value="Report a Bug / Problem">Report a Bug / Problem</option>
+                <option value="Accommodation Listing Help">Accommodation Listing Help</option>
+                <option value="Event Posting Help">Event Posting Help</option>
+                <option value="Request a New Service / Dev">Request a New Service / Dev</option>
+              </select>
+            </div>
+            <div>
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Message</label>
               <textarea
                 rows={5}
+                maxLength={3000}
                 className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-none text-slate-800 dark:text-white"
                 placeholder="How can we help you?"
                 value={message}
