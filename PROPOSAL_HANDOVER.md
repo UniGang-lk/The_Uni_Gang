@@ -707,6 +707,22 @@
       - **Anti-Disintermediation & Safety Protection ([MarketItemDetailPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketItemDetailPage.tsx), [MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):** External WhatsApp communication හරහා සිදුවන platform leakage, student harassment සහ off-platform scamming වැළැක්වීම සඳහා, Peer-to-Peer Marketplace communication එක 100% ක් platform එක තුළම In-App Chat සහ Real-Time WebSocket Alerts ලෙස තබා ගනිමින් Campus Safety Badge එක එක් කරන ලදී.
       - **Modal Gallery Thumbnail URL Resilience ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):** Quick preview modal එකෙහි thumbnail gallery එකෙහි images double-prefixing නොවී external URLs සහ local uploads දෙකම නිවැරදිව load වන පරිදි safe resolver logic එක එක් කිරීම.
       - **Non-Standard Tailwind Class Clean-up ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):** Typo වූ CSS classes (`border-gray-150`, `border-slate-150`, `border-gray-250`, `from-amber-50 to-orange-550`, `text-amber-505`) ප්‍රමිතියට අනුකූල Tailwind CSS utility classes වලට යාවත්කාලීන කිරීම.
+    - **🛍️ Round 73-74 Campus Marketplace Full Team Audit & Order Lifecycle Completion:**
+      - **Inventory & Stock Guard in Order Creation ([marketplace_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/marketplace_controller.go)):**
+        - Sellers තමන්ගේම listings order කිරීම වැළැක්වීම (`item.SellerID == user.ID`).
+        - `AVAILABLE` තත්වයේ නොමැති items (`SOLD`, `SUSPENDED`) order කිරීම වැළැක්වීම.
+        - Official Store items සඳහා Out-of-Stock checks සහ requested quantity exceeds available stock validations එක් කිරීම.
+        - Peer-to-peer භාණ්ඩවල stock එක 0 වූ විට listing status එක ස්වයංක්‍රීයව `"SOLD"` බවට පත් කිරීම.
+      - **Order Status Transition & Real-Time Buyer Notifications ([marketplace_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/marketplace_controller.go)):**
+        - `UpdateOrderStatus` endpoint එක සඳහා දැඩි `AdminOnly` ආරක්ෂාව තහවුරු කිරීම.
+        - Admin විසින් Order status එක `PROCESSING`, `DELIVERED`, හෝ `CANCELLED` ලෙස වෙනස් කළ විට, අදාළ ශිෂ්‍යයාට (`order.BuyerID`) emoji-rich In-App Notifications ක්ෂණිකව dispatch වීම.
+      - **Chat Self-Messaging Protection & Offline In-App Notifications ([marketplace_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/marketplace_controller.go)):**
+        - පරිශීලකයින් තමන් සමගම chat ආරම්භ කිරීම (`sellerID == user.ID`) වැළැක්වීම.
+        - Real-Time WebSocket event එකට අමතරව offline recipients සඳහා In-App Notification එකක් (`/market?chat=...`) DB එකේ persist කිරීම.
+      - **Item Update Stock & Images Support ([marketplace_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/marketplace_controller.go)):** Listing එකක් සංස්කරණය කිරීමේදී `stockQuantity` සහ `images` array එක නිවැරදිව update වීම සහතික කිරීම.
+      - **Admin Dashboard Official Store Order Moderation ([AdminDashboard.tsx](file:///e:/The-Uni-Gang/Website/src/pages/admin/AdminDashboard.tsx), [api.ts](file:///e:/The-Uni-Gang/Website/src/api.ts)):**
+        - Marketplace Tab එක තුළ Sub-Navigation switcher එකක් (`[Item Listings]` සහ `[Official Store Orders]`) එක් කිරීම.
+        - Store Orders view එක හරහා customer delivery details, phone link, payment slip receipt preview, සහ 1-Click Status updates (`Process`, `Deliver`, `Cancel`) සම්පූර්ණයෙන්ම සක්‍රීය කිරීම.
     - **✅ Zero Build & Compile Errors:** `npx tsc -b` සහ `go build ./internal/controller/...` මගින් Website සහ Backend 100% clean, error-free සහ production-ready බව තහවුරු කරන ලදී.
 
 ---

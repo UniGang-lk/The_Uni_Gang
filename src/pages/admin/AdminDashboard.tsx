@@ -6,7 +6,8 @@ import {
   LuExternalLink, LuUserCheck, LuMail, LuHouse, LuUsers,
   LuLifeBuoy, LuCreditCard, LuRefreshCw, LuFootprints,
   LuMapPin, LuGraduationCap, LuBriefcase, LuHeart,
-  LuMegaphone, LuEye, LuMousePointer
+  LuMegaphone, LuEye, LuMousePointer, LuPackageCheck,
+  LuTruck, LuPhone, LuFileText
 } from 'react-icons/lu';
 import { FiHome } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
@@ -26,6 +27,8 @@ const AdminDashboard = () => {
   // Data states
   const [annexes, setAnnexes] = useState<any[]>([]);
   const [marketItems, setMarketItems] = useState<any[]>([]);
+  const [marketOrders, setMarketOrders] = useState<any[]>([]);
+  const [marketSubTab, setMarketSubTab] = useState<'listings' | 'orders'>('listings');
   const [events, setEvents] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
@@ -70,9 +73,10 @@ const AdminDashboard = () => {
     if (!token) return;
     setLoading(true);
     try {
-      const [annexData, marketData, eventData, userData, feedbackData, problemData, paymentData, proposalData, adData] = await Promise.all([
+      const [annexData, marketData, marketOrderData, eventData, userData, feedbackData, problemData, paymentData, proposalData, adData] = await Promise.all([
         api.getAdminAnnexes(token).catch(() => []),
         api.getAdminMarketItems(token).catch(() => []),
+        api.getAdminMarketOrders(token).catch(() => []),
         api.getAdminEvents(token).catch(() => []),
         api.getAdminUsers(token).catch(() => []),
         api.getAdminFeedbacks(token).catch(() => []),
@@ -84,6 +88,7 @@ const AdminDashboard = () => {
 
       setAnnexes(annexData);
       setMarketItems(marketData);
+      setMarketOrders(marketOrderData);
       setEvents(eventData);
       setUsers(userData);
       setFeedbacks(feedbackData);
@@ -141,6 +146,17 @@ const AdminDashboard = () => {
       setMarketItems(prev => prev.filter(m => m.id !== id));
     } catch (err: any) {
       toast.error(err.message || 'Failed to delete item');
+    }
+  };
+
+  const handleMarketOrderStatus = async (id: string, status: string) => {
+    if (!token) return;
+    try {
+      await api.updateAdminMarketOrderStatus(id, status, token);
+      toast.success(`Order status updated to ${status}`);
+      setMarketOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update order status');
     }
   };
 
@@ -292,7 +308,8 @@ const AdminDashboard = () => {
 
   // Metrics summary
   const pendingAnnexesCount = annexes.filter(a => a.status === 'Pending').length;
-  const pendingMarketCount = marketItems.filter(m => m.status === 'PENDING_VERIFICATION' || m.status === 'PENDING').length;
+  const pendingMarketOrdersCount = marketOrders.filter(o => o.status === 'PENDING').length;
+  const pendingMarketCount = marketItems.filter(m => m.status === 'PENDING_VERIFICATION' || m.status === 'PENDING').length + pendingMarketOrdersCount;
   const pendingEventsCount = events.filter(e => (e.status || '').toLowerCase() === 'pending').length;
   const pendingProblemsCount = problems.filter(p => (p.status || '').toUpperCase() === 'PENDING' || (p.status || '').toUpperCase() === 'IN_PROGRESS').length;
   const pendingPaymentsCount = payments.filter(p => p.status === 'pending').length;
@@ -471,55 +488,218 @@ const AdminDashboard = () => {
 
             {/* 2. Marketplace Tab */}
             {activeTab === 'market' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {marketItems
-                  .filter(m => !searchQuery || m.title?.toLowerCase().includes(searchQuery.toLowerCase()))
-                  .map(item => (
-                    <div key={item.id} className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                            item.status === 'AVAILABLE' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                            item.status === 'SUSPENDED' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
-                            'bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse'
-                          }`}>
-                            {item.status}
-                          </span>
-                          <span className="text-xs font-bold text-purple-400">Rs. {parseFloat(item.price || 0).toLocaleString()}</span>
+              <div className="flex flex-col gap-6">
+                {/* Marketplace Sub-Navigation */}
+                <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+                  <button
+                    onClick={() => setMarketSubTab('listings')}
+                    className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-none flex items-center gap-2 ${
+                      marketSubTab === 'listings'
+                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                    }`}
+                  >
+                    <span>Item Listings</span>
+                    <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-slate-800 text-slate-300">
+                      {marketItems.length}
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={() => setMarketSubTab('orders')}
+                    className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer border-none flex items-center gap-2 ${
+                      marketSubTab === 'orders'
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                    }`}
+                  >
+                    <span>Official Store Orders</span>
+                    {pendingMarketOrdersCount > 0 ? (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-amber-500 text-slate-950 font-black">
+                        {pendingMarketOrdersCount} Pending
+                      </span>
+                    ) : (
+                      <span className="px-1.5 py-0.5 rounded-full text-[9px] bg-slate-800 text-slate-300">
+                        {marketOrders.length}
+                      </span>
+                    )}
+                  </button>
+                </div>
+
+                {/* SubTab 1: Item Listings */}
+                {marketSubTab === 'listings' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {marketItems
+                      .filter(m => !searchQuery || m.title?.toLowerCase().includes(searchQuery.toLowerCase()))
+                      .map(item => (
+                        <div key={item.id} className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between mb-3">
+                              <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                                item.status === 'AVAILABLE' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                                item.status === 'SUSPENDED' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                                'bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse'
+                              }`}>
+                                {item.status}
+                              </span>
+                              <span className="text-xs font-bold text-purple-400">Rs. {parseFloat(item.price || 0).toLocaleString()}</span>
+                            </div>
+
+                            <h3 className="text-lg font-bold text-white mb-1 line-clamp-1">{item.title}</h3>
+                            <p className="text-xs text-slate-400 mb-3 line-clamp-2">{item.description}</p>
+                            <p className="text-[10px] text-slate-500 font-medium">Seller: {item.seller ? item.seller.name : 'Unknown'}</p>
+                          </div>
+
+                          <div className="pt-4 border-t border-slate-800/80 flex items-center justify-end gap-2">
+                            {item.status !== 'AVAILABLE' && (
+                              <button
+                                onClick={() => handleMarketStatus(item.id, 'AVAILABLE')}
+                                className="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                              >
+                                <LuCheck size={14} /> Approve
+                              </button>
+                            )}
+                            {item.status !== 'SUSPENDED' && (
+                              <button
+                                onClick={() => handleMarketStatus(item.id, 'SUSPENDED')}
+                                className="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                              >
+                                <LuX size={14} /> Suspend
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDeleteMarketItem(item.id)}
+                              className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-rose-400 hover:bg-slate-700 transition-colors cursor-pointer"
+                              title="Delete Listing"
+                            >
+                              <LuTrash2 size={14} />
+                            </button>
+                          </div>
                         </div>
+                      ))}
+                  </div>
+                )}
 
-                        <h3 className="text-lg font-bold text-white mb-1 line-clamp-1">{item.title}</h3>
-                        <p className="text-xs text-slate-400 mb-3 line-clamp-2">{item.description}</p>
-                        <p className="text-[10px] text-slate-500 font-medium">Seller: {item.seller ? item.seller.name : 'Unknown'}</p>
+                {/* SubTab 2: Official Store Orders */}
+                {marketSubTab === 'orders' && (
+                  <div className="flex flex-col gap-4">
+                    {marketOrders.length === 0 ? (
+                      <div className="text-center py-16 bg-slate-900/40 border border-slate-800 rounded-3xl">
+                        <LuShoppingBag className="mx-auto text-4xl text-slate-600 mb-3" />
+                        <h4 className="text-sm font-black uppercase tracking-wider text-slate-400">No Orders Yet</h4>
+                        <p className="text-xs text-slate-500 mt-1">Official store purchases will appear here for verification and delivery tracking.</p>
                       </div>
+                    ) : (
+                      marketOrders
+                        .filter(o => {
+                          if (!searchQuery) return true;
+                          const q = searchQuery.toLowerCase();
+                          return (
+                            o.item?.title?.toLowerCase().includes(q) ||
+                            o.buyer?.name?.toLowerCase().includes(q) ||
+                            o.delivery_phone?.toLowerCase().includes(q) ||
+                            o.delivery_location?.toLowerCase().includes(q)
+                          );
+                        })
+                        .map(order => {
+                          const item = order.item || {};
+                          const buyer = order.buyer || {};
+                          return (
+                            <div key={order.id} className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
+                              <div className="flex items-start gap-4 flex-1">
+                                <div className="w-14 h-14 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 overflow-hidden">
+                                  {item.images && item.images.length > 0 ? (
+                                    <img
+                                      src={item.images[0].startsWith('http') ? item.images[0] : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${item.images[0]}`}
+                                      alt=""
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <LuShoppingBag className="text-slate-500 text-xl" />
+                                  )}
+                                </div>
 
-                      <div className="pt-4 border-t border-slate-800/80 flex items-center justify-end gap-2">
-                        {item.status !== 'AVAILABLE' && (
-                          <button
-                            onClick={() => handleMarketStatus(item.id, 'AVAILABLE')}
-                            className="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
-                          >
-                            <LuCheck size={14} /> Approve
-                          </button>
-                        )}
-                        {item.status !== 'SUSPENDED' && (
-                          <button
-                            onClick={() => handleMarketStatus(item.id, 'SUSPENDED')}
-                            className="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
-                          >
-                            <LuX size={14} /> Suspend
-                          </button>
-                        )}
-                        <button
-                          onClick={() => handleDeleteMarketItem(item.id)}
-                          className="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-rose-400 hover:bg-slate-700 transition-colors cursor-pointer"
-                          title="Delete Listing"
-                        >
-                          <LuTrash2 size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <h4 className="text-base font-bold text-white">{item.title || 'Official Item'}</h4>
+                                    <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                                      order.status === 'DELIVERED' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                                      order.status === 'PROCESSING' ? 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30' :
+                                      order.status === 'CANCELLED' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' :
+                                      'bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse'
+                                    }`}>
+                                      {order.status}
+                                    </span>
+                                  </div>
+
+                                  <p className="text-xs text-slate-400">
+                                    Qty: <span className="font-bold text-white">{order.quantity}</span> • Total: <span className="font-bold text-purple-400">Rs. {parseFloat(order.total_price || 0).toLocaleString()}</span>
+                                  </p>
+
+                                  <div className="text-[11px] text-slate-400 flex flex-wrap items-center gap-x-4 gap-y-1 pt-1">
+                                    <span>👤 Buyer: <strong className="text-slate-200">{buyer.name || 'Student'}</strong></span>
+                                    <span>📞 <a href={`tel:${order.delivery_phone}`} className="text-indigo-400 hover:underline">{order.delivery_phone}</a></span>
+                                    <span>📍 {order.delivery_location}</span>
+                                    <span>💳 {order.payment_method === 'BANK_TRANSFER' ? 'Direct Bank Slip' : 'Cash on Delivery (COD)'}</span>
+                                  </div>
+
+                                  {order.notes && (
+                                    <p className="text-[11px] text-slate-400 italic">Notes: "{order.notes}"</p>
+                                  )}
+
+                                  {order.payment_method === 'BANK_TRANSFER' && order.payment_slip && (
+                                    <div className="pt-1">
+                                      <a
+                                        href={order.payment_slip.startsWith('http') ? order.payment_slip : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${order.payment_slip}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1 text-[11px] text-indigo-400 hover:text-indigo-300 font-bold underline"
+                                      >
+                                        <LuFileText size={12} /> View Uploaded Payment Slip
+                                      </a>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Status Action Buttons */}
+                              <div className="flex items-center gap-2 shrink-0 self-end md:self-center">
+                                {order.status === 'PENDING' && (
+                                  <button
+                                    onClick={() => handleMarketOrderStatus(order.id, 'PROCESSING')}
+                                    className="px-3 py-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 hover:bg-indigo-600 hover:text-white border border-indigo-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                                    title="Mark order as in-process/packaging"
+                                  >
+                                    <LuTruck size={14} /> Process
+                                  </button>
+                                )}
+
+                                {order.status !== 'DELIVERED' && (
+                                  <button
+                                    onClick={() => handleMarketOrderStatus(order.id, 'DELIVERED')}
+                                    className="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                                    title="Mark order as fulfilled & delivered"
+                                  >
+                                    <LuPackageCheck size={14} /> Deliver
+                                  </button>
+                                )}
+
+                                {order.status !== 'CANCELLED' && (
+                                  <button
+                                    onClick={() => handleMarketOrderStatus(order.id, 'CANCELLED')}
+                                    className="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30 text-xs font-bold transition-all cursor-pointer flex items-center gap-1"
+                                    title="Cancel order"
+                                  >
+                                    <LuX size={14} /> Cancel
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })
+                    )}
+                  </div>
+                )}
               </div>
             )}
 

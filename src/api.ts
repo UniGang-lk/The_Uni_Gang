@@ -1083,6 +1083,27 @@ export const api = {
     return response.json();
   },
 
+  getAdminMarketOrders: async (token: string): Promise<any[]> => {
+    const response = await fetch(`${BASE_URL}/api/market/orders/admin`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to fetch admin market orders');
+    return response.json();
+  },
+
+  updateAdminMarketOrderStatus: async (orderId: string, status: string, token: string): Promise<any> => {
+    const response = await fetch(`${BASE_URL}/api/market/orders/${orderId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ status })
+    });
+    if (!response.ok) throw new Error('Failed to update order status');
+    return response.json();
+  },
+
   getAdminEvents: async (token: string): Promise<any[]> => {
     const response = await fetch(`${BASE_URL}/api/events/admin/all`, {
       headers: { Authorization: `Bearer ${token}` }
