@@ -38,6 +38,7 @@ const AdminDashboard = () => {
   const [replyModalOpen, setReplyModalOpen] = useState(false);
   const [selectedProblem, setSelectedProblem] = useState<any | null>(null);
   const [adminReplyText, setAdminReplyText] = useState('');
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
 
   const token = localStorage.getItem('userToken');
 
@@ -225,10 +226,12 @@ const AdminDashboard = () => {
   };
 
   const handleSendProblemReply = async () => {
+    if (isSubmittingReply) return;
     if (!token || !selectedProblem || !adminReplyText.trim()) {
       toast.error('Please enter a reply message.');
       return;
     }
+    setIsSubmittingReply(true);
     try {
       await api.replyAdminProblem(selectedProblem.id, 'Resolved', adminReplyText, token);
       toast.success('Support problem resolved and reply sent!');
@@ -238,6 +241,8 @@ const AdminDashboard = () => {
       setAdminReplyText('');
     } catch (err: any) {
       toast.error(err.message || 'Failed to resolve problem');
+    } finally {
+      setIsSubmittingReply(false);
     }
   };
 
@@ -1180,10 +1185,11 @@ const AdminDashboard = () => {
                   Cancel
                 </button>
                 <button
+                  disabled={isSubmittingReply}
                   onClick={handleSendProblemReply}
-                  className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold border-none cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold border-none cursor-pointer"
                 >
-                  Send & Resolve
+                  {isSubmittingReply ? 'Sending...' : 'Send & Resolve'}
                 </button>
               </div>
             </motion.div>

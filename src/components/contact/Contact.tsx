@@ -93,6 +93,8 @@ const Contact = () => {
     const [feedbackInstitution, setFeedbackInstitution] = useState('');
     const [feedbackText, setFeedbackText] = useState('');
     const [feedbackSuccess, setFeedbackSuccess] = useState(false);
+    const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
+    const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
 
     // Dynamic testimonials state (Real approved client feedbacks only)
     const [activeFeedbacks, setActiveFeedbacks] = useState<Feedback[]>([]);
@@ -167,6 +169,7 @@ const Contact = () => {
     };
 
     const handleSendInquiry = async () => {
+        if (isSubmittingInquiry) return;
         if (!name.trim() || !email.trim() || !inquiryType || !message.trim()) {
             toast.error("Please fill all fields");
             return;
@@ -178,6 +181,7 @@ const Contact = () => {
             return;
         }
 
+        setIsSubmittingInquiry(true);
         try {
             await api.submitSupportProblem({
                 name: name.trim(),
@@ -193,15 +197,19 @@ const Contact = () => {
             if (!localStorage.getItem('userEmail')) setEmail('');
         } catch (err: any) {
             toast.error(err.message || "Failed to submit problem report");
+        } finally {
+            setIsSubmittingInquiry(false);
         }
     };
 
     const handleSendFeedback = async () => {
+        if (isSubmittingFeedback) return;
         if (!feedbackName.trim() || !feedbackText.trim() || rating === 0) {
             toast.error("Please provide your name, feedback comment, and a star rating.");
             return;
         }
 
+        setIsSubmittingFeedback(true);
         try {
             const formData = new FormData();
             formData.append('name', feedbackName.trim());
@@ -230,6 +238,8 @@ const Contact = () => {
             }, 3000);
         } catch (err: any) {
             toast.error(err.message || "Failed to submit feedback");
+        } finally {
+            setIsSubmittingFeedback(false);
         }
     };
 
@@ -424,12 +434,13 @@ const Contact = () => {
                                                 <textarea required value={message} onChange={(e) => setMessage(e.target.value)} rows={5} placeholder="Tell us about your problem, question, or request..." className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
                                             </div>
                                             <motion.button
+                                                disabled={isSubmittingInquiry}
                                                 onClick={handleSendInquiry}
-                                                whileHover={{ scale: 1.02, y: -2, boxShadow: "0 20px 40px -10px rgba(79, 70, 229, 0.4)" }}
-                                                whileTap={{ scale: 0.98 }}
-                                                className="w-full mt-auto py-4 rounded-[1.25rem] text-white text-[11px] font-black uppercase tracking-[0.2em] bg-gradient-to-r from-blue-600 to-primary flex items-center justify-center gap-3 transition-all"
+                                                whileHover={!isSubmittingInquiry ? { scale: 1.02, y: -2, boxShadow: "0 20px 40px -10px rgba(79, 70, 229, 0.4)" } : {}}
+                                                whileTap={!isSubmittingInquiry ? { scale: 0.98 } : {}}
+                                                className="w-full mt-auto py-4 rounded-[1.25rem] text-white text-[11px] font-black uppercase tracking-[0.2em] bg-gradient-to-r from-blue-600 to-primary flex items-center justify-center gap-3 transition-all disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
                                             >
-                                                Send Message <LuSend size={14} />
+                                                {isSubmittingInquiry ? 'Sending Inquiry...' : <>Send Message <LuSend size={14} /></>}
                                             </motion.button>
                                         </>
                                     ) : (
@@ -518,12 +529,13 @@ const Contact = () => {
                                             </div>
                                             <textarea required value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} rows={3} placeholder="Tell your Feedback..." className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-[#E91E63] focus:ring-4 focus:ring-[#E91E63]/10 outline-none resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
                                             <motion.button
+                                                disabled={isSubmittingFeedback}
                                                 onClick={handleSendFeedback}
-                                                whileHover={{ scale: 1.02, y: -2, boxShadow: "0 20px 40px -10px rgba(233, 30, 99, 0.4)" }}
-                                                whileTap={{ scale: 0.98 }}
-                                                className="w-full py-4 mt-auto rounded-[1.25rem] text-white text-[11px] font-black uppercase tracking-[0.2em] bg-gradient-to-r from-[#E91E63] to-[#880E4F] flex items-center justify-center gap-3 transition-all"
+                                                whileHover={!isSubmittingFeedback ? { scale: 1.02, y: -2, boxShadow: "0 20px 40px -10px rgba(233, 30, 99, 0.4)" } : {}}
+                                                whileTap={!isSubmittingFeedback ? { scale: 0.98 } : {}}
+                                                className="w-full py-4 mt-auto rounded-[1.25rem] text-white text-[11px] font-black uppercase tracking-[0.2em] bg-gradient-to-r from-[#E91E63] to-[#880E4F] flex items-center justify-center gap-3 transition-all disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
                                             >
-                                                Post Feedback <LuMessageSquareQuote size={14} />
+                                                {isSubmittingFeedback ? 'Posting Review...' : <>Post Feedback <LuMessageSquareQuote size={14} /></>}
                                             </motion.button>
                                         </>
                                     )}
