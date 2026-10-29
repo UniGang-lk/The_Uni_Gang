@@ -735,6 +735,11 @@
         - `/profile?tab=listings` සහ `/profile?tab=orders` deep-links හරහා අදාළ listings modal එක auto-open වීම.
         - Modal එක තුළ `View` (Open detail page), `Mark Sold / Relist` (Toggle availability status), සහ `Delete Permanently` (Clean removal from state and DB) buttons සම්පූර්ණයෙන් සක්‍රීය කිරීම.
       - **API Endpoint Mapping ([api.ts](file:///e:/The-Uni-Gang/Website/src/api.ts)):** `updateMyListingStatus` endpoint එක එක් කර seller හට status වෙනස් කිරීමේ හැකියාව සැපයීම.
+    - **🎨 Round 76 Comprehensive Polish & Card Badges:**
+      - **Marketplace Card Sold Status Overlay ([MarketplaceCard.tsx](file:///e:/The-Uni-Gang/Website/src/components/market/MarketplaceCard.tsx)):** විකිණී අවසන් වූ භාණ්ඩ (`item.status === 'SOLD'`) සඳහා කාඩ්පත මත පැහැදිලි "SOLD" badge එක සහ visual grayscale dimming එක් කර, available items සහ sold items වෙන්කර හඳුනා ගැනීමට සැලැස්වීම.
+      - **Homepage Direct Store Navigation & Purge-Proof Styling ([MarketSection.tsx](file:///e:/The-Uni-Gang/Website/src/components/market/MarketSection.tsx)):** Homepage teaser එකෙහි "Shop Official Store" button එක ක්ලික් කළ විට සෘජුවම `/market?type=OFFICIAL_PRODUCT` වෙත filter වී විවෘත වීම සහ dynamic class purge issues සම්පූර්ණයෙන්ම වැළැක්වීම.
+      - **Tailwind Non-Standard Color Fix ([CreateListingModal.tsx](file:///e:/The-Uni-Gang/Website/src/components/market/CreateListingModal.tsx)):** `bg-indigo-650` typo එක `bg-indigo-600` ලෙස ප්‍රමිතිගත කිරීම.
+      - **Backend Input Guard & Rating Cascade Clean-up ([marketplace_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/marketplace_controller.go)):** `CreateItem` හිදී හිස් title සහ සෘණ මිල ගණන් වැළැක්වීමේ guards එක් කිරීම සහ item එකක් delete කිරීමේදී ඊට අදාළ ratings DB එකෙන් ස්වයංක්‍රීයව clean වීම.
     - **✅ Zero Build & Compile Errors:** `npx tsc -b` සහ `go build ./internal/controller/...` මගින් Website සහ Backend 100% clean, error-free සහ production-ready බව තහවුරු කරන ලදී.
 
 ---

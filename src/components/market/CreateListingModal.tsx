@@ -378,7 +378,7 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
                       type="button"
                       disabled={isSubmitting || !verificationCode.trim()}
                       onClick={handleConfirmCode}
-                      className="px-6 py-2.5 rounded-xl font-bold text-white bg-indigo-650 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/30 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 border-none cursor-pointer"
+                      className="px-6 py-2.5 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/30 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2 border-none cursor-pointer"
                     >
                       {isSubmitting ? (
                         <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Verifying...</>

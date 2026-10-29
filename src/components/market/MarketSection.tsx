@@ -9,10 +9,10 @@ const MarketSection = () => {
   const navigate = useNavigate();
   const [isNavigating, setIsNavigating] = useState(false);
 
-  const handleExploreMarket = () => {
+  const handleExploreMarket = (path = '/market') => {
     setIsNavigating(true);
     setTimeout(() => {
-      navigate('/market');
+      navigate(path);
       setTimeout(() => setIsNavigating(false), 500);
     }, 300);
   };
@@ -202,8 +202,8 @@ const MarketSection = () => {
 
               {/* Action Button */}
               <button
-                onClick={handleExploreMarket}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 active:scale-[0.98] mt-auto"
+                onClick={() => handleExploreMarket('/market?type=OFFICIAL_PRODUCT')}
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 active:scale-[0.98] mt-auto cursor-pointer border-none"
               >
                 Shop Official Store
               </button>
@@ -225,19 +225,22 @@ const MarketSection = () => {
                   icon: <LuShoppingBag className="w-5 h-5" />,
                   title: "Physical Goods",
                   desc: "Buy and sell textbooks, drawing tables, laptops, and calculators.",
-                  color: "blue"
+                  textColor: "text-blue-500",
+                  bgColor: "bg-blue-500/10"
                 },
                 {
                   icon: <LuBriefcase className="w-5 h-5" />,
                   title: "Freelance Gigs",
                   desc: "Offer tutoring, graphic design, or coding services to peers.",
-                  color: "purple"
+                  textColor: "text-purple-500",
+                  bgColor: "bg-purple-500/10"
                 },
                 {
                   icon: <LuShieldCheck className="w-5 h-5" />,
                   title: "Zero Scams Guarantee",
                   desc: "Only university-verified students can list. 100% secure peer trades.",
-                  color: "emerald"
+                  textColor: "text-emerald-500",
+                  bgColor: "bg-emerald-500/10"
                 }
               ].map((item, idx) => (
                 <div
@@ -246,7 +249,7 @@ const MarketSection = () => {
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-${item.color}-500 bg-${item.color}-500/10 shrink-0 group-hover:scale-110 transition-transform`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${item.textColor} ${item.bgColor} shrink-0 group-hover:scale-110 transition-transform`}>
                     {item.icon}
                   </div>
 
@@ -263,8 +266,8 @@ const MarketSection = () => {
 
               {/* Action Button */}
               <button
-                onClick={handleExploreMarket}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-purple-600/20 hover:shadow-purple-600/40 active:scale-[0.98] mt-2"
+                onClick={() => handleExploreMarket('/market?type=PRODUCT')}
+                className="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-black uppercase tracking-widest text-xs transition-all shadow-lg shadow-purple-600/20 hover:shadow-purple-600/40 active:scale-[0.98] mt-2 cursor-pointer border-none"
               >
                 Explore Peer Listings
               </button>

@@ -22,6 +22,7 @@ interface MarketplaceCardProps {
       is_verified_professional?: boolean;
     } | null;
     is_featured?: boolean;
+    status?: string | null;
   };
   onClick: () => void;
   onAddToCart?: (item: any) => void;
@@ -42,6 +43,7 @@ const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ item, onClick, onAddT
     `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(sellerName)}`;
   const isStudentVerified = item.seller?.is_verified_student ?? false;
   const isProfessionalVerified = item.seller?.is_verified_professional ?? false;
+  const isSold = item.status === 'SOLD';
 
   let timeAgo = 'Recently';
   try {
@@ -64,7 +66,7 @@ const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ item, onClick, onAddT
         <img
           src={imageUrl}
           alt={item.title}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ${isSold ? 'opacity-70 grayscale-[40%]' : ''}`}
         />
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           {item.is_featured && (
@@ -72,7 +74,11 @@ const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ item, onClick, onAddT
               <LuStar className="w-3 h-3 fill-current" /> Featured
             </span>
           )}
-          {item.type === 'OFFICIAL_PRODUCT' ? (
+          {isSold ? (
+            <span className="px-3 py-1 text-xs font-black rounded-full shadow-md bg-rose-600 text-white uppercase tracking-wider backdrop-blur-md">
+              SOLD
+            </span>
+          ) : item.type === 'OFFICIAL_PRODUCT' ? (
             <span className="px-3 py-1 text-xs font-bold rounded-full shadow-md bg-gradient-to-r from-amber-500 to-orange-500 text-white">
               Official Store
             </span>
