@@ -136,7 +136,7 @@ const Contact = () => {
                         role: f.institution || 'Verified Client',
                         comment: f.comment,
                         avatar: f.avatar
-                            ? (f.avatar.startsWith('http') ? f.avatar : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${f.avatar}`)
+                            ? (f.avatar.startsWith('http') ? f.avatar : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${f.avatar.startsWith('/') ? f.avatar : '/' + f.avatar}`)
                             : `https://ui-avatars.com/api/?name=${encodeURIComponent(f.name || 'User')}&background=0D8ABC&color=fff`,
                         rating: f.rating || 5
                     }));

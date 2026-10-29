@@ -235,7 +235,7 @@ const AdminDashboard = () => {
     try {
       await api.replyAdminProblem(selectedProblem.id, 'Resolved', adminReplyText, token);
       toast.success('Support problem resolved and reply sent!');
-      setProblems(prev => prev.map(p => p.id === selectedProblem.id ? { ...p, status: 'Resolved', admin_reply: adminReplyText } : p));
+      setProblems(prev => prev.map(p => p.id === selectedProblem.id ? { ...p, status: 'Resolved', admin_reply: adminReplyText, adminReply: adminReplyText } : p));
       setReplyModalOpen(false);
       setSelectedProblem(null);
       setAdminReplyText('');
@@ -651,101 +651,133 @@ const AdminDashboard = () => {
 
             {/* 5. Feedbacks Tab */}
             {activeTab === 'feedbacks' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {feedbacks.map(fb => {
-                  const isApproved = fb.status === 'Approved' || fb.is_approved === true;
-                  return (
-                    <div key={fb.id} className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                            isApproved ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                          }`}>
-                            {isApproved ? 'Homepage Approved' : 'Pending Review'}
-                          </span>
-                          <span className="text-amber-400 font-bold text-xs">⭐ {fb.rating}/5</span>
+              feedbacks.length === 0 ? (
+                <div className="p-12 text-center rounded-2xl bg-slate-900/50 border border-slate-800 text-slate-400">
+                  <LuMessageSquare className="w-10 h-10 mx-auto mb-3 opacity-40 text-rose-400" />
+                  <h3 className="text-base font-bold text-white mb-1">No Client Feedbacks Yet</h3>
+                  <p className="text-xs text-slate-400 max-w-sm mx-auto">When users submit review feedback on the Contact page, they will appear here for admin moderation and approval.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {feedbacks.map(fb => {
+                    const isApproved = fb.status === 'Approved' || fb.is_approved === true;
+                    const avatarSrc = fb.avatar
+                      ? (fb.avatar.startsWith('http') ? fb.avatar : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${fb.avatar.startsWith('/') ? fb.avatar : '/' + fb.avatar}`)
+                      : `https://ui-avatars.com/api/?name=${encodeURIComponent(fb.name || 'User')}&background=0D8ABC&color=fff`;
+
+                    return (
+                      <div key={fb.id} className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                              isApproved ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                            }`}>
+                              {isApproved ? 'Homepage Approved' : 'Pending Review'}
+                            </span>
+                            <span className="text-amber-400 font-bold text-xs">⭐ {fb.rating}/5</span>
+                          </div>
+
+                          <p className="text-sm text-slate-200 italic mb-4">"{fb.comment}"</p>
+                          <div className="flex items-center gap-3">
+                            <img src={avatarSrc} alt={fb.name} className="w-8 h-8 rounded-full object-cover border border-slate-700" />
+                            <div>
+                              <p className="text-xs font-bold text-white leading-tight">{fb.name}</p>
+                              <p className="text-[10px] text-slate-400">{fb.institution || 'Verified Client'}</p>
+                            </div>
+                          </div>
                         </div>
 
-                        <p className="text-sm text-slate-200 italic mb-4">"{fb.comment}"</p>
-                        <p className="text-xs font-bold text-white">{fb.name} <span className="text-slate-500 font-normal">· {fb.institution || 'Verified Client'}</span></p>
+                        <div className="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleFeedbackApproval(fb.id, !isApproved)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                              isApproved
+                                ? 'bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30'
+                                : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30'
+                            }`}
+                          >
+                            {isApproved ? <><LuX size={14} /> Hide</> : <><LuCheck size={14} /> Approve for Homepage</>}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteFeedback(fb.id)}
+                            className="p-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 bg-slate-800 text-slate-400 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 hover:border-rose-500/30"
+                            title="Delete Feedback"
+                          >
+                            <LuTrash2 size={14} />
+                          </button>
+                        </div>
                       </div>
-
-                      <div className="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => handleFeedbackApproval(fb.id, !isApproved)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                            isApproved
-                              ? 'bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30'
-                              : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30'
-                          }`}
-                        >
-                          {isApproved ? <><LuX size={14} /> Hide</> : <><LuCheck size={14} /> Approve for Homepage</>}
-                        </button>
-                        <button
-                          onClick={() => handleDeleteFeedback(fb.id)}
-                          className="p-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 bg-slate-800 text-slate-400 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 hover:border-rose-500/30"
-                          title="Delete Feedback"
-                        >
-                          <LuTrash2 size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )
             )}
 
             {/* 6. Problems / Support Tickets Tab */}
             {activeTab === 'problems' && (
-              <div className="space-y-4">
-                {problems.map(prob => {
-                  const isResolved = (prob.status || '').toUpperCase() === 'RESOLVED';
-                  return (
-                    <div key={prob.id} className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                            isResolved ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse'
-                          }`}>
-                            {isResolved ? 'RESOLVED' : 'PENDING REVIEW'}
-                          </span>
-                          <span className="text-xs font-bold text-indigo-400">{prob.inquiry_type || prob.inquiryType || 'General Problem'}</span>
+              problems.length === 0 ? (
+                <div className="p-12 text-center rounded-2xl bg-slate-900/50 border border-slate-800 text-slate-400">
+                  <LuLifeBuoy className="w-10 h-10 mx-auto mb-3 opacity-40 text-cyan-400" />
+                  <h3 className="text-base font-bold text-white mb-1">No Support Tickets Found</h3>
+                  <p className="text-xs text-slate-400 max-w-sm mx-auto">No problems or inquiries have been reported yet. Incoming tickets from the Contact section will show here.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {problems.map(prob => {
+                    const isResolved = (prob.status || '').toUpperCase() === 'RESOLVED';
+                    const replyContent = prob.admin_reply || prob.adminReply;
+                    const repliedDate = prob.replied_at || prob.repliedAt;
+
+                    return (
+                      <div key={prob.id} className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2 flex-wrap">
+                            <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                              isResolved ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse'
+                            }`}>
+                              {isResolved ? 'RESOLVED' : 'PENDING REVIEW'}
+                            </span>
+                            <span className="text-xs font-bold text-indigo-400">{prob.inquiry_type || prob.inquiryType || 'General Problem'}</span>
+                            {repliedDate && (
+                              <span className="text-[10px] text-slate-500">Replied: {new Date(repliedDate).toLocaleDateString()}</span>
+                            )}
+                          </div>
+
+                          <h4 className="text-base font-bold text-white mb-1">{prob.name} ({prob.email})</h4>
+                          <p className="text-xs text-slate-300 leading-relaxed mb-2">{prob.message}</p>
+
+                          {replyContent && (
+                            <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 mt-2">
+                              <span className="font-bold">Admin Reply:</span> {replyContent}
+                            </div>
+                          )}
                         </div>
 
-                        <h4 className="text-base font-bold text-white mb-1">{prob.name} ({prob.email})</h4>
-                        <p className="text-xs text-slate-300 leading-relaxed mb-2">{prob.message}</p>
-
-                        {prob.admin_reply && (
-                          <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 mt-2">
-                            <span className="font-bold">Admin Reply:</span> {prob.admin_reply}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="shrink-0 flex items-center gap-2">
-                        {!isResolved && (
+                        <div className="shrink-0 flex items-center gap-2">
+                          {!isResolved && (
+                            <button
+                              onClick={() => {
+                                setSelectedProblem(prob);
+                                setReplyModalOpen(true);
+                              }}
+                              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all cursor-pointer shadow-lg shadow-indigo-600/30 border-none flex items-center gap-2"
+                            >
+                              <LuMail size={14} /> Reply & Resolve
+                            </button>
+                          )}
                           <button
-                            onClick={() => {
-                              setSelectedProblem(prob);
-                              setReplyModalOpen(true);
-                            }}
-                            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all cursor-pointer shadow-lg shadow-indigo-600/30 border-none flex items-center gap-2"
+                            onClick={() => handleDeleteProblem(prob.id)}
+                            className="p-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 bg-slate-800 text-slate-400 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 hover:border-rose-500/30"
+                            title="Delete Ticket"
                           >
-                            <LuMail size={14} /> Reply & Resolve
+                            <LuTrash2 size={14} />
                           </button>
-                        )}
-                        <button
-                          onClick={() => handleDeleteProblem(prob.id)}
-                          className="p-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 bg-slate-800 text-slate-400 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 hover:border-rose-500/30"
-                          title="Delete Ticket"
-                        >
-                          <LuTrash2 size={14} />
-                        </button>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )
             )}
 
             {/* 7. Premium Payments Tab */}
