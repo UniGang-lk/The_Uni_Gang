@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { LuPhone, LuMail, LuSend, LuFacebook } from 'react-icons/lu';
-import { FaWhatsapp } from 'react-icons/fa6';
+import { LuPhone, LuMail, LuSend } from 'react-icons/lu';
+import { FaWhatsapp, FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa6';
 import SEO from '../components/SEO';
 import toast from 'react-hot-toast';
 
@@ -168,9 +168,42 @@ const ContactUsPage = () => {
           {/* Socials */}
           <div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Follow us</h3>
-            <div className="flex gap-4">
-              <a href="#" className="w-12 h-12 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700 hover:border-brand-200 dark:hover:border-brand-900 hover:text-brand-600 dark:hover:text-brand-400 shadow-sm transition-all hover:-translate-y-1">
-                <LuFacebook className="w-6 h-6" />
+            <div className="flex items-center gap-3">
+              <a
+                href="https://wa.me/94724478148"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="WhatsApp"
+                className="w-12 h-12 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 hover:text-emerald-500 shadow-sm transition-all hover:-translate-y-1"
+              >
+                <FaWhatsapp className="w-5 h-5" />
+              </a>
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="w-12 h-12 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700 hover:border-blue-300 hover:text-blue-600 shadow-sm transition-all hover:-translate-y-1"
+              >
+                <FaFacebook className="w-5 h-5" />
+              </a>
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="w-12 h-12 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700 hover:border-pink-300 hover:text-pink-500 shadow-sm transition-all hover:-translate-y-1"
+              >
+                <FaInstagram className="w-5 h-5" />
+              </a>
+              <a
+                href="https://youtube.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+                className="w-12 h-12 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700 hover:border-red-300 hover:text-red-500 shadow-sm transition-all hover:-translate-y-1"
+              >
+                <FaYoutube className="w-5 h-5" />
               </a>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LuSend, LuPhone, LuMail, LuMapPin, LuMessageSquareQuote, LuStar, LuChevronDown, LuUser, LuCopy, LuCheck } from 'react-icons/lu';
+import { LuSend, LuPhone, LuMail, LuMapPin, LuMessageSquareQuote, LuStar, LuChevronDown, LuUser, LuCopy, LuCheck, LuExternalLink } from 'react-icons/lu';
+import { FaWhatsapp } from 'react-icons/fa6';
 import TiltCard from '../ui/TiltCard.tsx';
 import toast from 'react-hot-toast';
 import { api } from '../../api';
@@ -266,31 +267,45 @@ const Contact = () => {
                         <div className="bg-white/10 dark:bg-slate-900/40 backdrop-blur-2xl p-10 md:p-12 rounded-[2.5rem] border border-white/30 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] h-full flex flex-col transition-all duration-500 hover:border-primary/30">
                             <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-12 tracking-tight">Reach Out To Us</h3>
 
-                            <div className="space-y-10 flex-grow">
+                            <div className="space-y-8 flex-grow">
                                 {[
-                                    { icon: LuMail, label: "Email Endpoint", value: "uniganglk@gmail.com" },
-                                    { icon: LuPhone, label: "Direct Hotline", value: "+94 72 447 8148" },
-                                    { icon: LuMapPin, label: "Our Base", value: "Colombo, Sri Lanka" }
+                                    { icon: LuMail, label: "Email Endpoint", value: "uniganglk@gmail.com", href: "mailto:uniganglk@gmail.com" },
+                                    { icon: FaWhatsapp, label: "Live WhatsApp", value: "+94 72 447 8148", href: "https://wa.me/94724478148" },
+                                    { icon: LuPhone, label: "Direct Hotline", value: "+94 72 447 8148", href: "tel:+94724478148" },
+                                    { icon: LuMapPin, label: "Our Base", value: "Colombo, Sri Lanka", href: null }
                                 ].map((item, i) => (
                                     <motion.div
                                         key={i}
                                         whileHover={{ x: 6 }}
-                                        className="flex gap-6 items-center group relative cursor-pointer"
+                                        className="flex gap-5 items-center group relative cursor-pointer"
                                         onClick={() => handleCopy(item.value, item.label)}
                                     >
                                         <motion.div
                                             animate={{ y: [0, -4, 0] }}
                                             transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
-                                            className="w-14 h-14 rounded-2xl bg-white/20 dark:bg-slate-800/30 backdrop-blur-md border border-white/20 shadow-sm flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300"
+                                            className="w-13 h-13 rounded-2xl bg-white/20 dark:bg-slate-800/30 backdrop-blur-md border border-white/20 shadow-sm flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shrink-0"
                                         >
-                                            <item.icon className="text-2xl" />
+                                            <item.icon className="text-xl" />
                                         </motion.div>
-                                        <div className="flex-1 flex items-center justify-between">
-                                            <div>
-                                                <p className="text-[10px] font-bold uppercase tracking-widest text-primary/60 mb-1">{item.label}</p>
-                                                <p className="text-lg font-semibold text-slate-800 dark:text-slate-200 group-hover:text-primary transition-colors">{item.value}</p>
+                                        <div className="flex-1 flex items-center justify-between min-w-0">
+                                            <div className="truncate">
+                                                <p className="text-[10px] font-bold uppercase tracking-widest text-primary/60 mb-0.5">{item.label}</p>
+                                                {item.href ? (
+                                                    <a
+                                                        href={item.href}
+                                                        target={item.href.startsWith('http') ? '_blank' : undefined}
+                                                        rel="noopener noreferrer"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className="text-base font-semibold text-slate-800 dark:text-slate-200 hover:text-primary transition-colors hover:underline inline-flex items-center gap-1.5"
+                                                    >
+                                                        {item.value}
+                                                        <LuExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                    </a>
+                                                ) : (
+                                                    <p className="text-base font-semibold text-slate-800 dark:text-slate-200 group-hover:text-primary transition-colors">{item.value}</p>
+                                                )}
                                             </div>
-                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-slate-400 dark:text-slate-500 hover:text-primary p-2">
+                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-slate-400 dark:text-slate-500 hover:text-primary p-2 shrink-0">
                                                 {copiedItem === item.label ? (
                                                     <LuCheck className="text-emerald-500 text-lg animate-pulse" />
                                                 ) : (

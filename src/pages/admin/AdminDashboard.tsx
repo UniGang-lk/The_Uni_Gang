@@ -206,10 +206,21 @@ const AdminDashboard = () => {
     if (!token) return;
     try {
       await api.updateAdminFeedbackStatus(id, is_approved, token);
-      toast.success(is_approved ? 'Feedback approved for homepage!' : 'Feedback unapproved');
-      setFeedbacks(prev => prev.map(f => f.id === id ? { ...f, is_approved } : f));
+      toast.success(is_approved ? 'Feedback approved for homepage!' : 'Feedback hidden from homepage');
+      setFeedbacks(prev => prev.map(f => f.id === id ? { ...f, is_approved, status: is_approved ? 'Approved' : 'Pending' } : f));
     } catch (err: any) {
       toast.error(err.message || 'Failed to update feedback status');
+    }
+  };
+
+  const handleDeleteFeedback = async (id: string) => {
+    if (!token || !window.confirm('Are you sure you want to delete this client feedback?')) return;
+    try {
+      await api.deleteAdminFeedback(id, token);
+      toast.success('Feedback deleted successfully');
+      setFeedbacks(prev => prev.filter(f => f.id !== id));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete feedback');
     }
   };
 
@@ -219,14 +230,25 @@ const AdminDashboard = () => {
       return;
     }
     try {
-      await api.replyAdminProblem(selectedProblem.id, 'RESOLVED', adminReplyText, token);
+      await api.replyAdminProblem(selectedProblem.id, 'Resolved', adminReplyText, token);
       toast.success('Support problem resolved and reply sent!');
-      setProblems(prev => prev.map(p => p.id === selectedProblem.id ? { ...p, status: 'RESOLVED', admin_reply: adminReplyText } : p));
+      setProblems(prev => prev.map(p => p.id === selectedProblem.id ? { ...p, status: 'Resolved', admin_reply: adminReplyText } : p));
       setReplyModalOpen(false);
       setSelectedProblem(null);
       setAdminReplyText('');
     } catch (err: any) {
       toast.error(err.message || 'Failed to resolve problem');
+    }
+  };
+
+  const handleDeleteProblem = async (id: string) => {
+    if (!token || !window.confirm('Are you sure you want to delete this support ticket?')) return;
+    try {
+      await api.deleteAdminProblem(id, token);
+      toast.success('Support ticket deleted successfully');
+      setProblems(prev => prev.filter(p => p.id !== id));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete ticket');
     }
   };
 
@@ -267,7 +289,7 @@ const AdminDashboard = () => {
   const pendingAnnexesCount = annexes.filter(a => a.status === 'Pending').length;
   const pendingMarketCount = marketItems.filter(m => m.status === 'PENDING_VERIFICATION' || m.status === 'PENDING').length;
   const pendingEventsCount = events.filter(e => (e.status || '').toLowerCase() === 'pending').length;
-  const pendingProblemsCount = problems.filter(p => p.status === 'PENDING' || p.status === 'IN_PROGRESS').length;
+  const pendingProblemsCount = problems.filter(p => (p.status || '').toUpperCase() === 'PENDING' || (p.status || '').toUpperCase() === 'IN_PROGRESS').length;
   const pendingPaymentsCount = payments.filter(p => p.status === 'pending').length;
   const pendingProposalVerificationsCount = proposalProfiles.filter(p => p.verification_status === 'pending_review' || p.verificationStatus === 'pending_review').length;
   const pendingAdsCount = advertisements.filter(a => (a.status || '').toUpperCase() === 'PENDING').length;
@@ -625,79 +647,99 @@ const AdminDashboard = () => {
             {/* 5. Feedbacks Tab */}
             {activeTab === 'feedbacks' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {feedbacks.map(fb => (
-                  <div key={fb.id} className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                          fb.is_approved ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'
-                        }`}>
-                          {fb.is_approved ? 'Homepage Approved' : 'Hidden'}
-                        </span>
-                        <span className="text-amber-400 font-bold text-xs">⭐ {fb.rating}/5</span>
+                {feedbacks.map(fb => {
+                  const isApproved = fb.status === 'Approved' || fb.is_approved === true;
+                  return (
+                    <div key={fb.id} className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                            isApproved ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                          }`}>
+                            {isApproved ? 'Homepage Approved' : 'Pending Review'}
+                          </span>
+                          <span className="text-amber-400 font-bold text-xs">⭐ {fb.rating}/5</span>
+                        </div>
+
+                        <p className="text-sm text-slate-200 italic mb-4">"{fb.comment}"</p>
+                        <p className="text-xs font-bold text-white">{fb.name} <span className="text-slate-500 font-normal">· {fb.institution || 'Verified Client'}</span></p>
                       </div>
 
-                      <p className="text-sm text-slate-200 italic mb-4">"{fb.comment}"</p>
-                      <p className="text-xs font-bold text-white">{fb.name} <span className="text-slate-500 font-normal">· {fb.institution || 'Verified Client'}</span></p>
+                      <div className="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleFeedbackApproval(fb.id, !isApproved)}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                            isApproved
+                              ? 'bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30'
+                              : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30'
+                          }`}
+                        >
+                          {isApproved ? <><LuX size={14} /> Hide</> : <><LuCheck size={14} /> Approve for Homepage</>}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteFeedback(fb.id)}
+                          className="p-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 bg-slate-800 text-slate-400 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 hover:border-rose-500/30"
+                          title="Delete Feedback"
+                        >
+                          <LuTrash2 size={14} />
+                        </button>
+                      </div>
                     </div>
-
-                    <div className="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => handleFeedbackApproval(fb.id, !fb.is_approved)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                          fb.is_approved
-                            ? 'bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white border border-rose-500/30'
-                            : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/30'
-                        }`}
-                      >
-                        {fb.is_approved ? <><LuX size={14} /> Hide</> : <><LuCheck size={14} /> Approve for Homepage</>}
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
             {/* 6. Problems / Support Tickets Tab */}
             {activeTab === 'problems' && (
               <div className="space-y-4">
-                {problems.map(prob => (
-                  <div key={prob.id} className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                          prob.status === 'RESOLVED' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse'
-                        }`}>
-                          {prob.status}
-                        </span>
-                        <span className="text-xs font-bold text-indigo-400">{prob.inquiry_type || prob.inquiryType || 'General Problem'}</span>
+                {problems.map(prob => {
+                  const isResolved = (prob.status || '').toUpperCase() === 'RESOLVED';
+                  return (
+                    <div key={prob.id} className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 hover:border-slate-700 transition-all flex flex-col md:flex-row md:items-center justify-between gap-6">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                            isResolved ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse'
+                          }`}>
+                            {isResolved ? 'RESOLVED' : 'PENDING REVIEW'}
+                          </span>
+                          <span className="text-xs font-bold text-indigo-400">{prob.inquiry_type || prob.inquiryType || 'General Problem'}</span>
+                        </div>
+
+                        <h4 className="text-base font-bold text-white mb-1">{prob.name} ({prob.email})</h4>
+                        <p className="text-xs text-slate-300 leading-relaxed mb-2">{prob.message}</p>
+
+                        {prob.admin_reply && (
+                          <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 mt-2">
+                            <span className="font-bold">Admin Reply:</span> {prob.admin_reply}
+                          </div>
+                        )}
                       </div>
 
-                      <h4 className="text-base font-bold text-white mb-1">{prob.name} ({prob.email})</h4>
-                      <p className="text-xs text-slate-300 leading-relaxed mb-2">{prob.message}</p>
-
-                      {prob.admin_reply && (
-                        <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 mt-2">
-                          <span className="font-bold">Admin Reply:</span> {prob.admin_reply}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="shrink-0">
-                      {prob.status !== 'RESOLVED' && (
+                      <div className="shrink-0 flex items-center gap-2">
+                        {!isResolved && (
+                          <button
+                            onClick={() => {
+                              setSelectedProblem(prob);
+                              setReplyModalOpen(true);
+                            }}
+                            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all cursor-pointer shadow-lg shadow-indigo-600/30 border-none flex items-center gap-2"
+                          >
+                            <LuMail size={14} /> Reply & Resolve
+                          </button>
+                        )}
                         <button
-                          onClick={() => {
-                            setSelectedProblem(prob);
-                            setReplyModalOpen(true);
-                          }}
-                          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all cursor-pointer shadow-lg shadow-indigo-600/30 border-none flex items-center gap-2"
+                          onClick={() => handleDeleteProblem(prob.id)}
+                          className="p-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1 bg-slate-800 text-slate-400 hover:bg-rose-500/20 hover:text-rose-400 border border-slate-700 hover:border-rose-500/30"
+                          title="Delete Ticket"
                         >
-                          <LuMail size={14} /> Reply & Resolve
+                          <LuTrash2 size={14} />
                         </button>
-                      )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 

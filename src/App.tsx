@@ -94,6 +94,7 @@ function App() {
           {/* Single Pages using standard Layout */}
           <Route path="/find-accommodation" element={<Layout><FindAccommodationPage /></Layout>} />
           <Route path="/contact-us" element={<Layout><ContactUsPage /></Layout>} />
+          <Route path="/contact" element={<Layout><ContactUsPage /></Layout>} />
           <Route path="/annex/:id" element={<Layout><AnnexDetailsPage /></Layout>} />
 
           {/* Post Advertiesment using SubLayout */}

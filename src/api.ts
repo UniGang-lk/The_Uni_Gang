@@ -1111,19 +1111,33 @@ export const api = {
     });
     if (!response.ok) throw new Error('Failed to fetch admin feedbacks');
     const data = await response.json();
-    return data.feedbacks || [];
+    const list = Array.isArray(data) ? data : data.feedbacks || [];
+    return list.map((f: any) => ({
+      ...f,
+      is_approved: f.is_approved !== undefined ? f.is_approved : f.status === 'Approved'
+    }));
   },
 
   updateAdminFeedbackStatus: async (id: string, is_approved: boolean, token: string): Promise<any> => {
+    const status = is_approved ? 'Approved' : 'Pending';
     const response = await fetch(`${BASE_URL}/api/support/admin/feedbacks/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({ is_approved })
+      body: JSON.stringify({ status, is_approved })
     });
     if (!response.ok) throw new Error('Failed to update feedback approval status');
+    return response.json();
+  },
+
+  deleteAdminFeedback: async (id: string, token: string): Promise<any> => {
+    const response = await fetch(`${BASE_URL}/api/support/admin/feedbacks/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to delete feedback');
     return response.json();
   },
 
@@ -1133,7 +1147,7 @@ export const api = {
     });
     if (!response.ok) throw new Error('Failed to fetch admin problem reports');
     const data = await response.json();
-    return data.problems || [];
+    return Array.isArray(data) ? data : data.problems || [];
   },
 
   replyAdminProblem: async (id: string, status: string, adminReply: string, token: string): Promise<any> => {
@@ -1143,9 +1157,18 @@ export const api = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: JSON.stringify({ status, adminReply })
+      body: JSON.stringify({ reply: adminReply, adminReply, status })
     });
     if (!response.ok) throw new Error('Failed to submit reply');
+    return response.json();
+  },
+
+  deleteAdminProblem: async (id: string, token: string): Promise<any> => {
+    const response = await fetch(`${BASE_URL}/api/support/admin/problems/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Failed to delete problem report');
     return response.json();
   },
 
