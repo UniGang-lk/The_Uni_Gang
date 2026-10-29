@@ -723,6 +723,18 @@
       - **Admin Dashboard Official Store Order Moderation ([AdminDashboard.tsx](file:///e:/The-Uni-Gang/Website/src/pages/admin/AdminDashboard.tsx), [api.ts](file:///e:/The-Uni-Gang/Website/src/api.ts)):**
         - Marketplace Tab එක තුළ Sub-Navigation switcher එකක් (`[Item Listings]` සහ `[Official Store Orders]`) එක් කිරීම.
         - Store Orders view එක හරහා customer delivery details, phone link, payment slip receipt preview, සහ 1-Click Status updates (`Process`, `Deliver`, `Cancel`) සම්පූර්ණයෙන්ම සක්‍රීය කිරීම.
+    - **📦 Round 75 Student Self-Listing Lifecycle Management & Bug Free Architecture:**
+      - **Listing Owner Direct Controls on Detail Page ([MarketItemDetailPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketItemDetailPage.tsx)):**
+        - Listing එක දමන ලද ශිෂ්‍යයා තමන්ගේම Product Detail page එකට ගිය විට `isOwner` controls සක්‍රීය කිරීම.
+        - **"🎉 Mark Sold" / "✅ Relist Item"** toggle button එක මගින් තමන්ගේ භාණ්ඩය විකිණී අවසන් වූ විට listing එක Sold කිරීමට හෝ නැවත Available කිරීමට ක්ෂණික පහසුකම.
+        - **"🗑️ Remove Item"** button එක මගින් confirmation සහිතව item එක ස්ථිරවම delete කර `/market` වෙත redirect වීම.
+        - Profile Listings view එකට සෘජු link එකක් සැපයීම.
+      - **Marketplace Hero Direct Access ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):**
+        - Marketplace Home hero banner එකෙහි "Post an Ad / Gig" button එකට සමගාමීව ශිෂ්‍යයින්ට තමන් දමා ඇති සියලුම listings බැලීමට **"My Listings"** navigation button එක එක් කිරීම.
+      - **Profile Deep-Linking & Rich Listing Modal ([Profile.tsx](file:///e:/The-Uni-Gang/Website/src/pages/profile/Profile.tsx)):**
+        - `/profile?tab=listings` සහ `/profile?tab=orders` deep-links හරහා අදාළ listings modal එක auto-open වීම.
+        - Modal එක තුළ `View` (Open detail page), `Mark Sold / Relist` (Toggle availability status), සහ `Delete Permanently` (Clean removal from state and DB) buttons සම්පූර්ණයෙන් සක්‍රීය කිරීම.
+      - **API Endpoint Mapping ([api.ts](file:///e:/The-Uni-Gang/Website/src/api.ts)):** `updateMyListingStatus` endpoint එක එක් කර seller හට status වෙනස් කිරීමේ හැකියාව සැපයීම.
     - **✅ Zero Build & Compile Errors:** `npx tsc -b` සහ `go build ./internal/controller/...` මගින් Website සහ Backend 100% clean, error-free සහ production-ready බව තහවුරු කරන ලදී.
 
 ---

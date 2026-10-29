@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuSearch, LuPlus, LuShoppingBag, LuBriefcase, LuShieldCheck,
@@ -529,20 +529,29 @@ const MarketplaceHome: React.FC = () => {
                 The exclusive marketplace for verified university students. Buy cheap gear, sell your old textbooks, or offer freelance services directly to your peers.
               </motion.p>
 
-              <motion.button
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3 }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handlePostAdClick}
-                className="group relative inline-flex items-center justify-center gap-3 bg-white text-slate-950 px-8 py-4 rounded-2xl font-black text-lg hover:bg-purple-50 transition-all overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.3)] w-full sm:w-auto"
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  <LuPlus className="w-6 h-6 text-purple-600" /> Post an Ad / Gig
-                </span>
-                <div className="absolute inset-0 bg-gradient-to-r from-white via-purple-100 to-white opacity-0 group-hover:opacity-100 transition-opacity" />
-              </motion.button>
+              <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+                <motion.button
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handlePostAdClick}
+                  className="group relative inline-flex items-center justify-center gap-3 bg-white text-slate-950 px-8 py-4 rounded-2xl font-black text-lg hover:bg-purple-50 transition-all overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.3)] w-full sm:w-auto cursor-pointer border-none"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    <LuPlus className="w-6 h-6 text-purple-600" /> Post an Ad / Gig
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-white via-purple-100 to-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                </motion.button>
+
+                <Link
+                  to="/profile?tab=listings"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-base border border-white/20 transition-all backdrop-blur-md w-full sm:w-auto text-center no-underline"
+                >
+                  <LuShoppingBag className="w-5 h-5 text-purple-300" /> My Listings
+                </Link>
+              </div>
             </div>
 
             {/* Right side floating graphics */}

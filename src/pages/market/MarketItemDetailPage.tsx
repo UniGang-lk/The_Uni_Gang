@@ -15,7 +15,8 @@ import {
   LuPlus,
   LuSend,
   LuChevronRight,
-  LuX
+  LuX,
+  LuTrash2
 } from 'react-icons/lu';
 import { formatDistanceToNow } from 'date-fns';
 import { api } from '../../api';
@@ -166,6 +167,30 @@ const MarketItemDetailPage: React.FC = () => {
     } catch (err) {
       console.error('Error sending message:', err);
       toast.error('Failed to send message.');
+    }
+  };
+
+  const handleOwnerDeleteListing = async () => {
+    if (!item?.id) return;
+    if (!window.confirm('Are you sure you want to permanently delete this listing? This action cannot be undone.')) return;
+    try {
+      await api.deleteListing(item.id);
+      toast.success('Marketplace listing removed successfully');
+      navigate('/market');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete listing');
+    }
+  };
+
+  const handleOwnerToggleStatus = async () => {
+    if (!item?.id) return;
+    const newStatus = item.status === 'AVAILABLE' ? 'SOLD' : 'AVAILABLE';
+    try {
+      await api.updateMyListingStatus(item.id, newStatus);
+      toast.success(newStatus === 'SOLD' ? 'Listing marked as Sold 🎉' : 'Listing marked as Available ✅');
+      setItem((prev: any) => ({ ...prev, status: newStatus }));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update listing status');
     }
   };
 
@@ -523,15 +548,47 @@ const MarketItemDetailPage: React.FC = () => {
                 ) : (
                   <>
                     {isOwner ? (
-                      <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200/60 dark:border-indigo-800 text-center">
-                        <span className="text-xs font-bold text-indigo-700 dark:text-indigo-300">
-                          This is your marketplace listing.
-                        </span>
+                      <div className="p-5 rounded-3xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/80 flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
+                            <LuShieldCheck className="w-4 h-4 text-indigo-500" />
+                            Your Listing Controls
+                          </span>
+                          <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                            item.status === 'AVAILABLE' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' :
+                            'bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30'
+                          }`}>
+                            {item.status}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 pt-1">
+                          <button
+                            type="button"
+                            onClick={handleOwnerToggleStatus}
+                            className={`py-3 px-3 rounded-xl font-bold text-xs transition-all cursor-pointer border-none flex items-center justify-center gap-1.5 ${
+                              item.status === 'AVAILABLE'
+                                ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-md shadow-amber-500/20'
+                                : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20'
+                            }`}
+                          >
+                            {item.status === 'AVAILABLE' ? '🎉 Mark Sold' : '✅ Relist Item'}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={handleOwnerDeleteListing}
+                            className="py-3 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500 hover:text-white text-rose-500 font-bold text-xs transition-all cursor-pointer border-none flex items-center justify-center gap-1.5"
+                          >
+                            <LuTrash2 className="w-4 h-4" /> Remove Item
+                          </button>
+                        </div>
+
                         <Link
-                          to="/market"
-                          className="mt-2 block text-xs font-black text-indigo-600 dark:text-indigo-400 hover:underline"
+                          to="/profile?tab=listings"
+                          className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline text-center block pt-1"
                         >
-                          Manage your listings on Marketplace &rarr;
+                          View & manage all your listings in Profile &rarr;
                         </Link>
                       </div>
                     ) : (

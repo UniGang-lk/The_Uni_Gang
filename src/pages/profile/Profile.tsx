@@ -526,6 +526,12 @@ const Profile = () => {
       } else if (type === 'annex') {
         setInboxTab('annex');
       }
+    } else if (tab === 'listings' || tab === 'market') {
+      setShowListingsModal(true);
+      fetchListings();
+    } else if (tab === 'orders') {
+      setShowOrdersModal(true);
+      fetchMyOrders();
     }
   }, [searchParams]);
 
@@ -538,6 +544,17 @@ const Profile = () => {
       console.error('Failed to load listings:', err);
     } finally {
       setLoadingListings(false);
+    }
+  };
+
+  const handleToggleListingStatus = async (listingId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'AVAILABLE' ? 'SOLD' : 'AVAILABLE';
+    try {
+      await api.updateMyListingStatus(listingId, newStatus);
+      toast.success(newStatus === 'SOLD' ? 'Listing marked as Sold 🎉' : 'Listing marked as Available ✅');
+      setMyListings(prev => prev.map(l => l.id === listingId ? { ...l, status: newStatus } : l));
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update listing status');
     }
   };
 
@@ -2685,13 +2702,38 @@ const Profile = () => {
                                       </div>
                                     </div>
                                   </div>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleDeleteListing(listing.id)}
-                                    className="w-full sm:w-auto p-3 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 rounded-xl transition-all cursor-pointer border-none flex items-center justify-center"
-                                  >
-                                    <LuTrash2 size={16} />
-                                  </button>
+                                    <div className="flex items-center gap-2 w-full sm:w-auto shrink-0 justify-end">
+                                      <Link
+                                        to={`/market/${listing.id}`}
+                                        className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all text-xs font-bold flex items-center gap-1.5 no-underline"
+                                        title="View Listing"
+                                      >
+                                        <LuEye size={15} />
+                                        <span className="hidden sm:inline">View</span>
+                                      </Link>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => handleToggleListingStatus(listing.id, listing.status)}
+                                        className={`px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border-none flex items-center gap-1 ${
+                                          listing.status === 'AVAILABLE'
+                                            ? 'bg-amber-500/10 hover:bg-amber-500 hover:text-white text-amber-500'
+                                            : 'bg-emerald-500/10 hover:bg-emerald-500 hover:text-white text-emerald-500'
+                                        }`}
+                                        title={listing.status === 'AVAILABLE' ? 'Mark as Sold' : 'Mark as Available'}
+                                      >
+                                        {listing.status === 'AVAILABLE' ? 'Mark Sold' : 'Relist'}
+                                      </button>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteListing(listing.id)}
+                                        className="p-2.5 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 rounded-xl transition-all cursor-pointer border-none flex items-center justify-center"
+                                        title="Delete Listing Permanently"
+                                      >
+                                        <LuTrash2 size={16} />
+                                      </button>
+                                    </div>
                                 </div>
                               );
                             })}

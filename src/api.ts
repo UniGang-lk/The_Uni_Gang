@@ -782,6 +782,24 @@ export const api = {
     return response.json();
   },
 
+  updateMyListingStatus: async (id: string, status: string): Promise<any> => {
+    const token = localStorage.getItem('userToken');
+    const formData = new FormData();
+    formData.append('status', status);
+    const response = await fetch(`${BASE_URL}/api/market/${id}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: formData
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to update listing status');
+    }
+    return response.json();
+  },
+
   rateListing: async (id: string, rating: number): Promise<any> => {
     const token = localStorage.getItem('userToken');
     const response = await fetch(`${BASE_URL}/api/market/${id}/rate`, {
