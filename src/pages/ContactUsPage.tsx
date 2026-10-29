@@ -86,10 +86,12 @@ const ContactUsPage = () => {
           <h2 className="text-2xl font-bold text-slate-800 dark:text-white mb-6">Send us a message</h2>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Your Name</label>
+              <label htmlFor="contactus-name" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Your Name</label>
               <input
+                id="contactus-name"
                 type="text"
                 maxLength={255}
+                aria-label="Your Name"
                 className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-none text-slate-800 dark:text-white"
                 placeholder="John Doe"
                 value={name}
@@ -98,10 +100,12 @@ const ContactUsPage = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Email Address</label>
+              <label htmlFor="contactus-email" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Email Address</label>
               <input
+                id="contactus-email"
                 type="email"
                 maxLength={255}
+                aria-label="Email Address"
                 className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-none text-slate-800 dark:text-white"
                 placeholder="john@example.com"
                 value={email}
@@ -110,9 +114,11 @@ const ContactUsPage = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Subject / Inquiry Type</label>
+              <label htmlFor="contactus-inquiry-type" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Subject / Inquiry Type</label>
               <select
+                id="contactus-inquiry-type"
                 value={inquiryType}
+                aria-label="Subject or Inquiry Type"
                 onChange={(e) => setInquiryType(e.target.value)}
                 className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-none text-slate-800 dark:text-white cursor-pointer"
               >
@@ -124,10 +130,12 @@ const ContactUsPage = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Message</label>
+              <label htmlFor="contactus-message" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Message</label>
               <textarea
+                id="contactus-message"
                 rows={5}
                 maxLength={3000}
+                aria-label="Support Message"
                 className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:bg-white dark:focus:bg-slate-800 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 transition-all outline-none text-slate-800 dark:text-white"
                 placeholder="How can we help you?"
                 value={message}

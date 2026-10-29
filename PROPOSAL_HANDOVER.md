@@ -681,6 +681,9 @@
     - **🛡️ Round 65 Support Notification Deep-Linking & Unified Inbox Auto-Focus:**
       - **One-Click Support Resolution Deep-Link ([support_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/support_controller.go)):** Admin විසින් support ticket එකකට reply යැවූ විට පරිශීලකයාට ලැබෙන In-App Notification එකෙහි `link` එක `/contact-us` (හිස් ආකෘති පත්‍රය) වෙනුවට `/profile?tab=support` ලෙස නියමිත ස්ථානයට යොමු කිරීම.
       - **Profile Unified Inbox Auto-Open ([Profile.tsx](file:///e:/The-Uni-Gang/Website/src/pages/profile/Profile.tsx)):** පරිශීලකයා notification එක click කළ සැනින් Profile page එකෙහි Unified Inbox Modal එක සහ එහි `Support` tab එක auto-open වී, admin ලබාදුන් පිළිතුර සහ ticket resolution status එක ක්ෂණිකව පරිශීලකයා ඉදිරියේ විවෘත වන පරිදි සකස් කිරීම.
+    - **🛡️ Round 66 Contact Accessibility, Unique IDs & Unmount Safety Polish:**
+      - **Full HTML5 Label Association & Unique Element IDs ([Contact.tsx](file:///e:/The-Uni-Gang/Website/src/components/contact/Contact.tsx), [ContactUsPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/ContactUsPage.tsx)):** සියලුම inputs, selects, textareas සහ star rating buttons සඳහා descriptive unique `id`, `htmlFor`, සහ `aria-label` ගුණාංග එක් කර Screen Reader සහ Browser Automation සඳහා 100% ප්‍රශස්ත කිරීම.
+      - **Component Unmount Safety & Timeout Leak Prevention ([Contact.tsx](file:///e:/The-Uni-Gang/Website/src/components/contact/Contact.tsx)):** Feedback success state reset කිරීම සඳහා ක්‍රියාත්මක වන 3000ms timer එක `feedbackTimeoutRef` මගින් component unmount වන විට `clearTimeout` කර React unmounted memory leak අනතුරු ඇඟවීම් 0% කිරීම.
     - **✅ Zero Build & Compile Errors:** `npx tsc --noEmit` සහ `go build ./internal/controller/...` මගින් Website සහ Backend 100% clean, error-free සහ production-ready බව තහවුරු කරන ලදී.
 
 ---

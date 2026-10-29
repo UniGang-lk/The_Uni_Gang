@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LuSend, LuPhone, LuMail, LuMapPin, LuMessageSquareQuote, LuStar, LuChevronDown, LuUser, LuCopy, LuCheck, LuExternalLink } from 'react-icons/lu';
 import { FaWhatsapp } from 'react-icons/fa6';
@@ -95,6 +95,7 @@ const Contact = () => {
     const [feedbackSuccess, setFeedbackSuccess] = useState(false);
     const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false);
     const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+    const feedbackTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Dynamic testimonials state (Real approved client feedbacks only)
     const [activeFeedbacks, setActiveFeedbacks] = useState<Feedback[]>([]);
@@ -115,11 +116,14 @@ const Contact = () => {
         }
     }, []);
 
-    // Cleanup avatar preview URL
+    // Cleanup avatar preview URL and timeout
     useEffect(() => {
         return () => {
             if (avatarPreview && avatarPreview.startsWith('blob:')) {
                 URL.revokeObjectURL(avatarPreview);
+            }
+            if (feedbackTimeoutRef.current) {
+                clearTimeout(feedbackTimeoutRef.current);
             }
         };
     }, [avatarPreview]);
@@ -224,7 +228,7 @@ const Contact = () => {
 
             setFeedbackSuccess(true);
             toast.success("Feedback posted successfully!");
-            setTimeout(() => {
+            feedbackTimeoutRef.current = setTimeout(() => {
                 setFeedbackSuccess(false);
                 if (!localStorage.getItem('userName')) setFeedbackName('');
                 setFeedbackInstitution('');
@@ -413,14 +417,14 @@ const Contact = () => {
                                         <form onSubmit={(e) => { e.preventDefault(); handleSendInquiry(); }} className="flex flex-col gap-4 flex-grow">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                                                 <div className="group">
-                                                    <input required maxLength={255} value={name} onChange={(e) => setName(e.target.value)} type="text" placeholder="Full Name" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
+                                                    <input id="contact-name" aria-label="Full Name" required maxLength={255} value={name} onChange={(e) => setName(e.target.value)} type="text" placeholder="Full Name" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
                                                 </div>
                                                 <div className="group">
-                                                    <input required maxLength={255} value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Email Address" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
+                                                    <input id="contact-email" aria-label="Email Address" required maxLength={255} value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="Email Address" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
                                                 </div>
                                             </div>
                                             <div className="relative group mb-5">
-                                                <select required value={inquiryType} onChange={(e) => setInquiryType(e.target.value)} className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none appearance-none cursor-pointer shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-700 dark:text-slate-200">
+                                                <select id="contact-inquiry-type" aria-label="Inquiry or Problem Type" required value={inquiryType} onChange={(e) => setInquiryType(e.target.value)} className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none appearance-none cursor-pointer shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-700 dark:text-slate-200">
                                                     <option disabled value="" className="dark:bg-slate-900">Select Inquiry or Problem Type</option>
                                                     <option value="General Inquiry" className="dark:bg-slate-900">General Inquiry</option>
                                                     <option value="Report a Bug / Problem" className="dark:bg-slate-900">Report a Bug / Problem</option>
@@ -431,7 +435,7 @@ const Contact = () => {
                                                 <LuChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-focus-within:text-primary transition-colors" />
                                             </div>
                                             <div className="group mb-6">
-                                                <textarea required maxLength={3000} value={message} onChange={(e) => setMessage(e.target.value)} rows={5} placeholder="Tell us about your problem, question, or request..." className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
+                                                <textarea id="contact-message" aria-label="Inquiry Message" required maxLength={3000} value={message} onChange={(e) => setMessage(e.target.value)} rows={5} placeholder="Tell us about your problem, question, or request..." className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
                                             </div>
                                             <motion.button
                                                 type="submit"
@@ -446,9 +450,11 @@ const Contact = () => {
                                     ) : (
                                         <form onSubmit={(e) => { e.preventDefault(); handleSendFeedback(); }} className="flex flex-col gap-4 flex-grow">
                                             <div className="flex items-center gap-6 p-6 rounded-2xl bg-slate-100/50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50">
-                                                <label className="relative cursor-pointer group">
+                                                <label htmlFor="feedback-avatar-upload" className="relative cursor-pointer group">
                                                     <input
+                                                        id="feedback-avatar-upload"
                                                         type="file"
+                                                        aria-label="Upload Profile Avatar"
                                                         accept="image/*"
                                                         className="sr-only"
                                                         onChange={(e) => {
@@ -485,10 +491,10 @@ const Contact = () => {
                                             </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div className="group">
-                                                    <input required maxLength={255} value={feedbackName} onChange={(e) => setFeedbackName(e.target.value)} type="text" placeholder="Your Name" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-[#E91E63] focus:ring-4 focus:ring-[#E91E63]/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
+                                                    <input id="feedback-name" aria-label="Your Name" required maxLength={255} value={feedbackName} onChange={(e) => setFeedbackName(e.target.value)} type="text" placeholder="Your Name" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-[#E91E63] focus:ring-4 focus:ring-[#E91E63]/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
                                                 </div>
                                                 <div className="group">
-                                                    <input maxLength={255} value={feedbackInstitution} onChange={(e) => setFeedbackInstitution(e.target.value)} type="text" placeholder="Club / University" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-[#E91E63] focus:ring-4 focus:ring-[#E91E63]/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
+                                                    <input id="feedback-institution" aria-label="Club or University" maxLength={255} value={feedbackInstitution} onChange={(e) => setFeedbackInstitution(e.target.value)} type="text" placeholder="Club / University" className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-[#E91E63] focus:ring-4 focus:ring-[#E91E63]/10 outline-none transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
                                                 </div>
                                             </div>
                                             <div className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-slate-100/50 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/50 shadow-sm relative overflow-hidden group">
@@ -499,6 +505,7 @@ const Contact = () => {
                                                         <motion.button
                                                             key={i}
                                                             type="button"
+                                                            aria-label={`Rate ${i} of 5 stars`}
                                                             whileHover={{ scale: 1.25, rotate: 10 }}
                                                             whileTap={{ scale: 0.9 }}
                                                             onClick={() => setRating(i)}
@@ -527,7 +534,7 @@ const Contact = () => {
                                                     </motion.p>
                                                 </AnimatePresence>
                                             </div>
-                                            <textarea required maxLength={3000} value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} rows={3} placeholder="Tell your Feedback..." className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-[#E91E63] focus:ring-4 focus:ring-[#E91E63]/10 outline-none resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
+                                            <textarea id="feedback-comment" aria-label="Feedback Review Comment" required maxLength={3000} value={feedbackText} onChange={(e) => setFeedbackText(e.target.value)} rows={3} placeholder="Tell your Feedback..." className="w-full px-6 py-4 rounded-[1.25rem] text-sm font-semibold bg-slate-100/50 dark:bg-slate-800/40 backdrop-blur-md border-[1.5px] border-slate-200 dark:border-slate-800 focus:border-[#E91E63] focus:ring-4 focus:ring-[#E91E63]/10 outline-none resize-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] group-hover:bg-white/70 dark:group-hover:bg-slate-800/70 text-slate-800 dark:text-slate-100 placeholder:text-slate-400" />
                                             <motion.button
                                                 type="submit"
                                                 disabled={isSubmittingFeedback}
