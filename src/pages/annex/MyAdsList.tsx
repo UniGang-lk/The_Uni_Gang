@@ -79,12 +79,14 @@ const MyAdsList: React.FC<MyAdsListProps> = ({ ads, onEdit, onDelete }) => {
       {ads.map((ad, index) => {
         const images = Array.isArray(ad.images)
           ? ad.images.map((img: any) => {
-              if (typeof img === 'object' && img !== null && img.imageUrl) {
-                return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${img.imageUrl}`;
+              const url = typeof img === 'object' && img !== null ? (img.imageUrl || img.url) : img;
+              if (typeof url === 'string') {
+                if (url.startsWith('http')) return url;
+                return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${url}`;
               }
-              return img;
+              return url || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800';
             })
-          : (ad.images ? [ad.images] : []);
+          : (ad.images ? [ad.images] : ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800']);
         const currentIndex = currentImageIndices[ad.id] || 0;
 
         return (
