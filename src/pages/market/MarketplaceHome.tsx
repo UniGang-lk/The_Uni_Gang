@@ -266,6 +266,17 @@ const MarketplaceHome: React.FC = () => {
   };
 
   useEffect(() => {
+    const currentUrlType = searchParams.get('type');
+    if (currentUrlType && validFilters.includes(currentUrlType.toUpperCase())) {
+      if (filter !== currentUrlType.toUpperCase()) {
+        setFilter(currentUrlType.toUpperCase() as any);
+      }
+    } else if (!currentUrlType && filter !== 'All') {
+      setFilter('All');
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
     setCurrentPage(1);
     fetchItems();
   }, [filter]);
