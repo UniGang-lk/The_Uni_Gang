@@ -48,9 +48,9 @@ const footerColumns = [
 ];
 
 const socialLinks = [
-  { icon: <FaFacebook size={16} />, href: '#', label: 'Facebook', color: 'hover:bg-blue-600' },
-  { icon: <FaInstagram size={16} />, href: '#', label: 'Instagram', color: 'hover:bg-pink-600' },
-  { icon: <FaYoutube size={16} />, href: '#', label: 'YouTube', color: 'hover:bg-red-600' },
+  { icon: <FaFacebook size={16} />, href: 'https://facebook.com', label: 'Facebook', color: 'hover:bg-blue-600' },
+  { icon: <FaInstagram size={16} />, href: 'https://instagram.com', label: 'Instagram', color: 'hover:bg-pink-600' },
+  { icon: <FaYoutube size={16} />, href: 'https://youtube.com', label: 'YouTube', color: 'hover:bg-red-600' },
   { icon: <FaWhatsapp size={16} />, href: 'https://wa.me/94724478148', label: 'WhatsApp', color: 'hover:bg-emerald-600' },
 ];
 
