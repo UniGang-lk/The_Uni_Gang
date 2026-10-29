@@ -60,7 +60,8 @@ const PostAdPage = () => {
 
   const handleAuthSuccess = () => {
     setIsLoggedIn(true);
-    navigate('/');
+    setCurrentView('postAdForm');
+    fetchMyAds();
   };
 
   const handleAnnexFormSubmit = async (adData: any, isEditing: boolean) => {

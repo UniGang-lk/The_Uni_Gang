@@ -13,6 +13,16 @@ import AdNativeFeed from "../../components/advertise/AdNativeFeed";
 import SEO from "../../components/SEO";
 import VerifiedBadge from "../../components/ui/VerifiedBadge";
 
+const escapeHtml = (str: string) => {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+};
+
 // Dynamic Leaflet map rendering component with Proximity Radius Circle overlay
 const LeafletListMap = ({ items, centerUniId, maxDistance }: { items: any[], centerUniId: string, maxDistance: string }) => {
     const [mapReady, setMapReady] = useState(false);
@@ -103,8 +113,8 @@ const LeafletListMap = ({ items, centerUniId, maxDistance }: { items: any[], cen
                     marker.bindPopup(`
                         <div style="font-family:sans-serif; padding:6px; max-width:220px;">
                             <span style="font-size:9px; font-weight:bold; background:#dbeafe; color:#1e40af; padding:2px 6px; border-radius:10px; text-transform:uppercase;">${item.listing_type === 'ROOMMATE_WANTED' ? 'Roommate Finder' : 'Landlord Annex'}</span>
-                            <h4 style="margin:6px 0 4px 0; color:#0f172a; font-weight:bold; font-size:13px; line-height:1.2;">${item.title}</h4>
-                            <p style="margin:0 0 4px 0; font-size:10px; color:#64748b;">${item.address}</p>
+                            <h4 style="margin:6px 0 4px 0; color:#0f172a; font-weight:bold; font-size:13px; line-height:1.2;">${escapeHtml(item.title)}</h4>
+                            <p style="margin:0 0 4px 0; font-size:10px; color:#64748b;">${escapeHtml(item.address)}</p>
                             <p style="margin:0 0 6px 0; font-size:10px; font-weight:bold; color:#2563eb;">${distanceStr}</p>
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; pt:6px; border-top:1px solid #f1f5f9;">
                                 <span style="font-weight:900; color:#1e40af; font-size:13px;">Rs. ${price}<span style="font-size:9px; color:#64748b; font-weight:normal;">/mo</span></span>

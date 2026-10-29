@@ -7,6 +7,7 @@ import {
   LuChevronLeft, LuMapPin, LuGraduationCap, LuPhone, LuCamera,
   LuCalendar, LuBadgePercent, LuInfo, LuHeart
 } from 'react-icons/lu';
+import { FaWhatsapp } from 'react-icons/fa6';
 import SEO from '../../components/SEO';
 import VerifiedBadge from '../../components/ui/VerifiedBadge';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
@@ -541,13 +542,26 @@ const AnnexDetailsPage = () => {
                   </div>
                 </div>
                 {(annex.owner?.phone || annex.contactPhone) ? (
-                  <a
-                    href={`tel:${annex.owner?.phone || annex.contactPhone}`}
-                    className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors no-underline cursor-pointer"
-                  >
-                    <LuPhone size={14} className="text-blue-600" />
-                    <span>Call Landlord</span>
-                  </a>
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={`tel:${annex.owner?.phone || annex.contactPhone}`}
+                      className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 px-3 py-1.5 rounded-xl border border-blue-200 dark:border-blue-800 transition-colors no-underline cursor-pointer"
+                      title="Direct Voice Call"
+                    >
+                      <LuPhone size={14} className="text-blue-600" />
+                      <span>Call</span>
+                    </a>
+                    <a
+                      href={`https://wa.me/${(annex.owner?.phone || annex.contactPhone).replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi! I'm interested in your Annex listing "${annex.title}" on The Uni Gang.`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/40 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800 transition-colors no-underline cursor-pointer"
+                      title="Chat on WhatsApp"
+                    >
+                      <FaWhatsapp size={14} className="text-emerald-600" />
+                      <span>WhatsApp</span>
+                    </a>
+                  </div>
                 ) : (
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
                     <LuPhone size={14} className="text-blue-600" />

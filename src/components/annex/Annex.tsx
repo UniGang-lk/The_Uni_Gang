@@ -220,7 +220,7 @@ const Annex = () => {
                 Find Accommodations <LuArrowRight size={14} />
               </button>
               <button
-                onClick={() => window.location.href = '/post-ad'}
+                onClick={() => navigate('/post-ad')}
                 className="py-4 px-6 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-black uppercase tracking-widest text-xs rounded-2xl active:scale-[0.98] transition-all border-none cursor-pointer"
               >
                 List Your Property
