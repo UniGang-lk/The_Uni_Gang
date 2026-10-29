@@ -509,9 +509,12 @@ const Profile = () => {
     if (tab === 'services') {
       setActiveProfileTab('events');
       setShowServicesModal(true);
-    } else if (tab === 'inbox') {
+    } else if (tab === 'inbox' || tab === 'support') {
       setShowInboxModal(true);
-      if (type === 'event') {
+      if (tab === 'support' || type === 'support') {
+        setInboxTab('support');
+        fetchSupportProblems();
+      } else if (type === 'event') {
         setInboxTab('events');
         fetchEventChats().then(() => {
           if (chatId) {
