@@ -1399,7 +1399,7 @@ const MarketplaceHome: React.FC = () => {
             }`}
         >
           <LuShoppingBag className="w-7 h-7" />
-          <span className="absolute -top-1.5 -right-1.5 bg-red-550 border-2 border-white dark:border-slate-950 text-white text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center shadow-md animate-pulse">
+          <span className="absolute -top-1.5 -right-1.5 bg-red-500 border-2 border-white dark:border-slate-950 text-white text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center shadow-md animate-pulse">
             {cart.reduce((sum, item) => sum + item.quantity, 0)}
           </span>
         </motion.button>
@@ -1415,7 +1415,7 @@ const MarketplaceHome: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsCartOpen(false)}
-              className="fixed inset-0 bg-slate-955/60 z-[999] backdrop-blur-xs"
+              className="fixed inset-0 bg-slate-950/60 z-[999] backdrop-blur-sm"
             />
             {/* Drawer */}
             <motion.div
@@ -1426,7 +1426,7 @@ const MarketplaceHome: React.FC = () => {
               className="fixed top-0 right-0 h-screen w-full max-w-md bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-white/10 shadow-2xl z-[1000] flex flex-col transition-colors duration-500"
             >
               {/* Header */}
-              <div className="p-6 border-b border-slate-150 dark:border-white/5 flex items-center justify-between">
+              <div className="p-6 border-b border-slate-200 dark:border-white/5 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <LuShoppingBag className="w-5 h-5 text-amber-500" />
                   <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-wider">Company Store Cart</h3>
@@ -1442,7 +1442,7 @@ const MarketplaceHome: React.FC = () => {
                   )}
                   <button
                     onClick={() => setIsCartOpen(false)}
-                    className="p-2 rounded-full bg-slate-105 dark:bg-slate-800 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white cursor-pointer border-none"
+                    className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-white cursor-pointer border-none"
                   >
                     <LuX className="w-4 h-4" />
                   </button>
@@ -1457,7 +1457,7 @@ const MarketplaceHome: React.FC = () => {
                       <LuShoppingBag className="w-8 h-8 text-slate-400" />
                     </div>
                     <h4 className="text-base font-bold text-slate-900 dark:text-white mb-1">Your cart is empty</h4>
-                    <p className="text-xs text-slate-505 dark:text-slate-400 mb-6 max-w-[200px]">Add graduation bouquets, keytags, or souvenirs from the store.</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 max-w-[200px]">Add graduation bouquets, keytags, or souvenirs from the store.</p>
                     <button
                       onClick={() => {
                         setIsCartOpen(false);
@@ -1473,7 +1473,7 @@ const MarketplaceHome: React.FC = () => {
                   <>
                     <div className="flex-1 space-y-4">
                       {cart.map((item) => (
-                        <div key={item.id} className="flex gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/30 border border-slate-150 dark:border-white/5 transition-all">
+                        <div key={item.id} className="flex gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/30 border border-slate-200 dark:border-white/5 transition-all">
                           {item.image ? (
                             <img 
                               src={
@@ -1490,14 +1490,14 @@ const MarketplaceHome: React.FC = () => {
                           <div className="min-w-0 flex-1 flex flex-col justify-between">
                             <div>
                               <h4 className="text-sm font-bold text-slate-900 dark:text-white truncate pr-2">{item.title}</h4>
-                              <p className="text-xs font-extrabold text-indigo-650 dark:text-indigo-400 mt-0.5">Rs. {item.price.toLocaleString()}</p>
+                              <p className="text-xs font-extrabold text-indigo-600 dark:text-indigo-400 mt-0.5">Rs. {item.price.toLocaleString()}</p>
                             </div>
                             <div className="flex items-center justify-between mt-2">
                               <div className="flex items-center gap-2">
                                 <button
                                   type="button"
                                   onClick={() => updateCartQuantity(item.id, item.quantity - 1)}
-                                  className="w-7 h-7 rounded-lg bg-slate-105 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold border-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-750 transition-colors animate-pulse-once"
+                                  className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold border-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors animate-pulse-once"
                                 >
                                   -
                                 </button>
@@ -1505,7 +1505,7 @@ const MarketplaceHome: React.FC = () => {
                                 <button
                                   type="button"
                                   onClick={() => updateCartQuantity(item.id, item.quantity + 1)}
-                                  className="w-7 h-7 rounded-lg bg-slate-105 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold border-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-750 transition-colors animate-pulse-once"
+                                  className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold border-none cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors animate-pulse-once"
                                 >
                                   +
                                 </button>
@@ -1526,7 +1526,7 @@ const MarketplaceHome: React.FC = () => {
                     <div className="border-t border-slate-100 dark:border-white/5 pt-4 space-y-4">
                       <div className="flex justify-between items-center text-slate-900 dark:text-white">
                         <span className="text-sm font-semibold">Subtotal</span>
-                        <span className="text-lg font-black text-indigo-650 dark:text-indigo-400">
+                        <span className="text-lg font-black text-indigo-600 dark:text-indigo-400">
                           Rs. {cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString()}
                         </span>
                       </div>
@@ -1552,7 +1552,7 @@ const MarketplaceHome: React.FC = () => {
                       </button>
 
                       {/* Items Summary list */}
-                      <div className="p-4 bg-slate-50 dark:bg-slate-950/30 border border-slate-150 dark:border-white/5 rounded-2xl">
+                      <div className="p-4 bg-slate-50 dark:bg-slate-950/30 border border-slate-200 dark:border-white/5 rounded-2xl">
                         <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Order Summary</h4>
                         <div className="max-h-24 overflow-y-auto space-y-1.5 custom-scrollbar text-xs">
                           {cart.map(item => (
@@ -1604,7 +1604,7 @@ const MarketplaceHome: React.FC = () => {
                               onClick={() => setCartPayment(pay.id as any)}
                               className={`py-3 rounded-xl text-[10px] font-black uppercase border transition-all cursor-pointer ${cartPayment === pay.id
                                 ? 'bg-amber-500/10 border-amber-500 text-amber-500'
-                                : 'bg-transparent border-gray-200 dark:border-white/5 text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                                : 'bg-transparent border-gray-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                                 }`}
                             >
                               {pay.label}
@@ -1627,7 +1627,7 @@ const MarketplaceHome: React.FC = () => {
                           </div>
 
                           {uploadedReceipt ? (
-                            <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 p-3 bg-slate-50 dark:bg-slate-955/30 flex items-center gap-3">
+                            <div className="relative rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 p-3 bg-slate-50 dark:bg-slate-950/30 flex items-center gap-3">
                               {uploadedReceiptUrl && (
                                 <img src={uploadedReceiptUrl} alt="Receipt Preview" className="w-12 h-12 rounded-lg object-cover border border-slate-200 dark:border-white/10" />
                               )}
