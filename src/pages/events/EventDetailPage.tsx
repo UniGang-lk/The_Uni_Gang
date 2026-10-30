@@ -5,7 +5,7 @@ import {
   LuCalendar, LuMapPin, LuGraduationCap,
   LuTicket, LuZap, LuShare2, LuSparkles, LuCheck, LuCloudUpload, LuCircleAlert,
   LuClock, LuMessageCircle, LuArrowRight, LuShieldCheck, LuHeart, LuCamera,
-  LuStar, LuInfo, LuPhone, LuUsers, LuUser, LuExternalLink
+  LuStar, LuInfo, LuPhone, LuUsers, LuUser, LuExternalLink, LuTrash
 } from "react-icons/lu";
 import { FaWhatsapp } from 'react-icons/fa6';
 import confetti from 'canvas-confetti';
@@ -244,7 +244,13 @@ const EventDetailPage: React.FC = () => {
 
   const handleAddToCalendar = () => {
     if (!event) return;
-    const startDate = new Date(event.date);
+    let startDate: Date;
+    if (event.time && /^\d{1,2}:\d{2}/.test(event.time.trim())) {
+      const parsedTime = new Date(`${event.date} ${event.time}`);
+      startDate = !isNaN(parsedTime.getTime()) ? parsedTime : new Date(event.date);
+    } else {
+      startDate = new Date(event.date);
+    }
     const isValidDate = !isNaN(startDate.getTime());
     const startStr = isValidDate
       ? startDate.toISOString().replace(/-|:|\.\d\d\d/g, "")
@@ -260,6 +266,20 @@ const EventDetailPage: React.FC = () => {
 
     const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}&location=${location}`;
     window.open(googleCalUrl, '_blank');
+  };
+
+  const handleDeleteEvent = async () => {
+    if (!event) return;
+    const confirmDelete = window.confirm(`Are you sure you want to cancel and delete "${event.title}"? This cannot be undone.`);
+    if (!confirmDelete) return;
+
+    try {
+      await api.deleteEvent(String(event.id));
+      toast.success("Event deleted successfully.");
+      navigate('/event-list');
+    } catch (err: any) {
+      toast.error(err.message || "Failed to delete event.");
+    }
   };
 
   const exportToCSV = () => {
@@ -586,16 +606,25 @@ const EventDetailPage: React.FC = () => {
                   </button>
 
                   {isHost ? (
-                    <button
-                      onClick={() => setShowDashboard(!showDashboard)}
-                      className={`flex-1 py-4 px-6 rounded-2xl font-black uppercase tracking-wider text-xs transition-all border shadow-md flex items-center justify-center gap-2 cursor-pointer ${
-                        showDashboard
-                          ? 'bg-slate-900 border-slate-900 text-white dark:bg-white dark:text-slate-900'
-                          : 'bg-amber-500 border-amber-500 text-white hover:bg-amber-600'
-                      }`}
-                    >
-                      <LuSparkles size={16} /> {showDashboard ? 'Close Dashboard' : 'Manage Attendee Roster'}
-                    </button>
+                    <div className="flex-1 flex items-center gap-2">
+                      <button
+                        onClick={() => setShowDashboard(!showDashboard)}
+                        className={`flex-1 py-4 px-4 rounded-2xl font-black uppercase tracking-wider text-xs transition-all border shadow-md flex items-center justify-center gap-2 cursor-pointer ${
+                          showDashboard
+                            ? 'bg-slate-900 border-slate-900 text-white dark:bg-white dark:text-slate-900'
+                            : 'bg-amber-500 border-amber-500 text-white hover:bg-amber-600'
+                        }`}
+                      >
+                        <LuSparkles size={16} /> {showDashboard ? 'Close Roster' : 'Manage Roster'}
+                      </button>
+                      <button
+                        onClick={handleDeleteEvent}
+                        className="py-4 px-4 rounded-2xl font-black uppercase tracking-wider text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-950/40 dark:border-rose-800 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                        title="Cancel & Delete Event"
+                      >
+                        <LuTrash size={16} /> Delete
+                      </button>
+                    </div>
                   ) : (
                     <button
                       onClick={handleRsvp}

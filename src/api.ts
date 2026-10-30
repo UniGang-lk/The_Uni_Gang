@@ -493,11 +493,12 @@ export const api = {
     return Array.isArray(data) ? data : (data.data ?? []);
   },
 
-  deleteEvent: async (id: string, token: string): Promise<any> => {
+  deleteEvent: async (id: string, token?: string): Promise<any> => {
+    const authToken = token || localStorage.getItem('userToken') || localStorage.getItem('userEmail') || '';
     const response = await fetch(`${BASE_URL}/api/events/${id}`, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${authToken}`
       }
     });
     if (!response.ok) {
