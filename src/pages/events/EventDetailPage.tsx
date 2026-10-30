@@ -443,14 +443,24 @@ const EventDetailPage: React.FC = () => {
                         ? `94${cleanNumber.substring(1)}`
                         : cleanNumber;
                       return (
-                        <a
-                          href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Hi, I'm reaching out regarding your event "${event.title}" on The Uni Gang!`)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer text-decoration-none"
-                        >
-                          <FaWhatsapp size={16} /> Contact via WhatsApp ({event.contact})
-                        </a>
+                        <div className="grid grid-cols-2 gap-2">
+                          <a
+                            href={`tel:${cleanNumber}`}
+                            className="py-3 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer text-decoration-none truncate"
+                            title={`Call ${event.contact}`}
+                          >
+                            <LuPhone size={15} /> Call Now
+                          </a>
+                          <a
+                            href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Hi, I'm reaching out regarding your event "${event.title}" on The Uni Gang!`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="py-3 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer text-decoration-none truncate"
+                            title={`WhatsApp ${event.contact}`}
+                          >
+                            <FaWhatsapp size={15} /> WhatsApp
+                          </a>
+                        </div>
                       );
                     })()}
 
