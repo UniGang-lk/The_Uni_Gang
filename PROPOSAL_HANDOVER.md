@@ -745,6 +745,9 @@
       - **Type-Safe Seller Identification ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx) & [MarketItemDetailPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketItemDetailPage.tsx)):** Seller ID comparison සියල්ල `String(item.seller_id) === String(userId)` ලෙස type-safe කර integer/string type mismatch නිසා සිදුවිය හැකි self-rating හෝ self-chatting bypass වැළැක්වීම.
       - **Robust Chat Partner Fallbacks ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):** Seller profile partial වන අවස්ථාවලදී UI crash නොවන සේ `const partner = item.seller || { name: 'Seller' }` safe fallback යෙදීම.
       - **100% Zero-Bug Verification:** `npx tsc -b` (Exit 0) සහ `go build ./internal/controller/...` (Exit 0) මගින් frontend සහ backend සම්පූර්ණයෙන්ම තහවුරු කර git repositories (`master` & `main`) වෙත push කරන ලදී.
+    - **📱 Round 78 WhatsApp Direct Seller Actions & Quick Modal Controls:**
+      - **Direct WhatsApp Seller Action ([MarketItemDetailPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketItemDetailPage.tsx) & [MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):** විකුණුම්කරුගේ profile එකෙහි phone number එකක් ඇත්නම්, In-App Chat එකට අමතරව pre-filled message එකක් ("Hi [Seller], I saw your listing on The Uni Gang Marketplace...") සහිතව ක්ෂණික direct WhatsApp button එක detail page එකට සහ quick preview modal එකට එක් කරන ලදී.
+      - **Owner Controls in Quick Modal ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):** Listing එක අයිති පරිශීලකයා Marketplace grid එකෙන් තම item එක ක්ලික් කළ විට "Contact Seller" (which previously alerted "This is your own listing") වෙනුවට සෘජු "Your Listing Controls" badge එක සහ "Manage & View Details" button එක දිස්වන සේ UX එක පරිපූර්ණ කරන ලදී.
 
 ---
 
