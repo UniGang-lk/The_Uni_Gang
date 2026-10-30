@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
 import {
   LuThumbsUp,
@@ -231,11 +231,33 @@ const BlogDetail: React.FC = () => {
     }
   };
 
+  const navigate = useNavigate();
+
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     toast.success('Story link copied to clipboard!', {
       style: { borderRadius: '16px', background: '#1e293b', color: '#fff' }
     });
+  };
+
+  const handleDeleteStory = async () => {
+    if (!blog) return;
+    const confirmDelete = window.confirm(`Are you sure you want to delete "${blog.title}"? This action cannot be undone.`);
+    if (!confirmDelete) return;
+
+    const token = localStorage.getItem('userToken');
+    if (!token) {
+      toast.error('Please login to delete this story.');
+      return;
+    }
+
+    try {
+      await api.deleteBlog(blog.id, token);
+      toast.success('Story deleted successfully.');
+      navigate('/blogs');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete story.');
+    }
   };
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
@@ -652,18 +674,33 @@ const BlogDetail: React.FC = () => {
                           <h4 className="text-base font-bold text-slate-900 dark:text-white">{blog.author?.name}</h4>
                         </div>
                         {blog.author?.id && (
-                          isAuthor ? (
+                          (isAuthor || isAdmin) ? (
                             <div className="flex items-center gap-2 w-fit mx-auto sm:mx-0">
-                              <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60">
-                                You (Author)
-                              </span>
+                              {isAuthor && (
+                                <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60">
+                                  You (Author)
+                                </span>
+                              )}
+                              {isAdmin && !isAuthor && (
+                                <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-200/60 dark:border-purple-800/60">
+                                  Admin
+                                </span>
+                              )}
                               <Link
                                 to={`/blogs/submit?edit=${blog.slug || blog.id}`}
                                 className="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-blue-600 dark:hover:bg-blue-500 dark:hover:text-white transition-all shadow-sm"
                               >
                                 <LuPenLine className="w-3.5 h-3.5" />
-                                <span>Edit Story</span>
+                                <span>Edit</span>
                               </Link>
+                              <button
+                                onClick={handleDeleteStory}
+                                className="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-950/40 dark:border-rose-800 transition-all shadow-xs cursor-pointer"
+                                title="Delete Story"
+                              >
+                                <LuTrash2 className="w-3.5 h-3.5" />
+                                <span>Delete</span>
+                              </button>
                             </div>
                           ) : (
                             <button
