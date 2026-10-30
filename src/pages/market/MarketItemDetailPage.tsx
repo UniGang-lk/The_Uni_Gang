@@ -19,6 +19,7 @@ import {
   LuTrash2
 } from 'react-icons/lu';
 import { formatDistanceToNow } from 'date-fns';
+import { FaWhatsapp } from 'react-icons/fa6';
 import { api } from '../../api';
 import SEO from '../../components/SEO';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
@@ -601,6 +602,17 @@ const MarketItemDetailPage: React.FC = () => {
                           <LuSend className="w-4 h-4" />
                           {loadingChat ? 'Connecting...' : 'Chat with Seller (In-App Message)'}
                         </button>
+                        {item.seller?.phone && (
+                          <a
+                            href={`https://wa.me/${item.seller.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi ${item.seller.name || 'there'}! I saw your listing "${item.title}" on The Uni Gang Marketplace.`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2.5 active:scale-95 no-underline cursor-pointer"
+                          >
+                            <FaWhatsapp className="w-4 h-4 text-white" />
+                            WhatsApp Seller
+                          </a>
+                        )}
                         <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-semibold text-center">
                           <LuShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                           Protected In-App Chat • Meet safely on campus

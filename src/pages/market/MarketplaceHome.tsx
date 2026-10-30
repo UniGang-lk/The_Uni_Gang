@@ -8,6 +8,7 @@ import {
   LuZap, LuRefreshCw
 } from 'react-icons/lu';
 import MarketplaceCard from '../../components/market/MarketplaceCard';
+import { FaWhatsapp } from 'react-icons/fa6';
 import { VerificationModal } from '../../features/proposal/components/verification/VerificationModal';
 import AuthCard from '../../components/auth/AuthCard';
 import CreateListingModal from '../../components/market/CreateListingModal';
@@ -1244,17 +1245,59 @@ const MarketplaceHome: React.FC = () => {
                       </div>
                     ) : (
                       <div className="flex flex-col gap-2.5">
-                        <button
-                          onClick={() => handleContactSeller(selectedItem)}
-                          disabled={loadingChat}
-                          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-black text-sm transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 cursor-pointer border-none"
-                        >
-                          <LuSend className="w-4 h-4" /> {loadingChat ? 'Connecting...' : 'Contact Seller (In-App Message)'}
-                        </button>
-                        <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-semibold text-center">
-                          <LuShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                          Protected In-App Chat • Meet safely on campus
-                        </div>
+                        {localStorage.getItem('userId') && String(selectedItem.seller_id) === String(localStorage.getItem('userId')) ? (
+                          <div className="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/80 flex flex-col gap-2.5">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-black uppercase tracking-wider text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
+                                <LuShieldCheck className="w-4 h-4 text-indigo-500" />
+                                Your Listing Controls
+                              </span>
+                              <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                                selectedItem.status === 'AVAILABLE' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                              }`}>
+                                {selectedItem.status}
+                              </span>
+                            </div>
+                            <Link
+                              to={`/market/${selectedItem.id}`}
+                              onClick={() => setSelectedItem(null)}
+                              className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all text-center no-underline flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20"
+                            >
+                              Manage & View Details &rarr;
+                            </Link>
+                          </div>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleContactSeller(selectedItem)}
+                              disabled={loadingChat}
+                              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-black text-sm transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2 cursor-pointer border-none"
+                            >
+                              <LuSend className="w-4 h-4" /> {loadingChat ? 'Connecting...' : 'Contact Seller (In-App Message)'}
+                            </button>
+                            {selectedItem.seller?.phone && (
+                              <a
+                                href={`https://wa.me/${selectedItem.seller.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi ${selectedItem.seller.name || 'there'}! I saw your listing "${selectedItem.title}" on The Uni Gang Marketplace.`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition-all shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 no-underline cursor-pointer"
+                              >
+                                <FaWhatsapp className="w-4 h-4 text-white" /> WhatsApp Seller
+                              </a>
+                            )}
+                            <Link
+                              to={`/market/${selectedItem.id}`}
+                              onClick={() => setSelectedItem(null)}
+                              className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline text-center block pt-1"
+                            >
+                              View Full Item Details & Specs &rarr;
+                            </Link>
+                            <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 font-semibold text-center">
+                              <LuShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                              Protected In-App Chat • Meet safely on campus
+                            </div>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
