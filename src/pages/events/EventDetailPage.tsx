@@ -220,6 +220,10 @@ const EventDetailPage: React.FC = () => {
 
   const handleStartChat = async () => {
     if (!event) return;
+    if (isHost) {
+      toast.error("You are the organizer of this event.");
+      return;
+    }
     const token = localStorage.getItem('userToken') || localStorage.getItem('userEmail');
     if (!token) {
       toast.error("Please login to chat with the event host.");
@@ -228,7 +232,11 @@ const EventDetailPage: React.FC = () => {
     try {
       const chat = await api.startEventChat(event.id.toString());
       navigate(`/profile?tab=inbox&chatId=${chat.id}&type=event`);
-    } catch {
+    } catch (err: any) {
+      if (err?.message?.includes('organizer') || err?.message?.includes('yourself')) {
+        toast.error("You are the organizer of this event.");
+        return;
+      }
       toast.success("Opening chat with event organizer...");
       navigate(`/profile?tab=inbox&type=event&eventId=${event.id}`);
     }

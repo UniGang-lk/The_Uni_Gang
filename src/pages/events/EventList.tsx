@@ -137,7 +137,10 @@ const EventList: React.FC = () => {
             const chat = await api.startEventChat(eventId);
             navigate(`/profile?tab=inbox&chatId=${chat.id}&type=event`);
         } catch (err: any) {
-            console.error(err);
+            if (err?.message?.includes('organizer') || err?.message?.includes('yourself')) {
+                toast.error("You are the organizer of this event.");
+                return;
+            }
             navigate(`/profile?tab=inbox&type=event&eventId=${eventId}`);
         }
     };

@@ -411,7 +411,7 @@ export const api = {
       body: JSON.stringify({ eventId })
     });
     if (!response.ok) {
-      const err = await response.json();
+      const err = await response.json().catch(() => ({}));
       throw new Error(err.message || 'Failed to start event chat');
     }
     return response.json();
@@ -461,7 +461,7 @@ export const api = {
       }
     });
     if (!response.ok) {
-      const err = await response.json();
+      const err = await response.json().catch(() => ({}));
       throw new Error(err.message || 'Failed to toggle RSVP');
     }
     return response.json();
@@ -476,7 +476,7 @@ export const api = {
       body: formData
     });
     if (!response.ok) {
-      const err = await response.json();
+      const err = await response.json().catch(() => ({}));
       throw new Error(err.message || 'Failed to submit event');
     }
     return response.json();
@@ -501,7 +501,7 @@ export const api = {
       }
     });
     if (!response.ok) {
-      const err = await response.json();
+      const err = await response.json().catch(() => ({}));
       throw new Error(err.message || 'Failed to delete event');
     }
     return response.json();
