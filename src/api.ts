@@ -811,7 +811,7 @@ export const api = {
       body: JSON.stringify({ rating })
     });
     if (!response.ok) {
-      const err = await response.json();
+      const err = await response.json().catch(() => ({}));
       throw new Error(err.message || 'Failed to submit rating');
     }
     return response.json();
@@ -828,7 +828,7 @@ export const api = {
       body: JSON.stringify({ itemId, sellerId })
     });
     if (!response.ok) {
-      const err = await response.json();
+      const err = await response.json().catch(() => ({}));
       throw new Error(err.message || 'Failed to start chat');
     }
     return response.json();
@@ -880,7 +880,7 @@ export const api = {
       body: formData
     });
     if (!response.ok) {
-      const err = await response.json();
+      const err = await response.json().catch(() => ({}));
       throw new Error(err.message || 'Failed to place order');
     }
     return response.json();
