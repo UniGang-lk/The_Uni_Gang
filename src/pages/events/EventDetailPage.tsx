@@ -437,14 +437,22 @@ const EventDetailPage: React.FC = () => {
                 {/* Contact Actions */}
                 {event.contact && (
                   <div className="space-y-2 pt-2">
-                    <a
-                      href={`https://wa.me/${event.contact.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hi, I'm reaching out regarding your event "${event.title}" on The Uni Gang!`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer text-decoration-none"
-                    >
-                      <FaWhatsapp size={16} /> Contact via WhatsApp ({event.contact})
-                    </a>
+                    {(() => {
+                      const cleanNumber = event.contact.replace(/[^0-9]/g, '');
+                      const waNumber = cleanNumber.startsWith('0') && cleanNumber.length === 10
+                        ? `94${cleanNumber.substring(1)}`
+                        : cleanNumber;
+                      return (
+                        <a
+                          href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Hi, I'm reaching out regarding your event "${event.title}" on The Uni Gang!`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer text-decoration-none"
+                        >
+                          <FaWhatsapp size={16} /> Contact via WhatsApp ({event.contact})
+                        </a>
+                      );
+                    })()}
 
                     <button
                       onClick={handleStartChat}
