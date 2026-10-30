@@ -748,6 +748,9 @@
     - **📱 Round 78 WhatsApp Direct Seller Actions & Quick Modal Controls:**
       - **Direct WhatsApp Seller Action ([MarketItemDetailPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketItemDetailPage.tsx) & [MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):** විකුණුම්කරුගේ profile එකෙහි phone number එකක් ඇත්නම්, In-App Chat එකට අමතරව pre-filled message එකක් ("Hi [Seller], I saw your listing on The Uni Gang Marketplace...") සහිතව ක්ෂණික direct WhatsApp button එක detail page එකට සහ quick preview modal එකට එක් කරන ලදී.
       - **Owner Controls in Quick Modal ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):** Listing එක අයිති පරිශීලකයා Marketplace grid එකෙන් තම item එක ක්ලික් කළ විට "Contact Seller" (which previously alerted "This is your own listing") වෙනුවට සෘජු "Your Listing Controls" badge එක සහ "Manage & View Details" button එක දිස්වන සේ UX එක පරිපූර්ණ කරන ලදී.
+    - **🎨 Round 79 Cart Drawer Styling Sanitization & Production Polish:**
+      - **Tailwind Utility Classes Sanitization ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):** Cart drawer එකෙහි සහ checkout form එකෙහි තිබූ compile නොවන non-standard arbitrary classes 10+ (`bg-red-550`, `bg-slate-955`, `border-slate-150`, `bg-slate-105`, `text-slate-505`, `text-indigo-650`, `hover:bg-slate-750`, `text-slate-650`) සියල්ල standard Tailwind utility classes බවට පත් කර visual consistency එක 100% ක් සහතික කරන ලදී.
+      - **Zero Errors Verification:** Frontend `npx tsc -b` (Code 0) සහ Backend `go build` (Code 0) මගින් සම්පූර්ණයෙන්ම තහවුරු කර GitHub master/main වෙත push කරන ලදී.
 
 ---
 
