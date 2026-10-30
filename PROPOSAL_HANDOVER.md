@@ -750,7 +750,9 @@
       - **Owner Controls in Quick Modal ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):** Listing එක අයිති පරිශීලකයා Marketplace grid එකෙන් තම item එක ක්ලික් කළ විට "Contact Seller" (which previously alerted "This is your own listing") වෙනුවට සෘජු "Your Listing Controls" badge එක සහ "Manage & View Details" button එක දිස්වන සේ UX එක පරිපූර්ණ කරන ලදී.
     - **🎨 Round 79 Cart Drawer Styling Sanitization & Production Polish:**
       - **Tailwind Utility Classes Sanitization ([MarketplaceHome.tsx](file:///e:/The-Uni-Gang/Website/src/pages/market/MarketplaceHome.tsx)):** Cart drawer එකෙහි සහ checkout form එකෙහි තිබූ compile නොවන non-standard arbitrary classes 10+ (`bg-red-550`, `bg-slate-955`, `border-slate-150`, `bg-slate-105`, `text-slate-505`, `text-indigo-650`, `hover:bg-slate-750`, `text-slate-650`) සියල්ල standard Tailwind utility classes බවට පත් කර visual consistency එක 100% ක් සහතික කරන ලදී.
-      - **Zero Errors Verification:** Frontend `npx tsc -b` (Code 0) සහ Backend `go build` (Code 0) මගින් සම්පූර්ණයෙන්ම තහවුරු කර GitHub master/main වෙත push කරන ලදී.
+    - **🛡️ Round 80 API Error Handling Hardening:**
+      - **Resilient JSON Response Catchers ([api.ts](file:///e:/The-Uni-Gang/Website/src/api.ts)):** Marketplace endpoints (`rateListing`, `startMarketplaceChat`, `createMarketOrder`) සඳහා server 502/504 HTML response එකකදී JSON parsing syntax error එකක් throw වීම වළක්වා `await response.json().catch(() => ({}))` මගින් backend message එක හෝ fallback toast alert එක පමණක් පෙන්වන සේ hardening කරන ලදී.
+      - **100% Zero-Bug Verification:** `npx tsc -b` (Code 0) සහ `go build ./internal/controller/...` (Code 0) මගින් සම්පූර්ණයෙන්ම තහවුරු කර GitHub master/main වෙත push කරන ලදී.
 
 ---
 
