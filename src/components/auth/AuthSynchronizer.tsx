@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { auth } from '../../firebase';
 import { onIdTokenChanged } from 'firebase/auth';
+import { getSocket } from '../../services/realtime';
 
 /**
  * AuthSynchronizer silently runs in the background of the React Router.
@@ -10,6 +11,13 @@ import { onIdTokenChanged } from 'firebase/auth';
  */
 const AuthSynchronizer = () => {
   useEffect(() => {
+    // ⚡ Connect to realtime socket on website entry (counts towards live telemetry)
+    const socket = getSocket();
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      socket.emit('register', userId);
+      socket.emit('join_user_room', userId);
+    }
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
       if (user) {
         try {
