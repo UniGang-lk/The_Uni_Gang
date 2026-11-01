@@ -380,6 +380,7 @@ const SubmitBlog: React.FC = () => {
   const [searchParams] = useSearchParams();
   const editId = searchParams.get('edit');
   const [isEditMode, setIsEditMode] = useState(false);
+  const [targetBlogId, setTargetBlogId] = useState<string | null>(null);
 
   // Form State
   const [title, setTitle] = useState('');
@@ -405,6 +406,7 @@ const SubmitBlog: React.FC = () => {
         try {
           const blog = await api.getBlogBySlug(editId);
           if (blog) {
+            setTargetBlogId(blog.id || editId);
             setTitle(blog.title || '');
             if (blog.category) setCategory(blog.category);
             setExcerpt(blog.excerpt || '');
@@ -614,7 +616,7 @@ const SubmitBlog: React.FC = () => {
       }
 
       if (editId) {
-        await api.updateBlog(editId, data, userToken);
+        await api.updateBlog(targetBlogId || editId, data, userToken);
         toast.success('Story updated successfully! Submitted for editorial review.', {
           duration: 5000,
           style: {

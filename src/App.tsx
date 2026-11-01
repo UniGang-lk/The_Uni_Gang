@@ -63,8 +63,8 @@ function App() {
               <Layout isFullWidth>
                 <div className="flex flex-col">
                   <SEO
-                    title="The Uni Gang - Find Your Perfect Student Annex in Sri Lanka"
-                    description="Connect with the best student accommodations near universities in Sri Lanka. Easy, secure, and student-friendly annex hunting."
+                    title="The Uni Gang - Sri Lanka's #1 Student Community Platform"
+                    description="The ultimate ecosystem for Sri Lankan university undergraduates. Discover student annexes & boarding places, campus events, Hustle Hub student marketplace, articles, and student matchmaking."
                   />
 
                   <Hero />

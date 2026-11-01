@@ -175,6 +175,22 @@ const Profile = () => {
   const [showListingsModal, setShowListingsModal] = useState(false);
   const [myListings, setMyListings] = useState<any[]>([]);
   const [loadingListings, setLoadingListings] = useState(false);
+  const [editingListing, setEditingListing] = useState<any | null>(null);
+  const [isUpdatingListing, setIsUpdatingListing] = useState(false);
+
+  // Event editing state
+  const [isEditingEvent, setIsEditingEvent] = useState(false);
+  const [isUpdatingEvent, setIsUpdatingEvent] = useState(false);
+  const [eventEditForm, setEventEditForm] = useState({
+    title: '',
+    description: '',
+    location: '',
+    date: '',
+    time: '',
+    price: '',
+    contact: '',
+    uni: ''
+  });
 
   // Annex and Verification states
   const [myAnnexes, setMyAnnexes] = useState<any[]>([]);
@@ -438,6 +454,23 @@ const Profile = () => {
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || "Failed to delete event.");
+    }
+  };
+
+  const handleDeleteBlog = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this story? This will permanently remove it from The Uni Gang.")) {
+      return;
+    }
+    const token = localStorage.getItem('userToken');
+    if (!token) return;
+    try {
+      await api.deleteBlog(id, token);
+      setSubmittedBlogs(prev => prev.filter(b => b.id !== id));
+      setSelectedBlog(null);
+      toast.success("Story deleted successfully.");
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Failed to delete story.");
     }
   };
 
@@ -731,6 +764,55 @@ const Profile = () => {
       toast.success("Listing deleted successfully.");
     } catch (err: any) {
       toast.error(err.message || "Failed to delete listing.");
+    }
+  };
+
+  const handleSaveListingEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingListing) return;
+    try {
+      setIsUpdatingListing(true);
+      const formData = new FormData();
+      formData.append('title', editingListing.title);
+      formData.append('price', String(editingListing.price));
+      formData.append('description', editingListing.description || '');
+      formData.append('condition', editingListing.condition || 'Good');
+
+      await api.updateMarketListing(editingListing.id, formData);
+      setMyListings(prev => prev.map(l => l.id === editingListing.id ? { ...l, ...editingListing } : l));
+      setEditingListing(null);
+      toast.success("Listing updated successfully! 🎉");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update listing.");
+    } finally {
+      setIsUpdatingListing(false);
+    }
+  };
+
+  const handleSaveEventEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedEvent) return;
+    try {
+      setIsUpdatingEvent(true);
+      const formData = new FormData();
+      formData.append('title', eventEditForm.title);
+      formData.append('description', eventEditForm.description);
+      formData.append('location', eventEditForm.location);
+      formData.append('date', eventEditForm.date);
+      formData.append('time', eventEditForm.time);
+      formData.append('price', eventEditForm.price || 'Free');
+      formData.append('contact', eventEditForm.contact);
+      formData.append('uni', eventEditForm.uni);
+
+      await api.updateEvent(selectedEvent.id, formData);
+      setSubmittedEvents(prev => prev.map(ev => ev.id === selectedEvent.id ? { ...ev, ...eventEditForm } : ev));
+      setSelectedEvent((prev: any) => ({ ...prev, ...eventEditForm }));
+      setIsEditingEvent(false);
+      toast.success("Campus event updated successfully! 🎉");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update event.");
+    } finally {
+      setIsUpdatingEvent(false);
     }
   };
 
@@ -1631,13 +1713,22 @@ const Profile = () => {
                               <h4 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">{item.title}</h4>
                               <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{item.description}</p>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteListing(item.id)}
-                              className="w-full py-2 bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white text-xs font-bold rounded-xl transition-all border-none cursor-pointer"
-                            >
-                              Delete
-                            </button>
+                            <div className="flex items-center gap-2 pt-1">
+                              <button
+                                type="button"
+                                onClick={() => setEditingListing({ ...item })}
+                                className="flex-1 py-2 bg-blue-50 hover:bg-blue-600 hover:text-white dark:bg-slate-800 dark:hover:bg-blue-600 text-blue-600 dark:text-blue-400 text-xs font-bold rounded-xl transition-all border-none cursor-pointer flex items-center justify-center gap-1.5"
+                              >
+                                <LuPencil size={13} /> Edit
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteListing(item.id)}
+                                className="flex-1 py-2 bg-red-500/10 hover:bg-red-500 text-red-600 hover:text-white text-xs font-bold rounded-xl transition-all border-none cursor-pointer flex items-center justify-center gap-1.5"
+                              >
+                                <LuTrash2 size={13} /> Delete
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -2273,20 +2364,128 @@ const Profile = () => {
                                 </div>
                               )}
 
-                              {/* Self-Deletion Action */}
-                              <div className="p-5 rounded-2xl bg-red-500/5 dark:bg-red-950/10 border border-red-500/10 dark:border-red-500/20 flex flex-col sm:flex-row items-center justify-between gap-4">
-                                <div className="text-center sm:text-left">
-                                  <p className="text-xs font-black text-red-500 uppercase tracking-widest mb-1">Remove Event Proposal</p>
-                                  <p className="text-[10px] text-slate-400 dark:text-slate-500 font-semibold leading-normal">This will permanently delete your submission and take down any listings.</p>
+                              {/* Organizer Actions: Edit or Delete */}
+                              {isEditingEvent ? (
+                                <form onSubmit={handleSaveEventEdit} className="p-6 rounded-2xl bg-slate-500/5 dark:bg-slate-900/40 border border-slate-200/10 dark:border-white/10 space-y-4">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h4 className="text-xs font-black uppercase tracking-widest text-indigo-500">Edit Event Details</h4>
+                                    <button
+                                      type="button"
+                                      onClick={() => setIsEditingEvent(false)}
+                                      className="text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+
+                                  <div>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Event Title</label>
+                                    <input
+                                      type="text"
+                                      required
+                                      value={eventEditForm.title}
+                                      onChange={(e) => setEventEditForm({ ...eventEditForm, title: e.target.value })}
+                                      className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                    />
+                                  </div>
+
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div>
+                                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Venue Location</label>
+                                      <input
+                                        type="text"
+                                        required
+                                        value={eventEditForm.location}
+                                        onChange={(e) => setEventEditForm({ ...eventEditForm, location: e.target.value })}
+                                        className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Date</label>
+                                      <input
+                                        type="date"
+                                        required
+                                        value={eventEditForm.date}
+                                        onChange={(e) => setEventEditForm({ ...eventEditForm, date: e.target.value })}
+                                        className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Time</label>
+                                      <input
+                                        type="text"
+                                        placeholder="e.g. 05:30 PM"
+                                        value={eventEditForm.time}
+                                        onChange={(e) => setEventEditForm({ ...eventEditForm, time: e.target.value })}
+                                        className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Ticket Price</label>
+                                      <input
+                                        type="text"
+                                        placeholder="Free or Rs. 500"
+                                        value={eventEditForm.price}
+                                        onChange={(e) => setEventEditForm({ ...eventEditForm, price: e.target.value })}
+                                        className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                                      />
+                                    </div>
+                                  </div>
+
+                                  <div>
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Description</label>
+                                    <textarea
+                                      rows={3}
+                                      value={eventEditForm.description}
+                                      onChange={(e) => setEventEditForm({ ...eventEditForm, description: e.target.value })}
+                                      className="w-full p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                    />
+                                  </div>
+
+                                  <button
+                                    type="submit"
+                                    disabled={isUpdatingEvent}
+                                    className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-indigo-500/25 disabled:opacity-50"
+                                  >
+                                    {isUpdatingEvent ? 'Saving Updates...' : 'Update Event Information'}
+                                  </button>
+                                </form>
+                              ) : (
+                                <div className="p-5 rounded-2xl bg-slate-500/5 dark:bg-slate-900/30 border border-slate-200/10 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                  <div className="text-center sm:text-left">
+                                    <p className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-widest mb-1">Manage Event</p>
+                                    <p className="text-[10px] text-slate-400 font-semibold">Need to update event date, time or venue details?</p>
+                                  </div>
+                                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setEventEditForm({
+                                          title: selectedEvent.title || '',
+                                          description: selectedEvent.description || '',
+                                          location: selectedEvent.location || '',
+                                          date: selectedEvent.date || '',
+                                          time: selectedEvent.time || '',
+                                          price: selectedEvent.price || 'Free',
+                                          contact: selectedEvent.contact || '',
+                                          uni: selectedEvent.uni || ''
+                                        });
+                                        setIsEditingEvent(true);
+                                      }}
+                                      className="flex-1 sm:flex-none px-4 py-2.5 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-600 hover:text-white text-indigo-600 dark:text-indigo-400 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer border border-indigo-200 dark:border-indigo-800/80"
+                                    >
+                                      <LuPenLine size={14} /> Edit Event
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleDeleteEvent(selectedEvent.id)}
+                                      className="flex-1 sm:flex-none px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-md shadow-red-500/10 active:scale-95 border-none"
+                                    >
+                                      <LuTrash2 size={14} /> Delete
+                                    </button>
+                                  </div>
                                 </div>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteEvent(selectedEvent.id)}
-                                  className="w-full sm:w-auto px-5 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md shadow-red-500/10 active:scale-95 border-none"
-                                >
-                                  <LuTrash2 size={14} /> Delete Concept
-                                </button>
-                              </div>
+                              )}
                             </div>
                           </motion.div>
                         )}
@@ -2452,7 +2651,7 @@ const Profile = () => {
                                 </div>
                               </div>
 
-                              <div className="flex gap-3 pt-2">
+                              <div className="flex flex-wrap gap-3 pt-2">
                                 <Link
                                   to={`/blogs/submit?edit=${selectedBlog.slug || selectedBlog.id}`}
                                   className="flex-1 py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black text-xs uppercase tracking-wider text-center transition-all shadow-md shadow-purple-500/20 flex items-center justify-center gap-2"
@@ -2469,6 +2668,15 @@ const Profile = () => {
                                   <LuEye size={15} />
                                   <span>View</span>
                                 </Link>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteBlog(selectedBlog.id)}
+                                  className="py-3 px-4 rounded-xl bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 font-black text-xs uppercase tracking-wider text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer border-none"
+                                  title="Delete Story Permanently"
+                                >
+                                  <LuTrash2 size={15} />
+                                  <span>Delete</span>
+                                </button>
                               </div>
                             </div>
                           </motion.div>
@@ -2711,6 +2919,15 @@ const Profile = () => {
                                         <LuEye size={15} />
                                         <span className="hidden sm:inline">View</span>
                                       </Link>
+                                      <button
+                                        type="button"
+                                        onClick={() => setEditingListing({ ...listing })}
+                                        className="p-2.5 rounded-xl bg-blue-50 hover:bg-blue-600 hover:text-white dark:bg-slate-800 dark:hover:bg-blue-600 text-blue-600 dark:text-blue-400 transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer border-none"
+                                        title="Edit Listing Details"
+                                      >
+                                        <LuPencil size={15} />
+                                        <span className="hidden sm:inline">Edit</span>
+                                      </button>
 
                                       <button
                                         type="button"
@@ -2745,6 +2962,110 @@ const Profile = () => {
                 </>
               )}
             </AnimatePresence>
+
+            {/* Edit Marketplace Listing Modal */}
+            <AnimatePresence>
+              {editingListing && (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setEditingListing(null)}
+                    className="fixed inset-0 z-[110] bg-slate-950/70 backdrop-blur-md"
+                  />
+                  <div className="fixed inset-0 z-[111] overflow-y-auto pointer-events-none flex items-center justify-center p-4 sm:p-6">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                      className="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[2.5rem] p-6 sm:p-8 shadow-2xl relative pointer-events-auto"
+                    >
+                      <div className="flex justify-between items-center mb-6">
+                        <div>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-indigo-500 mb-0.5 block">Hustle Hub</span>
+                          <h3 className="text-xl font-black text-slate-900 dark:text-white">Edit Listing Details</h3>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setEditingListing(null)}
+                          className="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-red-500 transition-colors"
+                        >
+                          <LuX size={18} />
+                        </button>
+                      </div>
+
+                      <form onSubmit={handleSaveListingEdit} className="space-y-4">
+                        <div>
+                          <label className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1">Item Title</label>
+                          <input
+                            type="text"
+                            required
+                            value={editingListing.title}
+                            onChange={(e) => setEditingListing({ ...editingListing, title: e.target.value })}
+                            className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1">Price (LKR)</label>
+                          <input
+                            type="number"
+                            required
+                            min="0"
+                            value={editingListing.price}
+                            onChange={(e) => setEditingListing({ ...editingListing, price: e.target.value })}
+                            className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1">Condition</label>
+                          <select
+                            value={editingListing.condition || 'Good'}
+                            onChange={(e) => setEditingListing({ ...editingListing, condition: e.target.value })}
+                            className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
+                          >
+                            <option value="Brand New">Brand New</option>
+                            <option value="Like New">Like New</option>
+                            <option value="Good">Good</option>
+                            <option value="Fair">Fair</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider block mb-1">Description</label>
+                          <textarea
+                            rows={3}
+                            value={editingListing.description || ''}
+                            onChange={(e) => setEditingListing({ ...editingListing, description: e.target.value })}
+                            className="w-full p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                          />
+                        </div>
+
+                        <div className="flex gap-3 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => setEditingListing(null)}
+                            className="flex-1 py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase tracking-wider transition-colors"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={isUpdatingListing}
+                            className="flex-1 py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-indigo-500/25 disabled:opacity-50"
+                          >
+                            {isUpdatingListing ? 'Saving Changes...' : 'Save Changes'}
+                          </button>
+                        </div>
+                      </form>
+                    </motion.div>
+                  </div>
+                </>
+              )}
+            </AnimatePresence>
+
 
             {/* Backdrop-Blurred Unified Inbox Modal */}
             <AnimatePresence>

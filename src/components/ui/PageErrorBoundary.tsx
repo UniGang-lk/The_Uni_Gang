@@ -1,5 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 import { LuRefreshCw, LuTriangleAlert, LuHouse } from 'react-icons/lu';
+import { reportError } from '../../services/errorReporter';
 
 interface Props {
   children?: ReactNode;
@@ -22,6 +23,7 @@ export default class PageErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Page render error caught by PageErrorBoundary:', error, errorInfo);
+    reportError(error, { componentStack: errorInfo.componentStack });
 
     const isChunkError =
       error?.message?.includes('dynamically imported module') ||

@@ -28,6 +28,7 @@ import AuthCard from '../../components/auth/AuthCard';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 import DOMPurify from 'dompurify';
+import { subscribeToBlogUpdates, subscribeToBlogDeletions } from '../../services/realtime';
 
 const DEFAULT_FALLBACK_STORIES: Blog[] = [
   {
@@ -198,7 +199,31 @@ const BlogDetail: React.FC = () => {
   useEffect(() => {
     fetchBlog();
     window.scrollTo(0, 0);
-  }, [slug]);
+
+    const unsubscribeUpdate = subscribeToBlogUpdates((data: any) => {
+      // If current story is updated or status changed
+      if (data?.blogId === blog?.id || data?.blog?.slug === slug) {
+        if (data.status === 'Rejected') {
+          toast.error('This story is no longer publicly visible.');
+          navigate('/blogs');
+        } else {
+          fetchBlog();
+        }
+      }
+    });
+
+    const unsubscribeDelete = subscribeToBlogDeletions((data: any) => {
+      if (data?.blogId === blog?.id) {
+        toast.error('This story has been deleted.');
+        navigate('/blogs');
+      }
+    });
+
+    return () => {
+      unsubscribeUpdate();
+      unsubscribeDelete();
+    };
+  }, [slug, blog?.id]);
 
   const handleLike = async () => {
     if (!blog) return;
@@ -600,6 +625,14 @@ const BlogDetail: React.FC = () => {
                   <span className="inline-flex items-center gap-1.5">
                     <LuMessageSquare className="w-3.5 h-3.5 text-slate-400" />
                     {blog.comments?.length || 0} Comments
+                  </span>
+
+                  <span className="text-slate-300 dark:text-slate-700">&bull;</span>
+
+                  {/* Likes count */}
+                  <span className="inline-flex items-center gap-1.5">
+                    <LuThumbsUp className="w-3.5 h-3.5 text-slate-400" />
+                    {typeof blog.likes === 'number' ? blog.likes : (Array.isArray(blog.likes) ? (blog.likes as any).length : 0)} Likes
                   </span>
 
                   <span className="text-slate-300 dark:text-slate-700">&bull;</span>

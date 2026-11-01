@@ -11,8 +11,8 @@ interface SEOProps {
 
 const SEO = ({
   title,
-  description = "Find the best student accommodations, campus events, and marketplace gear in Sri Lanka. The Uni Gang connects students across islandwide universities.",
-  keywords = "student accommodation, university annex, sri lanka, boarding places, university students, room for rent, peradeniya, colombo, kelaniya, japura, moratuwa",
+  description = "The ultimate platform for Sri Lankan university undergraduates. Discover student annexes & boarding places, campus events, Hustle Hub student marketplace, articles, and student matchmaking.",
+  keywords = "the uni gang, student accommodation, university annex, campus events, hustle hub marketplace, student matchmaking, boarding places sri lanka, colombo, peradeniya, moratuwa, japura, kelaniya",
   image = "/assets/logoImage.jpg",
   url = typeof window !== 'undefined' ? window.location.href : 'https://unigang.lk',
   schemaData

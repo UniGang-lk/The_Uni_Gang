@@ -222,6 +222,24 @@ export const api = {
     if (!response.ok) throw new Error('Failed to delete comment');
   },
 
+  deleteBlog: async (blogId: string, token: string): Promise<any> => {
+    const response = await fetch(`${BASE_URL}/api/blogs/${blogId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      try {
+        const err = await response.json();
+        throw new Error(err.message || 'Failed to delete blog post');
+      } catch (e: any) {
+        throw new Error(e.message || 'Failed to delete blog post');
+      }
+    }
+    return response.json();
+  },
+
   updateProfile: async (
     profileData: {
       name: string;
@@ -504,6 +522,22 @@ export const api = {
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
       throw new Error(err.message || 'Failed to delete event');
+    }
+    return response.json();
+  },
+
+  updateEvent: async (id: string, formData: FormData, token?: string): Promise<any> => {
+    const authToken = token || localStorage.getItem('userToken') || '';
+    const response = await fetch(`${BASE_URL}/api/events/${id}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${authToken}`
+      },
+      body: formData
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to update event');
     }
     return response.json();
   },
@@ -797,6 +831,22 @@ export const api = {
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
       throw new Error(err.message || 'Failed to update listing status');
+    }
+    return response.json();
+  },
+
+  updateMarketListing: async (id: string, formData: FormData): Promise<any> => {
+    const token = localStorage.getItem('userToken');
+    const response = await fetch(`${BASE_URL}/api/market/${id}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: formData
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to update marketplace item');
     }
     return response.json();
   },

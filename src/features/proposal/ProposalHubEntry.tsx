@@ -14,6 +14,7 @@ import ProposalFAQPage from './pages/ProposalFAQPage';
 import ProposalSettingsPage from './pages/ProposalSettingsPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import Footer from '../../components/layout/Footer';
+import SEO from '../../components/SEO';
 import { useTheme } from '../../context/ThemeContext';
 import toast from 'react-hot-toast';
 
@@ -169,6 +170,26 @@ export default function ProposalHubEntry() {
       <div className={`min-h-screen flex flex-col font-sans selection:bg-rose-500/30 transition-colors duration-300 ${
         isDark ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'
       }`}>
+        <SEO
+          title="Uni Porondam - Verified University & Professional Matchmaking"
+          description="Sri Lanka's premier verified matchmaking platform for university undergraduates, alumni, and professionals. 100% confidential, NIC verified, and protected by photo privacy controls."
+          keywords="uni porondam, sri lanka proposals, university matchmaking, student proposals, mangala kinkini, verified matrimony sri lanka, colombo kandy peradeniya"
+          image="/assets/proposal-hero-couple.jpg"
+          url="https://unigang.lk/proposals"
+          schemaData={{
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Uni Porondam - University & Professional Matchmaking",
+            "description": "Verified matrimony and matchmaking network for Sri Lankan university graduates and young professionals.",
+            "url": "https://unigang.lk/proposals",
+            "isPartOf": {
+              "@type": "WebSite",
+              "name": "The Uni Gang",
+              "url": "https://unigang.lk"
+            }
+          }}
+        />
+
         {/* Global Proposal Navbar for Landing, Discover, Pricing, How It Works, Safety & FAQ views */}
         {(activeView === 'landing' || activeView === 'discover' || activeView === 'premium' || activeView === 'how-it-works' || activeView === 'safety' || activeView === 'faq') && (
           <ProposalNavbar
