@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { auth } from '../../firebase';
 import { onIdTokenChanged } from 'firebase/auth';
 import { getSocket } from '../../services/realtime';
+import { dispatchAuthUpdate } from '../../utils/authEvents';
 
 /**
  * AuthSynchronizer silently runs in the background of the React Router.
@@ -18,6 +19,26 @@ const AuthSynchronizer = () => {
       socket.emit('register', userId);
       socket.emit('join_user_room', userId);
     }
+
+    // 🎓 Real-Time Verification Sync: Instant update when admin approves verification
+    const handleProfileUpdated = (updatedUser: any) => {
+      if (updatedUser) {
+        if (updatedUser.is_verified_student !== undefined) {
+          localStorage.setItem('userIsVerifiedStudent', String(!!updatedUser.is_verified_student));
+        }
+        if (updatedUser.is_verified_landlord !== undefined) {
+          localStorage.setItem('userIsVerifiedLandlord', String(!!updatedUser.is_verified_landlord));
+        }
+        if (updatedUser.role) {
+          localStorage.setItem('userRole', updatedUser.role);
+        }
+        if (updatedUser.name) {
+          localStorage.setItem('userName', updatedUser.name);
+        }
+        dispatchAuthUpdate();
+      }
+    };
+    socket.on('user_profile_updated', handleProfileUpdated);
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
       if (user) {
         try {
@@ -53,7 +74,10 @@ const AuthSynchronizer = () => {
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      socket.off('user_profile_updated', handleProfileUpdated);
+      unsubscribe();
+    };
   }, []);
 
   return null; // Invisible background component
