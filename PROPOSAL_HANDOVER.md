@@ -766,7 +766,9 @@
       - **Context-Aware Return URL Redirection ([Header.tsx](file:///e:/The-Uni-Gang/Website/src/components/layout/Header.tsx), [SubHeader.tsx](file:///e:/The-Uni-Gang/Website/src/components/layout/SubHeader.tsx) & [PostAdPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/PostAdPage.tsx)):** 
         - Homepage එකෙන් "Sign In" ක්ලික් කර login වූ විට කෙලින්ම **Homepage (`/`)** වෙතම navigate වේ.
         - වෙනත් ඕනෑම screen එකක (उदा. Blogs, Market, Events, Services, Profile) සිට "Sign In" වූ විට හෝ post-ad gate එකෙන් register වූ විට පරිශීලකයා කලින් සිටි පිටුවටම (`?returnUrl=...`) ආපසු යවනු ලැබේ.
-        - පරිශීලකයා සෘජුවම "Post an Ad / Boarding Place" අරමුණින් ආවේ නම් පමණක් සාර්ථකව login වූ පසු Annex Ad submission form එක විවෘත වේ.
+    - **⚡ Round 84 Zero-Refresh Live Telemetry Sync:**
+      - **Lightweight Telemetry Endpoint ([stats_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/stats_controller.go)):** Database queries run නොවී, memory-efficient `GET /api/stats/telemetry` endpoint එකක් Backend එකට එක් කිරීම.
+      - **Automatic Pulse Polling ([AdminLayout.tsx](file:///e:/The-Uni-Gang/Dashboard/src/components/admin/AdminLayout.tsx)):** Dashboard එකෙහි සෑම තත්පර 5කට වරක් auto-pulse telemetry sync එකක් ක්‍රියාත්මක වීම. පරිශීලකයින් අලුතින් site එකට පැමිණෙන විට හෝ පිටවන විට Admin හට Dashboard එක refresh නොකරම Live Online Visitors badge එක තත්පර කිහිපයකින් auto-update වී සැබෑ අගය පෙන්වීම.
 
 ---
 
