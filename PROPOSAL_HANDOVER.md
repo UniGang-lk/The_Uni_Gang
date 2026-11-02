@@ -759,7 +759,14 @@
       - **Offline Message Alerts ([event_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/event_controller.go)):** Event organizer හෝ attendee හට chat message එකක් එවන විට, recipient offline සිටියද notification bell එකෙහි පෙන්වීම සඳහා in-app notification record එකක් DB එකේ auto-persist කිරීම.
       - **Cascade Message Cleanup ([event_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/event_controller.go)):** Event එකක් delete කිරීමේදී ඊට අදාළ event_messages DB එකෙන් සම්පූර්ණයෙන් cascade clean-up වීම.
       - **Organizer Self-Chat Prevention ([EventDetailPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/events/EventDetailPage.tsx) & [EventList.tsx](file:///e:/The-Uni-Gang/Website/src/pages/events/EventList.tsx)):** Event organizer තමාගේම event එකෙහි "Direct Campus Chat" ක්ලික් කළ විට redirect වී error වීමට පෙර "You are the organizer of this event" ලෙස ක්ෂණික toast notification එකක් ලබා දීම.
-      - **100% Zero-Bug Verification:** `npx tsc -b` (Code 0) සහ `go build ./internal/controller/...` (Code 0) මගින් සම්පූර්ණයෙන්ම තහවුරු කර GitHub master/main වෙත push කරන ලදී.
+    - **🚀 Round 82 Real-Time Live Online Telemetry & Image Resilience:**
+      - **True Active Visitors Count ([stats_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/stats_controller.go) & [AdminLayout.tsx](file:///e:/The-Uni-Gang/Dashboard/src/components/admin/AdminLayout.tsx)):** Active visitors telemetry එකෙහි තිබූ කෘතිම minimum 1 fallback ඉවත් කර, සැබෑ active WebSocket sessions ගණන (කවුරුත් නැතිනම් 0) පෙන්වන ලෙස backend සහ frontend සකස් කිරීම. Registered users ගණනට අමතරව site එකේ browser open කරගෙන සිටින registered / unregistered ඕනෑම active visitor කෙනෙක්ම real-time count වේ.
+      - **Serverless /uploads Image Fallback Engine ([main.go](file:///e:/The-Uni-Gang/Backend/cmd/api/main.go) & [BlogsPage.tsx](file:///e:/The-Uni-Gang/Dashboard/src/pages/admin/BlogsPage.tsx)):** AWS Lambda serverless disk එකෙහි ephemeral / missing demo upload images සඳහා auto high-resolution Unsplash redirect සහ dashboard image `onError` fallbacks එක් කර broken image icons සම්පූර්ණයෙන් තුරන් කිරීම.
+    - **🌐 Round 83 Smart Contextual Post-Login Navigation & Industry Standard UX:**
+      - **Context-Aware Return URL Redirection ([Header.tsx](file:///e:/The-Uni-Gang/Website/src/components/layout/Header.tsx), [SubHeader.tsx](file:///e:/The-Uni-Gang/Website/src/components/layout/SubHeader.tsx) & [PostAdPage.tsx](file:///e:/The-Uni-Gang/Website/src/pages/PostAdPage.tsx)):** 
+        - Homepage එකෙන් "Sign In" ක්ලික් කර login වූ විට කෙලින්ම **Homepage (`/`)** වෙතම navigate වේ.
+        - වෙනත් ඕනෑම screen එකක (उदा. Blogs, Market, Events, Services, Profile) සිට "Sign In" වූ විට හෝ post-ad gate එකෙන් register වූ විට පරිශීලකයා කලින් සිටි පිටුවටම (`?returnUrl=...`) ආපසු යවනු ලැබේ.
+        - පරිශීලකයා සෘජුවම "Post an Ad / Boarding Place" අරමුණින් ආවේ නම් පමණක් සාර්ථකව login වූ පසු Annex Ad submission form එක විවෘත වේ.
 
 ---
 
