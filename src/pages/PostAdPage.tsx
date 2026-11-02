@@ -60,8 +60,23 @@ const PostAdPage = () => {
 
   const handleAuthSuccess = () => {
     setIsLoggedIn(true);
-    setCurrentView('postAdForm');
     fetchMyAds();
+
+    const returnUrl = searchParams.get('returnUrl');
+    const redirectParam = searchParams.get('redirect');
+
+    if (returnUrl) {
+      navigate(decodeURIComponent(returnUrl), { replace: true });
+      return;
+    }
+
+    if (redirectParam === 'home') {
+      navigate('/', { replace: true });
+      return;
+    }
+
+    // Default: If user came directly to post an ad, show postAdForm
+    setCurrentView('postAdForm');
   };
 
   const handleAnnexFormSubmit = async (adData: any, isEditing: boolean) => {

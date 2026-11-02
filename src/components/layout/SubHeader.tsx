@@ -231,7 +231,7 @@ const SubHeader = () => {
             </div>
           ) : (
             <Link
-              to="/post-ad"
+              to={location.pathname === '/' ? '/post-ad?redirect=home' : `/post-ad?returnUrl=${encodeURIComponent(location.pathname + location.search + location.hash)}`}
               className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-sm font-semibold rounded-full hover:from-blue-700 hover:to-cyan-600 transition-all shadow-lg shadow-blue-500/20"
             >
               Sign In
@@ -285,7 +285,7 @@ const SubHeader = () => {
                   </div>
                 ) : (
                   <Link
-                    to="/post-ad"
+                    to={location.pathname === '/' ? '/post-ad?redirect=home' : `/post-ad?returnUrl=${encodeURIComponent(location.pathname + location.search + location.hash)}`}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-lg font-bold py-4 rounded-xl shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2"
                   >

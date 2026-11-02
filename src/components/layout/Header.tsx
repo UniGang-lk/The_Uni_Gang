@@ -376,7 +376,7 @@ const Header = () => {
             </div>
           ) : (
             <Link
-              to="/post-ad"
+              to={location.pathname === '/' ? '/post-ad?redirect=home' : `/post-ad?returnUrl=${encodeURIComponent(location.pathname + location.search + location.hash)}`}
               className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-sm font-semibold rounded-full hover:from-blue-700 hover:to-cyan-600 transition-all shadow-lg shadow-blue-500/20"
             >
               Sign In
@@ -557,7 +557,7 @@ const Header = () => {
                       transition={{ delay: 0.4 }}
                     >
                       <Link
-                        to="/post-ad"
+                        to={location.pathname === '/' ? '/post-ad?redirect=home' : `/post-ad?returnUrl=${encodeURIComponent(location.pathname + location.search + location.hash)}`}
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="w-full flex items-center justify-center gap-2.5 p-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-sm shadow-xl shadow-blue-500/20 hover:scale-[1.01] active:scale-95 transition-all"
                       >
