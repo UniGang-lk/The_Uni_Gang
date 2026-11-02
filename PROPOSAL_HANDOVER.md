@@ -769,6 +769,10 @@
     - **⚡ Round 84 Zero-Refresh Live Telemetry Sync:**
       - **Lightweight Telemetry Endpoint ([stats_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/stats_controller.go)):** Database queries run නොවී, memory-efficient `GET /api/stats/telemetry` endpoint එකක් Backend එකට එක් කිරීම.
       - **Automatic Pulse Polling ([AdminLayout.tsx](file:///e:/The-Uni-Gang/Dashboard/src/components/admin/AdminLayout.tsx)):** Dashboard එකෙහි සෑම තත්පර 5කට වරක් auto-pulse telemetry sync එකක් ක්‍රියාත්මක වීම. පරිශීලකයින් අලුතින් site එකට පැමිණෙන විට හෝ පිටවන විට Admin හට Dashboard එක refresh නොකරම Live Online Visitors badge එක තත්පර කිහිපයකින් auto-update වී සැබෑ අගය පෙන්වීම.
+    - **🎓 Round 85 Instant Zero-Refresh Student Verification Sync & Admin New-User Alerts:**
+      - **Real-Time Verification Socket Push ([admin_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/admin_controller.go) & [AuthSynchronizer.tsx](file:///e:/The-Uni-Gang/Website/src/components/auth/AuthSynchronizer.tsx)):** Admin විසින් ශිෂ්‍යයෙකු verify කළ සැනින්, user හට page refresh කිරීමට අවශ්‍ය නොවී `user_profile_updated` socket event එක හරහා user profile සහ verified badge එක ක්ෂණිකව auto-activate වීම.
+      - **Admin Real-Time Notification on New User Registration ([auth_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/auth_controller.go)):** අලුත් ශිෂ්‍යයෙකු register වූ වහාම සියලුම platform admins ලාට real-time socket alert එකක් සහ notification bell record එකක් නිර්මාණය වීම.
+      - **Sidebar Dynamic Count Badges ([AdminSidebar.tsx](file:///e:/The-Uni-Gang/Dashboard/src/components/admin/AdminSidebar.tsx)):** Users menu item එක ඉදිරියෙන් registered students ගණන live badge එකක් ලෙස දැක්වීම.
 
 ---
 
