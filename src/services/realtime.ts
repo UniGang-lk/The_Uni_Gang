@@ -12,7 +12,7 @@ export const getSocket = (): Socket => {
     const token = localStorage.getItem('userToken');
     
     socketInstance = io(BASE_URL, {
-      withCredentials: true,
+      withCredentials: false,
       transports: ['polling'],
       auth: token ? { token } : undefined,
       autoConnect: true,
