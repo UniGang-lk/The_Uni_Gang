@@ -798,6 +798,20 @@
 
 ---
 
+## 📌 Round 90: Annex Ad Image Uploads, Admin View & Real-Time Approval Notifications (2026-11-03)
+- **1. Resilient Upload Routing & Controller Architecture (`Backend/internal/controller/upload_controller.go`):**
+  - Registered `UploadController` under `/uploads` and `/api/uploads` inside Ginboot controller registry so Ginboot AWS Lambda routing delivers static requests cleanly without 404 bypass.
+  - Serves static files directly if cached on disk, and deterministically falls back to high-res student housing photography for missing/ephemeral container requests.
+- **2. Instant Real-Time User Notification on Approval (`Website/src/components/ui/NotificationDropdown.tsx`):**
+  - Integrated Socket.IO listener for `new_notification` event.
+  - When Admin clicks "Approve", user receives a direct real-time toast alert pop-up on screen without requiring refresh, increments unread bell count, and prepends to the notifications list.
+- **3. Real-Time Annex Ad Live Reload (`Website/src/pages/annex/AnnexList.tsx`):**
+  - Added Socket.IO listener for `annex_updated` to automatically re-fetch accommodation listings whenever an admin approves or updates an ad.
+- **4. Resilient Admin Image Previews (`Dashboard/src/pages/admin/AnnexesPage.tsx`):**
+  - Added `onError` fallback handling in `AnnexDetailModal` to prevent broken thumbnail images.
+
+---
+
 ## 💬 3. ඊළඟ Session එක ආරම්භ කරන විට යොදන Prompt එක (Resume Prompt)
 > **"mcn api PROPOSAL_HANDOVER.md eke liyapu handover eka balala, ethanin issarahata ad section, proposal saha annex section eke weda tika karagena yamu."**
 
