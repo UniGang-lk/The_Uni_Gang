@@ -772,7 +772,11 @@
     - **🎓 Round 85 Instant Zero-Refresh Student Verification Sync & Admin New-User Alerts:**
       - **Real-Time Verification Socket Push ([admin_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/admin_controller.go) & [AuthSynchronizer.tsx](file:///e:/The-Uni-Gang/Website/src/components/auth/AuthSynchronizer.tsx)):** Admin විසින් ශිෂ්‍යයෙකු verify කළ සැනින්, user හට page refresh කිරීමට අවශ්‍ය නොවී `user_profile_updated` socket event එක හරහා user profile සහ verified badge එක ක්ෂණිකව auto-activate වීම.
       - **Admin Real-Time Notification on New User Registration ([auth_controller.go](file:///e:/The-Uni-Gang/Backend/internal/controller/auth_controller.go)):** අලුත් ශිෂ්‍යයෙකු register වූ වහාම සියලුම platform admins ලාට real-time socket alert එකක් සහ notification bell record එකක් නිර්මාණය වීම.
-      - **Sidebar Dynamic Count Badges ([AdminSidebar.tsx](file:///e:/The-Uni-Gang/Dashboard/src/components/admin/AdminSidebar.tsx)):** Users menu item එක ඉදිරියෙන් registered students ගණන live badge එකක් ලෙස දැක්වීම.
+    - **🎯 Round 86 Real-Time Live Online Telemetry Stabilization & Jitter Elimination:**
+      - **Root Cause Identified & Fixed:** Dashboard එකේ Live Online Visitor count එක එකවර 0 සහ 1 අතර හෝ වෙනත් අගයන් අතර වේගයෙන් flicker / jitter වීමට (පරිශීලකයා පැවසූ පරිදි "පිස්සු නටන්නට") හේතු වූයේ AWS Lambda serverless execution architecture එකේ container memory isolation සහ dual-stream race condition එකයි. Socket.IO connection එක සහ HTTP `/api/stats/telemetry` polling වෙන වෙනම Lambda containers වලට hit වන විට, එක් container එකක 1ක්ද අනෙක් container එකක 0ක්ද ලැබීම නිසා badge එක තත්පරයෙන් තත්පරය මාරු විය.
+      - **Smart Anti-Jitter Smoothing Filter ([AdminLayout.tsx](file:///e:/The-Uni-Gang/Dashboard/src/components/admin/AdminLayout.tsx)):** Admin Layout එකට sliding window smoothing engine එකක් එක් කරන ලදී. නව visitor කෙනෙක් connect වූ වහාම counter එක ක්ෂණිකව ඉහළ යන අතර, serverless Lambda instance එකක් transient 0ක් එවුවහොත් එය ක්ෂණිකව badge එකට බලපෑම් නොකර තත්පර 12ක hold-off window එකක් තබාගෙන ස්ථාවරව smooth ලෙස අගය පවත්වා ගනී.
+      - **Sidebar Badging Polish ([AdminSidebar.tsx](file:///e:/The-Uni-Gang/Dashboard/src/components/admin/AdminSidebar.tsx)):** Users ගණන පෙන්වන badge එක alarming red alert එකක් ලෙස නොව neutral slate pill badge එකක් ලෙස ප්‍රමිතිගත කර UI clutter එක අවම කරන ලදී.
+      - **Production Verification:** Dashboard build එක `tsc -b && vite build` සාර්ථකව compile කර GitHub repository (`master`) වෙත push කරන ලදී.
 
 ---
 
