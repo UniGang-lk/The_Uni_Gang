@@ -240,6 +240,10 @@ const Profile = () => {
   const [showInboxModal, setShowInboxModal] = useState(false);
   const [showRewardsModal, setShowRewardsModal] = useState(false);
   const [showActivityModal, setShowActivityModal] = useState(false);
+  const [showNetworkModal, setShowNetworkModal] = useState(false);
+  const [networkModalTab, setNetworkModalTab] = useState<'followers' | 'following'>('followers');
+  const [networkUsers, setNetworkUsers] = useState<{ followers: any[]; following: any[] }>({ followers: [], following: [] });
+  const [loadingNetwork, setLoadingNetwork] = useState(false);
   const [inboxTab, setInboxTab] = useState<'annex' | 'marketplace' | 'events' | 'support'>('annex');
 
   // Annex Chat states
@@ -508,14 +512,23 @@ const Profile = () => {
       const userId = localStorage.getItem('userId');
       if (!token || !userId) return;
       try {
+        setLoadingNetwork(true);
         const data = await api.getUserNetwork(userId, token);
+        const safeFollowers = Array.isArray(data.followers) ? data.followers : [];
+        const safeFollowing = Array.isArray(data.following) ? data.following : [];
+        setNetworkUsers({
+          followers: safeFollowers,
+          following: safeFollowing
+        });
         setStats(prev => ({
           ...prev,
-          followers: data.followersCount || 0,
-          following: data.followingCount || 0
+          followers: typeof data.followersCount === 'number' ? data.followersCount : safeFollowers.length,
+          following: typeof data.followingCount === 'number' ? data.followingCount : safeFollowing.length
         }));
       } catch (err) {
         console.error('Failed to load network:', err);
+      } finally {
+        setLoadingNetwork(false);
       }
     };
 
@@ -1083,20 +1096,18 @@ const Profile = () => {
       (ordersCount * 50) +
       (isVerifiedStudent ? 300 : 0);
 
-    // Dynamic Followers & Following (scaled with student listings & community engagement)
-    const computedFollowers = (listingsCount * 3) + (annexesCount * 4) + (eventsCount * 5);
-    const computedFollowing = (listingsCount > 0 ? 2 : 0) + (ordersCount > 0 ? 3 : 1);
-
-    setStats({
+    setStats(prev => ({
+      ...prev,
       savedAnnexes: annexesCount,
       recentReviews: listingsCount + annexesCount,
       activityScore: Math.min(100, computedActivity),
       registeredEvents: eventsCount,
       publishedAds: listingsCount + annexesCount,
       rewardPoints: computedPoints,
-      followers: computedFollowers,
-      following: computedFollowing
-    });
+      // Keep real followers & following from server DB (do not overwrite with mock calculations)
+      followers: prev.followers,
+      following: prev.following
+    }));
   }, [
     myListings.length,
     myAnnexes.length,
@@ -1355,8 +1366,68 @@ const Profile = () => {
                 {/* Key metrics */}
                 <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
                   {[
-                    { label: 'Followers', value: stats.followers, icon: LuUser, color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
-                    { label: 'Following', value: stats.following, icon: LuActivity, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                    {
+                      label: 'Followers',
+                      value: stats.followers,
+                      icon: LuUser,
+                      color: 'text-indigo-500',
+                      bg: 'bg-indigo-500/10',
+                      badge: 'View',
+                      onClick: () => {
+                        setNetworkModalTab('followers');
+                        setShowNetworkModal(true);
+                        // Refresh on click to ensure live up-to-date list
+                        const token = localStorage.getItem('userToken');
+                        const userId = localStorage.getItem('userId');
+                        if (token && userId) {
+                          setLoadingNetwork(true);
+                          api.getUserNetwork(userId, token)
+                            .then(data => {
+                              const safeFollowers = Array.isArray(data.followers) ? data.followers : [];
+                              const safeFollowing = Array.isArray(data.following) ? data.following : [];
+                              setNetworkUsers({ followers: safeFollowers, following: safeFollowing });
+                              setStats(prev => ({
+                                ...prev,
+                                followers: typeof data.followersCount === 'number' ? data.followersCount : safeFollowers.length,
+                                following: typeof data.followingCount === 'number' ? data.followingCount : safeFollowing.length
+                              }));
+                            })
+                            .catch(console.error)
+                            .finally(() => setLoadingNetwork(false));
+                        }
+                      }
+                    },
+                    {
+                      label: 'Following',
+                      value: stats.following,
+                      icon: LuActivity,
+                      color: 'text-blue-500',
+                      bg: 'bg-blue-500/10',
+                      badge: 'View',
+                      onClick: () => {
+                        setNetworkModalTab('following');
+                        setShowNetworkModal(true);
+                        // Refresh on click to ensure live up-to-date list
+                        const token = localStorage.getItem('userToken');
+                        const userId = localStorage.getItem('userId');
+                        if (token && userId) {
+                          setLoadingNetwork(true);
+                          api.getUserNetwork(userId, token)
+                            .then(data => {
+                              const safeFollowers = Array.isArray(data.followers) ? data.followers : [];
+                              const safeFollowing = Array.isArray(data.following) ? data.following : [];
+                              setNetworkUsers({ followers: safeFollowers, following: safeFollowing });
+                              setStats(prev => ({
+                                ...prev,
+                                followers: typeof data.followersCount === 'number' ? data.followersCount : safeFollowers.length,
+                                following: typeof data.followingCount === 'number' ? data.followingCount : safeFollowing.length
+                              }));
+                            })
+                            .catch(console.error)
+                            .finally(() => setLoadingNetwork(false));
+                        }
+                      }
+                    },
                     { 
                       label: 'Activity', 
                       value: `${stats.activityScore}%`, 
@@ -4053,6 +4124,166 @@ const Profile = () => {
                   className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-md shadow-emerald-600/20 border-none cursor-pointer"
                 >
                   තේරුණා (Got it)
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ═════════ 👥 NETWORK MODAL: FOLLOWERS & FOLLOWING LIST ═════════ */}
+      <AnimatePresence>
+        {showNetworkModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowNetworkModal(false)}
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 15 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 15 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-2xl overflow-hidden"
+            >
+              {/* Decorative top accent */}
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600" />
+
+              {/* Modal Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                    <LuUser size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white">Community Network</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Your campus connections & followers</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowNetworkModal(false)}
+                  className="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border-none bg-transparent cursor-pointer"
+                >
+                  <LuX size={18} />
+                </button>
+              </div>
+
+              {/* Segmented Control Tabs */}
+              <div className="grid grid-cols-2 gap-2 mt-4 p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/60">
+                <button
+                  type="button"
+                  onClick={() => setNetworkModalTab('followers')}
+                  className={`py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer border-none ${
+                    networkModalTab === 'followers'
+                      ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-transparent'
+                  }`}
+                >
+                  <span>Followers</span>
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                    {networkUsers.followers.length}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setNetworkModalTab('following')}
+                  className={`py-2 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 cursor-pointer border-none ${
+                    networkModalTab === 'following'
+                      ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm'
+                      : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white bg-transparent'
+                  }`}
+                >
+                  <span>Following</span>
+                  <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
+                    {networkUsers.following.length}
+                  </span>
+                </button>
+              </div>
+
+              {/* List Content */}
+              <div className="mt-4 max-h-[380px] overflow-y-auto custom-scrollbar space-y-2 pr-1">
+                {loadingNetwork ? (
+                  <div className="py-12 flex flex-col items-center justify-center text-slate-400">
+                    <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-2" />
+                    <span className="text-xs font-semibold">Loading connections...</span>
+                  </div>
+                ) : (
+                  (() => {
+                    const currentList = networkModalTab === 'followers' ? networkUsers.followers : networkUsers.following;
+                    if (currentList.length === 0) {
+                      return (
+                        <div className="py-12 flex flex-col items-center justify-center text-center p-6 rounded-2xl bg-slate-50 dark:bg-slate-800/30 border border-dashed border-slate-200 dark:border-white/10">
+                          <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-500 flex items-center justify-center mb-3">
+                            <LuUser size={24} />
+                          </div>
+                          <p className="text-sm font-bold text-slate-800 dark:text-white">
+                            {networkModalTab === 'followers' ? 'No followers yet' : 'Not following anyone yet'}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1 max-w-xs">
+                            {networkModalTab === 'followers'
+                              ? 'Publish campus accommodation, marketplace items, or stories to gain student followers!'
+                              : 'Explore accommodation listings and student marketplace sellers to follow campus peers!'}
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    return currentList.map((user) => {
+                      const avatar = user.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name || 'User'}`;
+                      return (
+                        <div
+                          key={user.id}
+                          className="flex items-center justify-between p-3 rounded-2xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-100 dark:border-white/5 hover:border-indigo-300 dark:hover:border-indigo-500/40 transition-all"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <img
+                              src={avatar}
+                              alt={user.name}
+                              className="w-10 h-10 rounded-full object-cover border border-white dark:border-slate-800 shadow-sm shrink-0"
+                              onError={(e: any) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name || 'User'}`;
+                              }}
+                            />
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                                  {user.name}
+                                </span>
+                                {user.is_verified_student && (
+                                  <span className="text-amber-500 text-[10px]" title="Verified Student">✓</span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                                {user.university || user.role || 'UniGang Member'}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="shrink-0">
+                            <span className="text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300">
+                              {networkModalTab === 'followers' ? 'Follower' : 'Following'}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowNetworkModal(false)}
+                  className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-indigo-600 hover:bg-indigo-700 transition-all shadow-md shadow-indigo-600/20 border-none cursor-pointer"
+                >
+                  Close
                 </button>
               </div>
             </motion.div>
