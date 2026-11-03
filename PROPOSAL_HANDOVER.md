@@ -810,6 +810,18 @@
 - **4. Resilient Admin Image Previews (`Dashboard/src/pages/admin/AnnexesPage.tsx`):**
   - Added `onError` fallback handling in `AnnexDetailModal` to prevent broken thumbnail images.
 
+## 📌 Round 91: Accurate Followers/Following Real Counters & Community Network Modal (2026-11-03)
+- **1. Backend Database-Driven Network API (`Backend/internal/controller/auth_controller.go`):**
+  - Updated `GetNetwork` endpoint (`GET /api/users/:id/network`) to fetch exact follower and following records from `follows` table.
+  - Sanitized query fields (`id, name, email, role, profile_pic, university, is_verified_student, is_verified_landlord`) for security and performance.
+- **2. Accurate Profile Stats Persistence (`Website/src/pages/profile/Profile.tsx`):**
+  - Removed artificial computed numbers `(listingsCount * 3) + ...` that were overwriting genuine database counts in `setStats`.
+  - Now preserves real `followers` and `following` counts fetched directly from user's account records.
+- **3. Interactive Community Network Modal (`Website/src/pages/profile/Profile.tsx`):**
+  - Made both **Followers** and **Following** metric cards interactive with a `VIEW` pill badge and smooth hover effects.
+  - Clicking either card opens a modern slide-in **Community Network Modal** with Segmented Tabs (`Followers` vs `Following`).
+  - Displays user avatar, name, verified student badge, university, role, and direct connection status with empty states.
+
 ---
 
 ## 💬 3. ඊළඟ Session එක ආරම්භ කරන විට යොදන Prompt එක (Resume Prompt)
