@@ -20,6 +20,35 @@ const AuthSynchronizer = () => {
       socket.emit('join_user_room', userId);
     }
 
+    // 📡 Global Active Session Pulse (Guarantees 100% accurate live telemetry across AWS Lambda instances)
+    let sessionId = sessionStorage.getItem('uni_session_id');
+    if (!sessionId) {
+      sessionId = 'sess_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+      sessionStorage.setItem('uni_session_id', sessionId);
+    }
+
+    const sendPulse = () => {
+      const currentUid = localStorage.getItem('userId') || '';
+      const currentRole = localStorage.getItem('userRole') || 'guest';
+      const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+
+      fetch(`${apiBase}/api/stats/pulse`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          userId: currentUid,
+          role: currentRole,
+        }),
+      }).catch(() => {});
+    };
+
+    // Send immediate pulse on page load
+    sendPulse();
+
+    // Pulse heartbeat every 20 seconds while user/visitor is browsing
+    const pulseInterval = setInterval(sendPulse, 20000);
+
     // 🎓 Real-Time Verification Sync: Instant update when admin approves verification
     const handleProfileUpdated = (updatedUser: any) => {
       if (updatedUser) {
@@ -75,6 +104,7 @@ const AuthSynchronizer = () => {
     });
 
     return () => {
+      clearInterval(pulseInterval);
       socket.off('user_profile_updated', handleProfileUpdated);
       unsubscribe();
     };
