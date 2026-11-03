@@ -12,6 +12,7 @@ import PageBreadcrumb from "../../components/ui/PageBreadcrumb";
 import AdNativeFeed from "../../components/advertise/AdNativeFeed";
 import SEO from "../../components/SEO";
 import VerifiedBadge from "../../components/ui/VerifiedBadge";
+import { getSocket } from "../../services/realtime";
 
 const escapeHtml = (str: string) => {
     if (!str) return '';
@@ -256,6 +257,22 @@ const AnnexList = () => {
         setCurrentPage(1);
         fetchAnnexes(appliedFilters, activeCategory);
     }, [activeCategory]);
+
+    // ⚡ Real-Time Instant Annex Refresh on Approval
+    useEffect(() => {
+        const socket = getSocket();
+        const handleAnnexUpdated = (data: any) => {
+            if (data) {
+                // Instantly re-fetch approved listings so newly approved annex appears without user refresh
+                fetchAnnexes(appliedFilters, activeCategory);
+            }
+        };
+
+        socket.on('annex_updated', handleAnnexUpdated);
+        return () => {
+            socket.off('annex_updated', handleAnnexUpdated);
+        };
+    }, [appliedFilters, activeCategory]);
 
     // Explicit Search Button Trigger
     const handleSearchClick = () => {

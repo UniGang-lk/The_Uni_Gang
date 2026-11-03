@@ -3,6 +3,8 @@ import { FiBell, FiCheck, FiInfo, FiFileText, FiCalendar, FiTool, FiHome, FiShop
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../api';
 import { useNavigate } from 'react-router-dom';
+import { getSocket } from '../../services/realtime';
+import toast from 'react-hot-toast';
 
 const getNotificationIcon = (type: string) => {
   switch (type) {
@@ -67,8 +69,51 @@ export const NotificationDropdown = () => {
   useEffect(() => {
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000); // Polled every 30s for better responsiveness
-    return () => clearInterval(interval);
-  }, []);
+
+    // ⚡ Real-Time Instant Notification Trigger via Socket
+    const socket = getSocket();
+    const handleNewNotification = (notif: any) => {
+      if (notif) {
+        setNotifications(prev => [notif, ...prev.filter(n => n.id !== notif.id)]);
+        // Display instant popup alert to the user
+        toast.custom((t) => (
+          <div
+            onClick={() => {
+              toast.dismiss(t.id);
+              if (notif.link) navigate(notif.link);
+            }}
+            className={`${
+              t.visible ? 'animate-enter' : 'animate-leave'
+            } max-w-md w-full bg-white dark:bg-slate-900 shadow-2xl rounded-2xl pointer-events-auto flex ring-1 ring-black/5 dark:ring-white/10 p-4 cursor-pointer hover:scale-[1.02] transition-transform`}
+          >
+            <div className="flex-1 w-0 flex items-center">
+              <div className="flex-shrink-0 pt-0.5 text-2xl mr-3">
+                {notif.type === 'Annex' ? '🏠' : '🔔'}
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-slate-900 dark:text-white">
+                  {notif.title || 'Notification'}
+                </p>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                  {notif.message}
+                </p>
+              </div>
+            </div>
+            <div className="flex border-l border-slate-100 dark:border-slate-800 pl-3 ml-2 items-center">
+              <span className="text-xs font-bold text-blue-600 dark:text-blue-400">View</span>
+            </div>
+          </div>
+        ), { duration: 6000 });
+      }
+    };
+
+    socket.on('new_notification', handleNewNotification);
+
+    return () => {
+      clearInterval(interval);
+      socket.off('new_notification', handleNewNotification);
+    };
+  }, [navigate]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
