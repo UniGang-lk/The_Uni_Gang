@@ -782,6 +782,10 @@
       - **WebSocket 400 Handshake Error Elimination ([realtime.ts](file:///e:/The-Uni-Gang/Dashboard/src/api/realtime.ts) & [realtime.ts](file:///e:/The-Uni-Gang/Website/src/services/realtime.ts)):** AWS Lambda / HTTP API Gateway එක standard WebSocket upgrade requests (`wss://...`) 400 Bad Request ලෙස reject කරන බැවින්, Socket.IO client configuration එකෙහි `transports: ['polling']` ලෙස lock කරන ලදී. මෙයින් console එකෙහි දිගින් දිගටම වැටුණු `WebSocket handshake: Unexpected response code: 400` errors සම්පූර්ණයෙන්ම තුරන් විය.
       - **Resilient Notifications JSON Parsing ([api.ts](file:///e:/The-Uni-Gang/Dashboard/src/api/api.ts)):** `fetchMyNotifications` හිදී token නොමැති විට හෝ non-200 / malformed response එකක් පැමිණි විට console එක crash කරන `SyntaxError: Unexpected non-whitespace character after JSON` දෝෂය වළක්වා, safe text check සහ `JSON.parse` fallback guards යොදා ආරක්ෂිත කරන ලදී.
       - **Production Verification:** Dashboard build එක සාර්ථකව compile වී (`built in 48.47s`) GitHub `master` වෙත push කරන ලදී (`commit 736087a`).
+    - **🌐 Round 89 Socket.IO Polling CORS Wildcard & Credentials Conflict Fix:**
+      - **Root Cause & Fix:** Browser CORS spec එකට අනුව `Access-Control-Allow-Origin: *` (wildcard) වන විට client request එකක `withCredentials: true` තිබිය නොහැක (එසේ වුවහොත් browser එක විසින් request එක block කරයි).
+      - **Resolution ([socket_service.go](file:///e:/The-Uni-Gang/Backend/internal/service/socket_service.go), [realtime.ts](file:///e:/The-Uni-Gang/Dashboard/src/api/realtime.ts), [realtime.ts](file:///e:/The-Uni-Gang/Website/src/services/realtime.ts)):** Backend Socket.IO options වල `Credentials: false` ලෙසත්, Dashboard සහ Website Socket.IO clients වල `withCredentials: false` ලෙසත් align කරන ලදී. මෙයින් CORS policy violation error එක සහ `ERR_FAILED` සම්පූර්ණයෙන්ම නිරාකරණය විය.
+      - **Build & Push:** Dashboard build එක සාර්ථකව compile වී (`built in 45.76s`) `d48582e` ලෙසද, Backend `79eaff0` ලෙසද, Website `06074b0` ලෙසද repositories වෙත push කරන ලදී.
 
 ---
 
