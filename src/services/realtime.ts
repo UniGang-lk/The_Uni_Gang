@@ -13,7 +13,7 @@ export const getSocket = (): Socket => {
     
     socketInstance = io(BASE_URL, {
       withCredentials: true,
-      transports: ['websocket', 'polling'],
+      transports: ['polling'],
       auth: token ? { token } : undefined,
       autoConnect: true,
       reconnection: true,
