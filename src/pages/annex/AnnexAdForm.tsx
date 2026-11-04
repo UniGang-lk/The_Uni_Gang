@@ -361,7 +361,7 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
     defaultValues: {
       title: initialData?.title ?? '',
       monthlyRent: initialData?.price ? String(initialData.price).replace(/\D/g, '') : '',
-      securityDeposit: initialData?.securityDeposit ?? '',
+      securityDeposit: initialData?.key_money_months ? String(initialData.key_money_months) : (initialData?.keyMoneyMonths ? String(initialData.keyMoneyMonths) : (initialData?.securityDeposit ? String(initialData.securityDeposit).replace(/\D/g, '') || '1' : '1')),
       address: initialData?.address ?? '',
       universityId: initialData?.universityId ? String(initialData.universityId) : '',
       customInstitution: '',
@@ -652,13 +652,37 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
                   </div>
                   <div>
                     <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
-                      {lang === 'si' ? 'ඇප මුදල (Key Money)' : 'Security Deposit (Key Money)'}
+                      {lang === 'si' ? 'ඇප මුදල / Key Money (මාස ගණන)' : 'Key Money / Security Deposit (Months)'}
                     </label>
-                    <input
-                      {...register('securityDeposit')}
-                      placeholder={lang === 'si' ? 'උදා: මාස 3 ක මුදල' : 'e.g. 3 Months Rent'}
-                      className="w-full px-5 py-4 rounded-2xl bg-slate-50/50 dark:bg-slate-800/30 border border-slate-200 dark:border-slate-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 font-medium outline-none transition-all dark:text-white"
-                    />
+                    <div className="relative">
+                      <select
+                        {...register('securityDeposit')}
+                        className="w-full pl-5 pr-10 py-4 rounded-2xl bg-white dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white font-bold outline-none cursor-pointer appearance-none shadow-sm transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                      >
+                        <option value="1" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold py-2">
+                          {lang === 'si' ? 'මාස 1 ක මුදල (1 Month)' : '1 Month Rent'}
+                        </option>
+                        <option value="2" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold py-2">
+                          {lang === 'si' ? 'මාස 2 ක මුදල (2 Months)' : '2 Months Rent'}
+                        </option>
+                        <option value="3" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold py-2">
+                          {lang === 'si' ? 'මාස 3 ක මුදල (3 Months)' : '3 Months Rent'}
+                        </option>
+                        <option value="4" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold py-2">
+                          {lang === 'si' ? 'මාස 4 ක මුදල (4 Months)' : '4 Months Rent'}
+                        </option>
+                        <option value="5" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold py-2">
+                          {lang === 'si' ? 'මාස 5 ක මුදල (5 Months)' : '5 Months Rent'}
+                        </option>
+                        <option value="6" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold py-2">
+                          {lang === 'si' ? 'මාස 6 ක මුදල (6 Months)' : '6 Months Rent'}
+                        </option>
+                        <option value="12" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-bold py-2">
+                          {lang === 'si' ? 'මාස 12 ක මුදල (1 Year)' : '12 Months Rent (1 Year)'}
+                        </option>
+                      </select>
+                      <LuChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-lg" />
+                    </div>
                     {errors.securityDeposit && <p className="text-red-500 text-sm mt-1">{errors.securityDeposit.message}</p>}
                   </div>
                 </div>
