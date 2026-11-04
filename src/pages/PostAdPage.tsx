@@ -108,6 +108,8 @@ const PostAdPage = () => {
       formData.append('longitude', String(adData.longitude));
       formData.append('universityId', adData.universityId);
       formData.append('securityDeposit', adData.securityDeposit || '');
+      const parsedKeyMoney = parseInt(String(adData.securityDeposit).replace(/\D/g, ''), 10);
+      formData.append('keyMoneyMonths', String(isNaN(parsedKeyMoney) || parsedKeyMoney <= 0 ? 1 : parsedKeyMoney));
       formData.append('listingType', adData.listingType || 'LANDLORD_RENT');
       if (adData.landlordPresence) formData.append('landlordPresence', adData.landlordPresence);
       if (adData.curfewTime) formData.append('curfewTime', adData.curfewTime);

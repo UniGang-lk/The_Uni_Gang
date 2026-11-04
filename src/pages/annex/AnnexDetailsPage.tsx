@@ -3,7 +3,7 @@ import {
   LuStar, LuWifi, LuBath, LuSnowflake, LuCar, LuUtensils,
   LuZap, LuMessageCircle, LuCircleCheckBig, LuCheck,
   LuShieldCheck, LuHouse, LuUsers, LuBus, LuFootprints,
-  LuDroplets, LuLock, LuLightbulb, LuBanknote, LuShare2, LuCalculator,
+  LuDroplets, LuLock, LuLightbulb, LuBanknote, LuShare2, 
   LuChevronLeft, LuMapPin, LuGraduationCap, LuPhone, LuCamera,
   LuCalendar, LuBadgePercent, LuInfo, LuHeart
 } from 'react-icons/lu';
@@ -104,14 +104,14 @@ const AnnexDetailsPage = () => {
 
   // Gallery and Roommate Calculator States
   const [activeImageIdx, setActiveImageIdx] = useState(0);
-  const [splitRoommates, setSplitRoommates] = useState(2);
+  
 
-  // Review Posting State
-  const [overall, setOverall] = useState(5);
-  const [cleanliness, setCleanliness] = useState(5);
-  const [landlord, setLandlord] = useState(5);
-  const [comment, setComment] = useState("");
-  const [submittingReview, setSubmittingReview] = useState(false);
+  
+  
+  
+  
+  
+  
 
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -185,45 +185,6 @@ const AnnexDetailsPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     fetchAnnexDetails();
   }, [id]);
-
-  const handleReviewSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const token = localStorage.getItem('userToken');
-    if (!token) {
-      toast.error("Please login to submit feedback.");
-      return;
-    }
-
-    setSubmittingReview(true);
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/annexes/${id}/reviews`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          overallRating: overall,
-          cleanlinessRating: cleanliness,
-          landlordRating: landlord,
-          comment
-        })
-      });
-      const data = await response.json();
-      if (response.ok) {
-        toast.success(data.message || "Feedback submitted! Awaiting approval.");
-        setComment("");
-        fetchAnnexDetails();
-      } else {
-        toast.error(data.message || "Failed to submit review.");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Error submitting review.");
-    } finally {
-      setSubmittingReview(false);
-    }
-  };
 
   // Compile review scores
   const calculateAverages = () => {
@@ -476,53 +437,6 @@ const AnnexDetailsPage = () => {
                 </div>
               </div>
 
-              {/* Interactive Rent & Bill Splitter Widget */}
-              <div className="bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/60 dark:from-slate-900 dark:to-slate-800/60 p-6 rounded-[2rem] border border-blue-200/70 dark:border-slate-700 shadow-sm space-y-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="text-xs font-black uppercase tracking-wider text-blue-700 dark:text-blue-400 flex items-center gap-1.5">
-                      <LuCalculator className="text-sm shrink-0" /> Roommate Rent Splitter
-                    </h3>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                      Calculate your individual share if sharing with batchmates
-                    </p>
-                  </div>
-                  <span className="text-xs font-extrabold px-3 py-1 bg-blue-600 text-white rounded-full shadow-xs">
-                    {splitRoommates} Students
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <span className="text-xs font-bold text-slate-500">1</span>
-                  <input
-                    type="range"
-                    min="1"
-                    max="6"
-                    value={splitRoommates}
-                    onChange={(e) => setSplitRoommates(parseInt(e.target.value))}
-                    className="flex-grow h-2 bg-blue-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                  />
-                  <span className="text-xs font-bold text-slate-500">6</span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-blue-200/50 dark:border-slate-700">
-                  <div className="p-3.5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800">
-                    <span className="text-[10px] font-bold uppercase text-slate-400 block mb-0.5">Pure Rent Share</span>
-                    <span className="text-lg font-black text-blue-700 dark:text-blue-400">
-                      Rs. {Math.round(parseFloat(annex.price || 0) / splitRoommates).toLocaleString()}
-                    </span>
-                    <span className="text-[10px] text-slate-500 block">/student/month</span>
-                  </div>
-                  <div className="p-3.5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800">
-                    <span className="text-[10px] font-bold uppercase text-slate-400 block mb-0.5">Est. with Utilities</span>
-                    <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">
-                      Rs. {(Math.round(parseFloat(annex.price || 0) / splitRoommates) + 2500).toLocaleString()}
-                    </span>
-                    <span className="text-[10px] text-slate-500 block">incl. ~Rs.2,500 CEB/Water</span>
-                  </div>
-                </div>
-              </div>
-
               {/* Landlord Contact Box */}
               <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex items-center justify-between">
                 <div className="flex items-center gap-3.5">
@@ -755,68 +669,7 @@ const AnnexDetailsPage = () => {
                   </div>
                 )}
 
-                {/* Submit Feedback Form */}
-                <form onSubmit={handleReviewSubmit} className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-400">Leave a Student Review</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                      <label className="text-[10px] font-bold uppercase text-slate-500 block mb-1">Overall Quality</label>
-                      <select
-                        value={overall}
-                        onChange={(e) => setOverall(Number(e.target.value))}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 outline-none"
-                      >
-                        {[5, 4, 3, 2, 1].map((val) => (
-                          <option key={val} value={val}>{val} Stars</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold uppercase text-slate-500 block mb-1">Cleanliness</label>
-                      <select
-                        value={cleanliness}
-                        onChange={(e) => setCleanliness(Number(e.target.value))}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 outline-none"
-                      >
-                        {[5, 4, 3, 2, 1].map((val) => (
-                          <option key={val} value={val}>{val} Stars</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold uppercase text-slate-500 block mb-1">Landlord Safety</label>
-                      <select
-                        value={landlord}
-                        onChange={(e) => setLandlord(Number(e.target.value))}
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 dark:text-slate-200 outline-none"
-                      >
-                        {[5, 4, 3, 2, 1].map((val) => (
-                          <option key={val} value={val}>{val} Stars</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold uppercase text-slate-500 block mb-1">Your Honest Feedback</label>
-                    <textarea
-                      value={comment}
-                      onChange={(e) => setComment(e.target.value)}
-                      placeholder="Share details about room condition, study environment, and landlord safety..."
-                      rows={3}
-                      required
-                      className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none font-medium"
-                    ></textarea>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={submittingReview}
-                    className="py-3 px-6 bg-slate-900 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 cursor-pointer shadow-md"
-                  >
-                    {submittingReview ? 'Submitting...' : 'Post Student Review'}
-                  </button>
-                </form>
+                
               </div>
 
             </div>
