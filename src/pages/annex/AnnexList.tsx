@@ -758,7 +758,7 @@ const AnnexList = () => {
                                             const rawImg = item.images?.[0]?.imageUrl || item.images?.[0]?.url || item.images?.[0];
                                             const coverImage = typeof rawImg === 'string'
                                                 ? (rawImg.startsWith('http') ? rawImg : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${rawImg}`)
-                                                : "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
+                                                : getDeterministicHousingImage(item.id || item.title);
 
                                             // Resolve University Name
                                             const uniName = item.university?.name || 
@@ -782,7 +782,7 @@ const AnnexList = () => {
                                                                 src={coverImage}
                                                                 onError={(e: any) => {
                                                                     e.currentTarget.onerror = null;
-                                                                    e.currentTarget.src = "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
+                                                                    e.currentTarget.src = getDeterministicHousingImage(item.id || item.title);
                                                                 }}
                                                             />
 

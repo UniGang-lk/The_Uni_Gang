@@ -215,10 +215,11 @@ const AnnexDetailsPage = () => {
     power: LuZap
   };
 
-  const resolveImageUrl = (img: any): string => {
-    if (!img) return "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
+  const resolveImageUrl = (img: any, fallbackKey?: string | number): string => {
+    const fallback = getDeterministicHousingImage(fallbackKey || annex?.id || 'housing');
+    if (!img) return fallback;
     const url = typeof img === 'string' ? img : (img.imageUrl || img.url || '');
-    if (!url) return "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
+    if (!url) return fallback;
     if (url.startsWith('http')) return url;
     return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${url}`;
   };
@@ -301,7 +302,7 @@ const AnnexDetailsPage = () => {
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     onError={(e: any) => {
                       e.currentTarget.onerror = null;
-                      e.currentTarget.src = "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
+                      e.currentTarget.src = getDeterministicHousingImage(annex?.id || activeImageIdx);
                     }}
                   />
 
