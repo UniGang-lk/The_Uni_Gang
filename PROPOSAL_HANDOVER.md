@@ -255,6 +255,28 @@ MAX_FILE_SIZE_MB=10
 
 ---
 
+## 📌 Round 92: Base64 Image Persistence, Mobile & Tablet Responsiveness, Admin Delete Route & Security Hardening (2026-11-05)
+- **1. Base64 Direct Database Image Persistence & Full Stack Decoder Fix:**
+  - **Website (`PostAdPage.tsx`):** Added client-side Base64 converter before submission (`base64Images` payload). Resolves AWS Lambda ephemeral disk wipes by storing image data permanently in PostgreSQL.
+  - **Backend (`Backend/internal/model/annex.go`, `config/db.go`, `annex_controller.go`):** Migrated `annex_images.image_url` to `TEXT` type in PostgreSQL schema and handled `base64Images` array JSON decoding in `CreateAnnex` & `UpdateAnnex`.
+  - **Image Rendering Across Views (`MyAdsList.tsx`, `AnnexList.tsx`, `AnnexDetailsPage.tsx`, `AnnexAdForm.tsx`):** Fixed broken image URL prepending by allowing `data:image` strings to pass through directly without prepending `${BASE_URL}`.
+- **2. Full Mobile & Tablet Form Responsiveness (`Website/src/pages/annex/AnnexAdForm.tsx`):**
+  - Overhauled container and header padding to be fully fluid (`px-4 py-5` on mobile, `sm:px-8` on tablet, `md:px-12` on desktop).
+  - Scaled stepper icons and dots dynamically for compact smartphone viewports without overflow.
+  - Made action buttons (`Continue`, `Back`, `Publish`) auto-wrap and resize for seamless finger taps.
+- **3. Admin Direct Delete Endpoint & Auto-Cascade Cleanup:**
+  - **Backend (`Backend/internal/controller/annex_controller.go`):** Registered dedicated admin route `DELETE /admin/:id` inside admin moderation group and implemented explicit child record deletion (`AnnexImage`, `AnnexFeature`, `AnnexReview`) alongside `ON DELETE CASCADE`.
+  - **Dashboard (`Dashboard/src/api/api.ts`):** Added automatic fallback to `/api/annexes/admin/:id` on 403/404 responses for reliable single-click deletion from Admin portal.
+- **4. Backend Security Hardening & Zero-Footprint Fingerprinting:**
+  - **cmd/api/main.go & security.go:** Stripped `Server` and `X-Powered-By` headers and replaced the root string banner with neutral JSON `{"status":"online","timestamp":...}`.
+  - **Upload Middleware (`internal/middleware/upload.go`):** Implemented strict file format and magic byte header inspection (`http.DetectContentType`) to reject disguised malware, SVGs with embedded scripts, and malicious binaries.
+  - **DDoS / Flood Rate Limiting:** Enforced `PublicLimiter` IP-based sliding window protection.
+- **5. Live Online Users Presence Deck on Admin Home (`DashboardPage.tsx`, `AdminLayout.tsx`, `stats_controller.go`):**
+  - Exposed online authenticated student/landlord member profiles (Full Name, Photo, University, Role, Green Live Indicator) from `/api/stats/telemetry`.
+  - Designed glowing dark-themed **Live Online Presence** overview desk directly on the Admin Dashboard Home with real-time heartbeat sync.
+
+---
+
 ## 💬 5. Handover & Resume Prompt
 ඕනෑම අවස්ථාවක අලුත් chat එකක් ආරම්භ වූ විට, පහත පණිවිඩය copy-paste කරන්න:
 
