@@ -758,7 +758,7 @@ const AnnexList = () => {
                                         {paginatedData.map((item, index) => {
                                             const rawImg = item.images?.[0]?.imageUrl || item.images?.[0]?.url || item.images?.[0];
                                             const coverImage = typeof rawImg === 'string'
-                                                ? (rawImg.startsWith('http') ? rawImg : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${rawImg}`)
+                                                ? ((rawImg.startsWith('http') || rawImg.startsWith('data:image')) ? rawImg : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${rawImg}`)
                                                 : "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
 
                                             // Resolve University Name

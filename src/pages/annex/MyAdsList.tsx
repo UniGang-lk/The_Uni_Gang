@@ -81,7 +81,7 @@ const MyAdsList: React.FC<MyAdsListProps> = ({ ads, onEdit, onDelete }) => {
           ? ad.images.map((img: any) => {
               const url = typeof img === 'object' && img !== null ? (img.imageUrl || img.url) : img;
               if (typeof url === 'string') {
-                if (url.startsWith('http')) return url;
+                if (url.startsWith('http') || url.startsWith('data:image')) return url;
                 return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${url}`;
               }
               return url || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800';

@@ -519,10 +519,10 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
   };
 
   return (
-    <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-white/50 dark:border-slate-700/50 overflow-hidden w-full max-w-4xl mx-auto mt-2 mb-8 font-sans relative z-10">
+    <div className="bg-white/70 dark:bg-slate-900/70 backdrop-blur-3xl rounded-2xl sm:rounded-3xl md:rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-white/50 dark:border-slate-700/50 overflow-hidden w-full max-w-4xl mx-auto mt-1 sm:mt-2 mb-8 font-sans relative z-10">
 
       {/* Header */}
-      <div className="px-8 py-8 md:px-12 md:py-10 border-b border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-slate-800/50 dark:to-slate-900/50">
+      <div className="px-4 py-5 sm:px-8 sm:py-8 md:px-12 md:py-10 border-b border-slate-200/50 dark:border-slate-800/50 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-slate-800/50 dark:to-slate-900/50">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-black text-slate-800 dark:text-white tracking-tight leading-none">
@@ -570,7 +570,7 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
           </div>
           {STEPS.map((step, idx) => (
             <div key={step.id} className="relative z-10 flex flex-col items-center gap-1">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-500 border-2 ${currentStep >= idx ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/30' : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-400'}`}>
+              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm transition-all duration-500 border-2 ${currentStep >= idx ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/30' : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-400'}`}>
                 {currentStep > idx ? <LuCheck size={18} /> : <step.icon size={18} />}
               </div>
               <span className={`text-[10px] font-bold uppercase tracking-wider hidden sm:block ${currentStep === idx ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}>
@@ -581,7 +581,7 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(submitForm)} className="p-8 md:p-12 relative min-h-[400px]">
+      <form onSubmit={handleSubmit(submitForm)} className="p-4 sm:p-8 md:p-12 relative min-h-[400px]">
         <AnimatePresence mode="wait">
 
           {/* ── STEP 1: General Specs ── */}
@@ -865,7 +865,7 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
                 Media Gallery
               </h2>
               
-              <div className={`border-2 border-dashed rounded-[2rem] p-10 text-center relative group transition-colors ${images.length >= 4 ? 'border-slate-200 dark:border-slate-700 bg-slate-100/50 dark:bg-slate-800/20 opacity-60 cursor-not-allowed' : 'border-slate-300 dark:border-slate-600 bg-slate-50/50 dark:bg-slate-800/30 hover:bg-slate-100/50 cursor-pointer'}`}>
+              <div className={`border-2 border-dashed rounded-2xl sm:rounded-[2rem] p-5 sm:p-10 text-center relative group transition-colors ${images.length >= 4 ? 'border-slate-200 dark:border-slate-700 bg-slate-100/50 dark:bg-slate-800/20 opacity-60 cursor-not-allowed' : 'border-slate-300 dark:border-slate-600 bg-slate-50/50 dark:bg-slate-800/30 hover:bg-slate-100/50 cursor-pointer'}`}>
                 {images.length < 4 && (
                   <input type="file" multiple accept="image/*" onChange={handleImageUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
                 )}
@@ -913,7 +913,7 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {initialData.images.map((img: any, idx: number) => {
                       const src = typeof img === 'object' && img !== null && img.imageUrl
-                        ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${img.imageUrl}`
+                        ? ((img.imageUrl.startsWith('http') || img.imageUrl.startsWith('data:image')) ? img.imageUrl : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${img.imageUrl}`)
                         : img;
                       return (
                         <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden shadow-md group">
@@ -1190,12 +1190,12 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
         </AnimatePresence>
 
         {/* Footer Navigation */}
-        <div className="flex justify-between mt-12 pt-6 border-t border-slate-200/50 dark:border-slate-800 relative z-10">
+        <div className="flex items-center justify-between gap-3 mt-8 sm:mt-12 pt-5 sm:pt-6 border-t border-slate-200/50 dark:border-slate-800 relative z-10">
           <button
             type="button"
             onClick={onPrev}
             disabled={currentStep === 0}
-            className={`flex items-center gap-2 px-6 py-3 font-bold rounded-xl transition-all border-none cursor-pointer ${currentStep === 0 ? 'opacity-0 pointer-events-none' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'}`}
+            className={`flex items-center gap-1.5 sm:gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded-xl transition-all border-none cursor-pointer ${currentStep === 0 ? 'opacity-0 pointer-events-none' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'}`}
           >
             <LuChevronLeft /> {lang === 'si' ? 'ආපසු (Back)' : 'Back'}
           </button>
@@ -1204,7 +1204,7 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
             <button
               type="button"
               onClick={onNext}
-              className="flex items-center gap-2 px-8 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl hover:shadow-lg hover:shadow-slate-900/20 dark:hover:shadow-white/20 transition-all hover:scale-105 active:scale-95 border-none cursor-pointer"
+              className="flex items-center gap-1.5 sm:gap-2 px-5 sm:px-8 py-2.5 sm:py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs sm:text-sm font-bold rounded-xl hover:shadow-lg hover:shadow-slate-900/20 dark:hover:shadow-white/20 transition-all hover:scale-105 active:scale-95 border-none cursor-pointer"
             >
               {lang === 'si' ? 'ඊළඟ පියවර (Continue)' : 'Continue'} <LuChevronRight />
             </button>
@@ -1212,7 +1212,7 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:shadow-xl hover:shadow-blue-500/30 transition-all hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 border-none cursor-pointer"
+              className="flex items-center gap-1.5 sm:gap-2 px-5 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs sm:text-sm font-bold rounded-xl hover:shadow-xl hover:shadow-blue-500/30 transition-all hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 border-none cursor-pointer"
             >
               {isSubmitting 
                 ? (lang === 'si' ? 'පළ කරමින්...' : 'Publishing...') 
