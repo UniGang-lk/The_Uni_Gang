@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import {
     LuArrowRight, LuGraduationCap, LuSearch, LuArrowLeft, LuPlus,
     LuHeart, LuMapPin, LuBedDouble, LuMap, LuHouse, LuShieldCheck,
@@ -63,7 +63,7 @@ const LeafletListMap = ({ items, centerUniId, maxDistance }: { items: any[], cen
             map = L.map('list-map-canvas').setView([centerLat, centerLng], 14);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
+                attribution: '┬⌐ OpenStreetMap contributors'
             }).addTo(map);
 
             // 1. Seed University Center Marker
@@ -258,7 +258,7 @@ const AnnexList = () => {
         fetchAnnexes(appliedFilters, activeCategory);
     }, [activeCategory]);
 
-    // ⚡ Real-Time Instant Annex Refresh on Approval
+    // ΓÜí Real-Time Instant Annex Refresh on Approval
     useEffect(() => {
         const socket = getSocket();
         const handleAnnexUpdated = (data: any) => {
@@ -673,7 +673,8 @@ const AnnexList = () => {
                                 </div>
                             </motion.div>
                         </main>
-                        {/* Annex Listings Section */}
+
+                        {/* Annex Listings Section */}
                         <section className="w-full max-w-7xl 2xl:max-w-[1600px] 3xl:max-w-[1800px] mx-auto px-4 sm:px-6 md:px-8 py-14" id="listing-grid">
                             <div className="flex flex-col gap-6 mb-10">
                                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -758,7 +759,7 @@ const AnnexList = () => {
                                             const rawImg = item.images?.[0]?.imageUrl || item.images?.[0]?.url || item.images?.[0];
                                             const coverImage = typeof rawImg === 'string'
                                                 ? (rawImg.startsWith('http') ? rawImg : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${rawImg}`)
-                                                : getDeterministicHousingImage(item.id || item.title);
+                                                : "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
 
                                             // Resolve University Name
                                             const uniName = item.university?.name || 
@@ -782,7 +783,7 @@ const AnnexList = () => {
                                                                 src={coverImage}
                                                                 onError={(e: any) => {
                                                                     e.currentTarget.onerror = null;
-                                                                    e.currentTarget.src = getDeterministicHousingImage(item.id || item.title);
+                                                                    e.currentTarget.src = "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
                                                                 }}
                                                             />
 

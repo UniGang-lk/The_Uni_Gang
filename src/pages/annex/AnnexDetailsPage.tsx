@@ -1,4 +1,4 @@
-import { useParams, useNavigate, Link } from 'react-router-dom';
+﻿import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   LuStar, LuWifi, LuBath, LuSnowflake, LuCar, LuUtensils,
   LuZap, LuMessageCircle, LuCircleCheckBig, LuCheck,
@@ -42,7 +42,7 @@ const LeafletDetailMap = ({ propertyLat, propertyLng, uniLat, uniLng, uniName, a
       map = L.map('details-map-canvas', { scrollWheelZoom: false }).setView([propertyLat, propertyLng], 15);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
+        attribution: '┬⌐ OpenStreetMap contributors'
       }).addTo(map);
 
       // Property Pin
@@ -138,7 +138,7 @@ const AnnexDetailsPage = () => {
       if (safeSaved.includes(id)) {
         updated = safeSaved.filter(item => item !== id);
         setIsFavorite(false);
-        toast('Removed from saved list', { icon: '🤍' });
+        toast('Removed from saved list', { icon: '≡ƒñì' });
       } else {
         updated = [...safeSaved, id];
         setIsFavorite(true);
@@ -215,11 +215,10 @@ const AnnexDetailsPage = () => {
     power: LuZap
   };
 
-  const resolveImageUrl = (img: any, fallbackKey?: string | number): string => {
-    const fallback = getDeterministicHousingImage(fallbackKey || annex?.id || 'housing');
-    if (!img) return fallback;
+  const resolveImageUrl = (img: any): string => {
+    if (!img) return "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
     const url = typeof img === 'string' ? img : (img.imageUrl || img.url || '');
-    if (!url) return fallback;
+    if (!url) return "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
     if (url.startsWith('http')) return url;
     return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${url}`;
   };
@@ -289,7 +288,7 @@ const AnnexDetailsPage = () => {
           {/* Main 2-Column Balanced Layout */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
-            {/* ── LEFT COLUMN (5 Cols): Photo Showcase + Highlights + Rent Splitter ── */}
+            {/* ΓöÇΓöÇ LEFT COLUMN (5 Cols): Photo Showcase + Highlights + Rent Splitter ΓöÇΓöÇ */}
             <div className="lg:col-span-5 space-y-6">
               
               {/* Photo Showcase Card */}
@@ -302,7 +301,7 @@ const AnnexDetailsPage = () => {
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     onError={(e: any) => {
                       e.currentTarget.onerror = null;
-                      e.currentTarget.src = getDeterministicHousingImage(annex?.id || activeImageIdx);
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800";
                     }}
                   />
 
@@ -377,7 +376,7 @@ const AnnexDetailsPage = () => {
                   <div className="bg-slate-50 dark:bg-slate-800/50 p-2.5 sm:p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
                     <span className="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">Bedrooms & Bath</span>
                     <span className="text-slate-800 dark:text-slate-200 font-extrabold text-[11px] sm:text-xs truncate block">
-                      {annex.beds || 1} Beds • {annex.bath || 'Shared Bath'}
+                      {annex.beds || 1} Beds ΓÇó {annex.bath || 'Shared Bath'}
                     </span>
                   </div>
                   <div className="bg-slate-50 dark:bg-slate-800/50 p-2.5 sm:p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
@@ -487,7 +486,7 @@ const AnnexDetailsPage = () => {
 
             </div>
 
-            {/* ── RIGHT COLUMN (7 Cols): Title, Amenities, Description, Location Map, Reviews ── */}
+            {/* ΓöÇΓöÇ RIGHT COLUMN (7 Cols): Title, Amenities, Description, Location Map, Reviews ΓöÇΓöÇ */}
             <div className="lg:col-span-7 space-y-6">
               
               {/* Title & Proximity Banner */}
@@ -524,7 +523,7 @@ const AnnexDetailsPage = () => {
                   )}
                   {(annex.distance_to_uni || annex.distanceToUni) && (
                     <span className="font-bold text-blue-600 dark:text-blue-400">
-                      📍 ~{annex.distance_to_uni || annex.distanceToUni} km from main gate
+                      ≡ƒôì ~{annex.distance_to_uni || annex.distanceToUni} km from main gate
                     </span>
                   )}
                 </div>
@@ -639,15 +638,15 @@ const AnnexDetailsPage = () => {
                 <div className="grid grid-cols-3 gap-3 text-center">
                   <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
                     <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Room Quality</span>
-                    <span className="text-lg font-black text-slate-900 dark:text-white">⭐ {scores.overall}</span>
+                    <span className="text-lg font-black text-slate-900 dark:text-white">Γ¡É {scores.overall}</span>
                   </div>
                   <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
                     <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Cleanliness</span>
-                    <span className="text-lg font-black text-teal-600 dark:text-teal-400">⭐ {scores.cleanliness}</span>
+                    <span className="text-lg font-black text-teal-600 dark:text-teal-400">Γ¡É {scores.cleanliness}</span>
                   </div>
                   <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
                     <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Landlord Safety</span>
-                    <span className="text-lg font-black text-blue-600 dark:text-blue-400">⭐ {scores.landlord}</span>
+                    <span className="text-lg font-black text-blue-600 dark:text-blue-400">Γ¡É {scores.landlord}</span>
                   </div>
                 </div>
 
