@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import SubLayout from './components/layout/SubLayout';
 import ScrollHandler from './components/layout/ScrollHandler';
@@ -105,6 +105,7 @@ function App() {
 
           {/* AnnexList using SubLayout */}
           <Route path="/annex-list" element={<SubLayout><AnnexList /></SubLayout>} />
+          <Route path="/annex" element={<Navigate to="/annex-list" replace />} />
 
           {/* EventList using SubLayout */}
           <Route path="/event-list" element={<SubLayout><EventList /></SubLayout>} />

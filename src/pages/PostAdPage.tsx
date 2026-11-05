@@ -225,7 +225,7 @@ const PostAdPage = () => {
             {/* Top Navigation & Breadcrumb */}
             <PageBreadcrumb
               items={[
-                { label: 'Accommodation', to: '/annex' },
+                { label: 'Accommodation', to: '/annex-list' },
                 { 
                   label: currentView === 'postAdForm' 
                     ? (editingAd ? 'Edit Advertisement' : 'Post Advertisement') 
@@ -233,7 +233,7 @@ const PostAdPage = () => {
                   active: true 
                 }
               ]}
-              backTo="/annex"
+              backTo="/annex-list"
               backLabel="Back to Accommodation"
               rightSlot={
                 isLoggedIn ? (
@@ -299,3 +299,5 @@ const PostAdPage = () => {
 };
 
 export default PostAdPage;
+
+
