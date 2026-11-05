@@ -137,6 +137,18 @@ const PostAdPage = () => {
       formData.append('features', JSON.stringify(features));
 
       if (adData.newImages && adData.newImages.length > 0) {
+        // Convert images to Base64 so they persist permanently in DB (bypasses ephemeral serverless disk)
+        const base64List: string[] = await Promise.all(
+          adData.newImages.map((file: File) => new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target?.result as string);
+            reader.onerror = () => resolve('');
+            reader.readAsDataURL(file);
+          }))
+        );
+        formData.append('base64Images', JSON.stringify(base64List.filter(Boolean)));
+
+        // Also append as file objects for backward compatibility
         adData.newImages.forEach((file: File) => {
           formData.append('images', file);
         });
