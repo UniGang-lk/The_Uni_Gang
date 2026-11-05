@@ -100,7 +100,7 @@ const MyAdsList: React.FC<MyAdsListProps> = ({ ads, onEdit, onDelete }) => {
             {/* Image Section */}
             <div className="relative h-[280px] rounded-[2rem] overflow-hidden mb-6 bg-slate-200 dark:bg-slate-700">
               {images.length > 0 ? (
-                <img src={images[currentIndex]} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={ad.title} />
+                <img src={images[currentIndex]} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={ad.title} onError={(e: any) => { e.currentTarget.onerror = null; e.currentTarget.src = "https://images.unsplash.com/photo-1522770179533-24471fcdba45?auto=format&fit=crop&q=80&w=800"; }} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-slate-400">No Image</div>
               )}
@@ -183,3 +183,4 @@ const MyAdsList: React.FC<MyAdsListProps> = ({ ads, onEdit, onDelete }) => {
 };
 
 export default MyAdsList;
+

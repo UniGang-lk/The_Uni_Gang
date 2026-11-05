@@ -1,3 +1,5 @@
+import { PageBreadcrumb } from '../components/ui/PageBreadcrumb';
+import { LuPlus, LuListOrdered } from 'react-icons/lu';
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import AuthCard from '../components/auth/AuthCard';
@@ -220,6 +222,42 @@ const PostAdPage = () => {
             transition={{ duration: 0.5 }}
             className="max-w-7xl mx-auto px-4 md:px-8 pt-3 sm:pt-4"
           >
+            {/* Top Navigation & Breadcrumb */}
+            <PageBreadcrumb
+              items={[
+                { label: 'Accommodation', to: '/annex' },
+                { 
+                  label: currentView === 'postAdForm' 
+                    ? (editingAd ? 'Edit Advertisement' : 'Post Advertisement') 
+                    : 'My Advertisements', 
+                  active: true 
+                }
+              ]}
+              backTo="/annex"
+              backLabel="Back to Accommodation"
+              rightSlot={
+                isLoggedIn ? (
+                  <div className="flex items-center gap-2">
+                    {currentView === 'myAds' ? (
+                      <button
+                        onClick={() => { setEditingAd(null); setCurrentView('postAdForm'); }}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs md:text-sm font-bold shadow-md hover:shadow-lg transition-all"
+                      >
+                        <LuPlus className="w-4 h-4" /> Post New Advertisement
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => { setCurrentView('myAds'); }}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs md:text-sm font-bold border border-slate-300 dark:border-slate-700 transition-all"
+                      >
+                        <LuListOrdered className="w-4 h-4" /> View My Ads ({myAds.length})
+                      </button>
+                    )}
+                  </div>
+                ) : undefined
+              }
+            />
+
             {!isLoggedIn ? (
               <div className="flex flex-col justify-center items-center py-10">
                 <AuthCard onAuthSuccess={handleAuthSuccess} />
