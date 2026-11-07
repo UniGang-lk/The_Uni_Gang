@@ -596,35 +596,49 @@ const AnnexDetailsPage = () => {
                 )}
 
                 {/* Sri Lanka Specific Utility Checklist */}
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-400">Student Living Specifications</h4>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs font-bold">
-                    <div className={`p-3 rounded-xl border flex items-center gap-2 ${annex.has_power_backup || annex.hasPowerBackup ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-slate-50 text-slate-400 border-slate-200 line-through'}`}>
-                      <LuZap size={15} /> Power Generator/UPS
-                    </div>
-                    <div className={`p-3 rounded-xl border flex items-center gap-2 ${(annex.has_water_tank !== false && annex.hasWaterTank !== false) ? 'bg-cyan-50 text-cyan-800 border-cyan-200' : 'bg-slate-50 text-slate-400 border-slate-200 line-through'}`}>
-                      <LuDroplets size={15} /> 24h Water Storage
-                    </div>
-                    <div className={`p-3 rounded-xl border flex items-center gap-2 ${(annex.is_cooking_allowed !== false && annex.isCookingAllowed !== false) ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-slate-50 text-slate-400 border-slate-200 line-through'}`}>
-                      <LuUtensils size={15} /> Cooking Permitted
-                    </div>
-                    <div className={`p-3 rounded-xl border flex items-center gap-2 ${annex.has_separate_entrance || annex.hasSeparateEntrance ? 'bg-indigo-50 text-indigo-800 border-indigo-200' : 'bg-slate-50 text-slate-400 border-slate-200 line-through'}`}>
-                      <LuLock size={15} /> Separate Entrance
-                    </div>
-                    <div className={`p-3 rounded-xl border flex items-center gap-2 ${annex.has_separate_meter || annex.hasSeparateMeter ? 'bg-purple-50 text-purple-800 border-purple-200' : 'bg-slate-50 text-slate-400 border-slate-200 line-through'}`}>
-                      <LuLightbulb size={15} /> Separate Electric Meter
-                    </div>
-                    {annex.bus_route || annex.busRoute ? (
-                      <div className="p-3 rounded-xl border bg-blue-50 text-blue-800 border-blue-200 flex items-center gap-2 truncate">
-                        <LuBus size={15} /> Route: {annex.bus_route || annex.busRoute}
+                {(() => {
+                  const featStrings = (annex.features || []).map((f: any) => 
+                    typeof f === 'object' && f !== null ? (f.feature_name || f.featureName || '') : String(f)
+                  ).filter(Boolean);
+
+                  const powerOk = annex.has_power_backup || annex.hasPowerBackup || featStrings.some((f: string) => f.includes('Power'));
+                  const waterOk = (annex.has_water_tank !== false && annex.hasWaterTank !== false) || featStrings.some((f: string) => f.includes('Water Tank'));
+                  const cookOk = (annex.is_cooking_allowed !== false && annex.isCookingAllowed !== false) || featStrings.some((f: string) => f.includes('Kitchen') || f.includes('Cooking'));
+                  const entranceOk = annex.has_separate_entrance || annex.hasSeparateEntrance || featStrings.some((f: string) => f.includes('Entrance'));
+                  const meterOk = annex.has_separate_meter || annex.hasSeparateMeter || featStrings.some((f: string) => f.includes('Meter'));
+
+                  return (
+                    <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                      <h4 className="text-xs font-black uppercase tracking-wider text-slate-400">Student Living Specifications</h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs font-bold">
+                        <div className={`p-3 rounded-xl border flex items-center gap-2 ${powerOk ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-slate-50 text-slate-400 border-slate-200 line-through'}`}>
+                          <LuZap size={15} /> Power Generator/UPS
+                        </div>
+                        <div className={`p-3 rounded-xl border flex items-center gap-2 ${waterOk ? 'bg-cyan-50 text-cyan-800 border-cyan-200' : 'bg-slate-50 text-slate-400 border-slate-200 line-through'}`}>
+                          <LuDroplets size={15} /> 24h Water Storage
+                        </div>
+                        <div className={`p-3 rounded-xl border flex items-center gap-2 ${cookOk ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-slate-50 text-slate-400 border-slate-200 line-through'}`}>
+                          <LuUtensils size={15} /> Cooking Permitted
+                        </div>
+                        <div className={`p-3 rounded-xl border flex items-center gap-2 ${entranceOk ? 'bg-indigo-50 text-indigo-800 border-indigo-200' : 'bg-slate-50 text-slate-400 border-slate-200 line-through'}`}>
+                          <LuLock size={15} /> Separate Entrance
+                        </div>
+                        <div className={`p-3 rounded-xl border flex items-center gap-2 ${meterOk ? 'bg-purple-50 text-purple-800 border-purple-200' : 'bg-slate-50 text-slate-400 border-slate-200 line-through'}`}>
+                          <LuLightbulb size={15} /> Separate Electric Meter
+                        </div>
+                        {annex.bus_route || annex.busRoute ? (
+                          <div className="p-3 rounded-xl border bg-blue-50 text-blue-800 border-blue-200 flex items-center gap-2 truncate">
+                            <LuBus size={15} /> Route: {annex.bus_route || annex.busRoute}
+                          </div>
+                        ) : (
+                          <div className="p-3 rounded-xl border bg-slate-50 text-slate-700 border-slate-200 flex items-center gap-2">
+                            <LuFootprints size={15} /> Direct Walking Route
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      <div className="p-3 rounded-xl border bg-slate-50 text-slate-700 border-slate-200 flex items-center gap-2">
-                        <LuFootprints size={15} /> Direct Walking Route
-                      </div>
-                    )}
-                  </div>
-                </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Campus Proximity & Interactive Map */}

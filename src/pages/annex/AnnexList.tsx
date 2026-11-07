@@ -2,7 +2,8 @@
 import {
     LuArrowRight, LuGraduationCap, LuSearch, LuArrowLeft, LuPlus,
     LuHeart, LuMapPin, LuBedDouble, LuMap, LuHouse, LuShieldCheck,
-    LuBus, LuFootprints, LuZap, LuDroplets, LuUtensils, LuChevronDown, LuX
+    LuBus, LuFootprints, LuZap, LuDroplets, LuUtensils, LuChevronDown, LuX,
+    LuWifi, LuBath, LuSnowflake, LuBookOpen, LuDoorClosed, LuWind, LuFlame, LuRefrigerator, LuShirt, LuKey
 } from "react-icons/lu";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, Link, useLocation } from "react-router-dom";
@@ -13,6 +14,28 @@ import AdNativeFeed from "../../components/advertise/AdNativeFeed";
 import SEO from "../../components/SEO";
 import VerifiedBadge from "../../components/ui/VerifiedBadge";
 import { getSocket } from "../../services/realtime";
+
+
+const FACILITY_ICON_MAP: Record<string, any> = {
+  wifi: LuWifi,
+  bath: LuBath,
+  attached: LuBath,
+  ac: LuSnowflake,
+  study: LuBookOpen,
+  bed: LuBedDouble,
+  wardrobe: LuDoorClosed,
+  fan: LuWind,
+  hot: LuFlame,
+  water: LuDroplets,
+  tank: LuDroplets,
+  power: LuZap,
+  kitchen: LuUtensils,
+  fridge: LuRefrigerator,
+  refrigerator: LuRefrigerator,
+  washing: LuShirt,
+  entrance: LuKey,
+  cctv: LuShieldCheck,
+};
 
 const escapeHtml = (str: string) => {
     if (!str) return '';
@@ -863,7 +886,7 @@ const AnnexList = () => {
                                                             </div>
 
                                                             {/* Amenities & Facility Badges */}
-                                                            <div className="flex flex-wrap items-center gap-1.5 py-2.5 border-y border-slate-100 dark:border-slate-800/80 mt-auto">
+                                                            <div className="flex flex-wrap items-center gap-1.5 py-2.5 border-y border-slate-100 dark:border-slate-800/80 mt-auto min-h-[46px]">
                                                                 {item.landlordPresence === 'INDEPENDENT' || item.landlord_presence === 'INDEPENDENT' ? (
                                                                     <span className="text-[9px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
                                                                         <LuHouse size={11} /> Independent
@@ -873,24 +896,45 @@ const AnnexList = () => {
                                                                         <LuShieldCheck size={11} /> On-Site Landlord
                                                                     </span>
                                                                 ) : null}
+                                                                
+                                                                {/* Dynamic Facilities from Form & DB */}
+                                                                {item.features && item.features.length > 0 ? (
+                                                                    item.features.slice(0, 3).map((f: any, fIdx: number) => {
+                                                                        const fName = typeof f === 'object' && f !== null ? (f.feature_name || f.featureName || '') : String(f);
+                                                                        if (!fName) return null;
+                                                                        const lower = fName.toLowerCase();
+                                                                        const matchKey = Object.keys(FACILITY_ICON_MAP).find(k => lower.includes(k));
+                                                                        const FIcon = matchKey ? FACILITY_ICON_MAP[matchKey] : LuHouse;
+                                                                        return (
+                                                                            <span key={fIdx} className="text-[9px] font-bold bg-blue-500/10 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-md inline-flex items-center gap-1 truncate max-w-[125px]" title={fName}>
+                                                                                <FIcon size={11} className="shrink-0 text-blue-600 dark:text-blue-400" />
+                                                                                {fName}
+                                                                            </span>
+                                                                        );
+                                                                    })
+                                                                ) : (
+                                                                    <>
+                                                                        {item.has_power_backup || item.hasPowerBackup ? (
+                                                                            <span className="text-[9px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                                                                <LuZap size={11} /> Power Backup
+                                                                            </span>
+                                                                        ) : null}
+                                                                        {(item.has_water_tank !== false && item.hasWaterTank !== false) ? (
+                                                                            <span className="text-[9px] font-bold bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                                                                <LuDroplets size={11} /> Water Tank
+                                                                            </span>
+                                                                        ) : null}
+                                                                        {(item.is_cooking_allowed !== false && item.isCookingAllowed !== false) ? (
+                                                                            <span className="text-[9px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
+                                                                                <LuUtensils size={11} /> Cooking Allowed
+                                                                            </span>
+                                                                        ) : null}
+                                                                    </>
+                                                                )}
+
                                                                 {item.busRoute || item.bus_route ? (
-                                                                    <span className="text-[9px] font-bold bg-blue-500/10 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded-md truncate max-w-[130px] inline-flex items-center gap-1" title={item.busRoute || item.bus_route}>
+                                                                    <span className="text-[9px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-2 py-0.5 rounded-md truncate max-w-[120px] inline-flex items-center gap-1" title={item.busRoute || item.bus_route}>
                                                                         <LuBus size={11} className="shrink-0" /> {item.busRoute || item.bus_route}
-                                                                    </span>
-                                                                ) : null}
-                                                                {item.has_power_backup || item.hasPowerBackup ? (
-                                                                    <span className="text-[9px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
-                                                                        <LuZap size={11} /> Power Backup
-                                                                    </span>
-                                                                ) : null}
-                                                                {(item.has_water_tank !== false && item.hasWaterTank !== false) ? (
-                                                                    <span className="text-[9px] font-bold bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
-                                                                        <LuDroplets size={11} /> Water Tank
-                                                                    </span>
-                                                                ) : null}
-                                                                {(item.is_cooking_allowed !== false && item.isCookingAllowed !== false) ? (
-                                                                    <span className="text-[9px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-md inline-flex items-center gap-1">
-                                                                        <LuUtensils size={11} /> Cooking Allowed
                                                                     </span>
                                                                 ) : null}
                                                             </div>
