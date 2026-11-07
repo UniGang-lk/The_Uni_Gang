@@ -188,7 +188,7 @@ export const NotificationDropdown = () => {
             animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
             exit={{ opacity: 0, y: 10, scale: 0.95, filter: 'blur(5px)' }}
             transition={{ duration: 0.3, type: 'spring', stiffness: 300, damping: 25 }}
-            className="absolute right-0 mt-3 w-[22rem] sm:w-[24rem] bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border border-white/50 dark:border-slate-700/50 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden z-50"
+            className="fixed inset-x-3 top-20 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-3 max-w-sm sm:max-w-none sm:w-[24rem] mx-auto sm:mx-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl border border-slate-200/80 dark:border-slate-700/80 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] overflow-hidden z-50"
           >
             {/* Header */}
             <div className="px-5 py-4 flex items-center justify-between bg-gradient-to-r from-slate-50/50 to-white/50 dark:from-slate-800/50 dark:to-slate-900/50 border-b border-slate-100 dark:border-slate-800/80">

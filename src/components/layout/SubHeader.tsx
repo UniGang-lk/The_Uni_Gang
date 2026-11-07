@@ -239,13 +239,39 @@ const SubHeader = () => {
           )}
         </div>
 
-        {/* Mobile Menu Toggle */}
-        <button
-          className="md:hidden text-slate-800 dark:text-white focus:outline-none p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <LuX className="w-7 h-7" /> : <LuMenu className="w-7 h-7" />}
-        </button>
+        {/* Mobile Notification & Menu Controls */}
+        <div className="md:hidden flex items-center gap-2">
+          {isLoggedIn && <NotificationDropdown />}
+
+          {/* Cart Icon on Mobile if items exist */}
+          {isLoggedIn && cartCount > 0 && (
+            <button
+              onClick={() => {
+                if (window.location.pathname === '/market') {
+                  window.dispatchEvent(new Event('open-cart-drawer'));
+                } else {
+                  window.location.href = '/market?openCart=true';
+                }
+              }}
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-white relative active:scale-95 transition-all"
+              title="Shopping Cart"
+            >
+              <LuShoppingBag className="w-5 h-5 text-indigo-500" />
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white dark:border-slate-900 shadow-sm">
+                {cartCount}
+              </span>
+            </button>
+          )}
+
+          {/* Mobile Menu Toggle */}
+          <button
+            className="text-slate-800 dark:text-white focus:outline-none p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            title={isMobileMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {isMobileMenuOpen ? <LuX className="w-6 h-6" /> : <LuMenu className="w-6 h-6" />}
+          </button>
+        </div>
 
         {/* Mobile Navigation Overlay */}
         <AnimatePresence>

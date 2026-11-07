@@ -392,13 +392,40 @@ const Header = () => {
           </Link> */}
         </div>
 
-        {/* Mobile Menu Toggle */}
-        <button
-          className="md:hidden flex items-center justify-center p-2.5 rounded-2xl bg-white/50 dark:bg-slate-800/50 backdrop-blur-md text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm border border-slate-200/50 dark:border-slate-700/50 transition-all active:scale-95"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <LuX className="w-7 h-7" /> : <LuMenu className="w-7 h-7" />}
-        </button>
+        {/* Mobile Notification & Menu Controls */}
+        <div className="md:hidden flex items-center gap-2">
+          {/* Notification Icon directly on the left of the menu toggle */}
+          {isLoggedIn && <NotificationDropdown />}
+
+          {/* Cart Icon on Mobile if items exist */}
+          {isLoggedIn && cartCount > 0 && (
+            <button
+              onClick={() => {
+                if (window.location.pathname === '/market') {
+                  window.dispatchEvent(new Event('open-cart-drawer'));
+                } else {
+                  window.location.href = '/market?openCart=true';
+                }
+              }}
+              className="p-2 rounded-xl bg-white/50 dark:bg-slate-800/50 backdrop-blur-md text-slate-800 dark:text-white relative border border-slate-200/50 dark:border-slate-700/50 shadow-sm active:scale-95 transition-all"
+              title="Shopping Cart"
+            >
+              <LuShoppingBag className="w-5 h-5 text-indigo-500" />
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-white dark:border-slate-900 shadow-sm">
+                {cartCount}
+              </span>
+            </button>
+          )}
+
+          {/* Mobile Menu Toggle */}
+          <button
+            className="flex items-center justify-center p-2.5 rounded-2xl bg-white/50 dark:bg-slate-800/50 backdrop-blur-md text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm border border-slate-200/50 dark:border-slate-700/50 transition-all active:scale-95 cursor-pointer"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            title={isMobileMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {isMobileMenuOpen ? <LuX className="w-6 h-6" /> : <LuMenu className="w-6 h-6" />}
+          </button>
+        </div>
 
         {/* Premium Mobile Navigation Overlay */}
         <AnimatePresence>
