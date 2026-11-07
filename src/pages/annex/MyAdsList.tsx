@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import {
   LuChevronLeft, LuChevronRight, LuPencil, LuTrash, LuMapPin,
-  LuWifi, LuBath, LuSnowflake, LuCar, LuUtensils, LuZap
+  LuWifi, LuBath, LuSnowflake, LuCar, LuUtensils, LuZap,
+  LuBookOpen, LuBedDouble, LuDoorClosed, LuWind, LuFlame, LuDroplets, LuGauge, LuRefrigerator, LuShirt, LuCupSoda, LuKey, LuShieldCheck, LuSun, LuTrash2
 } from 'react-icons/lu';
 import { motion } from 'framer-motion';
 import { Annex } from '../../types/annex';
@@ -13,12 +14,40 @@ interface MyAdsListProps {
 }
 
 const AMENITIES_ICONS: Record<string, any> = {
+  study: LuBookOpen,
+  table: LuBookOpen,
+  chair: LuBookOpen,
   wifi: LuWifi,
-  bath: LuBath,
+  bed: LuBedDouble,
+  mattress: LuBedDouble,
+  wardrobe: LuDoorClosed,
+  cupboard: LuDoorClosed,
+  fan: LuWind,
   ac: LuSnowflake,
-  parking: LuCar,
+  bath: LuBath,
+  hot: LuFlame,
+  geyser: LuFlame,
+  water: LuDroplets,
+  tank: LuDroplets,
+  power: LuZap,
+  generator: LuZap,
+  meter: LuGauge,
   kitchen: LuUtensils,
-  power: LuZap
+  cook: LuUtensils,
+  fridge: LuRefrigerator,
+  refrigerator: LuRefrigerator,
+  washing: LuShirt,
+  laundry: LuShirt,
+  drink: LuCupSoda,
+  filter: LuCupSoda,
+  entrance: LuKey,
+  key: LuKey,
+  cctv: LuShieldCheck,
+  parking: LuCar,
+  balcony: LuSun,
+  terrace: LuSun,
+  garbage: LuTrash2,
+  waste: LuTrash2,
 };
 
 const MyAdsList: React.FC<MyAdsListProps> = ({ ads, onEdit, onDelete }) => {
@@ -136,7 +165,7 @@ const MyAdsList: React.FC<MyAdsListProps> = ({ ads, onEdit, onDelete }) => {
                 </div>
               </div>
 
-              {/* Dynamic Amenities Row (only shows selected items) */}
+              {/* Dynamic Facilities Row (only shows selected items) */}
               {ad.features && ad.features.length > 0 ? (
                 <div className="flex flex-wrap items-center gap-2 py-4 border-y border-slate-200/50 dark:border-slate-800/50 mt-auto min-h-[50px]">
                   {ad.features.map((feat: any, idx: number) => {
@@ -155,7 +184,7 @@ const MyAdsList: React.FC<MyAdsListProps> = ({ ads, onEdit, onDelete }) => {
                 </div>
               ) : (
                 <div className="flex items-center gap-2 py-4 border-y border-slate-200/50 dark:border-slate-800/50 mt-auto min-h-[50px] text-xs text-slate-400 italic">
-                  No amenities specified
+                  No facilities specified
                 </div>
               )}
 

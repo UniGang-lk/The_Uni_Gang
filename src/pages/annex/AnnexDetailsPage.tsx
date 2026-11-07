@@ -5,7 +5,8 @@ import {
   LuShieldCheck, LuHouse, LuUsers, LuBus, LuFootprints,
   LuDroplets, LuLock, LuLightbulb, LuBanknote, LuShare2, 
   LuChevronLeft, LuMapPin, LuGraduationCap, LuPhone, LuCamera,
-  LuCalendar, LuBadgePercent, LuInfo, LuHeart
+  LuCalendar, LuBadgePercent, LuInfo, LuHeart,
+  LuBookOpen, LuBedDouble, LuDoorClosed, LuWind, LuFlame, LuGauge, LuRefrigerator, LuShirt, LuCupSoda, LuKey, LuSun, LuTrash2
 } from 'react-icons/lu';
 import { FaWhatsapp } from 'react-icons/fa6';
 import SEO from '../../components/SEO';
@@ -207,12 +208,40 @@ const AnnexDetailsPage = () => {
   const scores = calculateAverages();
 
   const AMENITIES_ICONS: Record<string, any> = {
+    study: LuBookOpen,
+    table: LuBookOpen,
+    chair: LuBookOpen,
     wifi: LuWifi,
-    bath: LuBath,
+    bed: LuBedDouble,
+    mattress: LuBedDouble,
+    wardrobe: LuDoorClosed,
+    cupboard: LuDoorClosed,
+    fan: LuWind,
     ac: LuSnowflake,
-    parking: LuCar,
+    bath: LuBath,
+    hot: LuFlame,
+    geyser: LuFlame,
+    water: LuDroplets,
+    tank: LuDroplets,
+    power: LuZap,
+    generator: LuZap,
+    meter: LuGauge,
     kitchen: LuUtensils,
-    power: LuZap
+    cook: LuUtensils,
+    fridge: LuRefrigerator,
+    refrigerator: LuRefrigerator,
+    washing: LuShirt,
+    laundry: LuShirt,
+    drink: LuCupSoda,
+    filter: LuCupSoda,
+    entrance: LuKey,
+    key: LuKey,
+    cctv: LuShieldCheck,
+    parking: LuCar,
+    balcony: LuSun,
+    terrace: LuSun,
+    garbage: LuTrash2,
+    waste: LuTrash2,
   };
 
   const resolveImageUrl = (img: any): string => {
@@ -540,7 +569,7 @@ const AnnexDetailsPage = () => {
               {/* Key Features & Amenities Grid */}
               <div className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-md space-y-5">
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                  <LuCircleCheckBig className="text-blue-600" /> Key Amenities & Facilities
+                  <LuCircleCheckBig className="text-blue-600" /> Key Facilities & Features
                 </h3>
 
                 {annex.features && annex.features.length > 0 ? (
@@ -563,7 +592,7 @@ const AnnexDetailsPage = () => {
                     })}
                   </div>
                 ) : (
-                  <p className="text-xs text-slate-400 italic">No specific amenity tags listed.</p>
+                  <p className="text-xs text-slate-400 italic">No specific facility tags listed.</p>
                 )}
 
                 {/* Sri Lanka Specific Utility Checklist */}

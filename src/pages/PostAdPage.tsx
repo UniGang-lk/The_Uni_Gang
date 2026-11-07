@@ -122,12 +122,14 @@ const PostAdPage = () => {
       }
 
       const features = (adData.amenities as string[]) || [];
-      const hasPowerBackup = features.includes('Power Backup') || features.includes('Power');
-      const isCookingAllowed = features.includes('Kitchen');
-      const hasSeparateEntrance = features.includes('Separate Entrance');
+      const hasPowerBackup = features.some(f => f.includes('Power Backup') || f.includes('Power Generator'));
+      const isCookingAllowed = features.some(f => f.includes('Kitchen') || f.includes('Cooking Allowed'));
+      const hasSeparateEntrance = features.some(f => f.includes('Separate Entrance') || f.includes('Entrance'));
+      const hasWaterTank = features.some(f => f.includes('Water Tank') || f.includes('Water Storage'));
       formData.append('hasPowerBackup', String(hasPowerBackup));
       formData.append('isCookingAllowed', String(isCookingAllowed));
       formData.append('hasSeparateEntrance', String(hasSeparateEntrance));
+      formData.append('hasWaterTank', String(hasWaterTank));
 
       let genderPolicy = 'ANY';
       const hr = ((adData.houseRules as string) || '').toLowerCase();

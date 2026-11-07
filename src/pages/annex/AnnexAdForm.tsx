@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuFileText, LuLayoutDashboard, LuImage, LuMapPin, LuChevronRight, LuChevronLeft, LuChevronDown,
   LuWifi, LuBath, LuSnowflake, LuCar, LuUtensils, LuZap, LuCheck,
-  LuUpload, LuX, LuGraduationCap, LuInfo, LuSearch, LuHouse, LuUsers, LuShieldCheck, LuBus, LuNavigation, LuPhone
+  LuUpload, LuX, LuGraduationCap, LuInfo, LuSearch, LuHouse, LuUsers, LuShieldCheck, LuBus, LuNavigation, LuPhone,
+  LuBookOpen, LuBedDouble, LuDoorClosed, LuWind, LuFlame, LuDroplets, LuGauge, LuRefrigerator, LuShirt, LuCupSoda, LuKey, LuSun, LuTrash2
 } from 'react-icons/lu';
 import toast from 'react-hot-toast';
 import universitiesData from '../../constants/annex/Universities.json';
@@ -248,18 +249,58 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-const AMENITIES_LIST = [
-  { id: 'WiFi', labelEn: 'High-speed Wifi', labelSi: 'අධිවේගී Wi-Fi පහසුකම (Wifi)', icon: LuWifi, col: 'text-blue-500' },
-  { id: 'Attached Bath', labelEn: 'Attached Bath', labelSi: 'අනුයුක්ත නාන කාමරය (Attached Bath)', icon: LuBath, col: 'text-teal-500' },
-  { id: 'A/C', labelEn: 'Air Conditioning', labelSi: 'වායු සමීකරණය (Air Conditioning)', icon: LuSnowflake, col: 'text-red-500' },
-  { id: 'Safe Parking', labelEn: 'Safe Parking', labelSi: 'ආරක්ෂිත වාහන නැවැත්වීම (Vehicle Parking)', icon: LuCar, col: 'text-orange-500' },
-  { id: 'Kitchen', labelEn: 'Equipped Kitchen', labelSi: 'කුස්සිය / කෑම පිසීමේ පහසුකම් (Kitchen)', icon: LuUtensils, col: 'text-indigo-500' },
-  { id: 'Power Backup', labelEn: 'Power Backup', labelSi: 'විදුලි ජනක යන්ත්‍ර / UPS (Power Backup)', icon: LuZap, col: 'text-yellow-500' },
+export const FACILITIES_CATEGORIES = [
+  {
+    categoryEn: 'Living & Study Essentials',
+    categorySi: 'පාඩම් සහ නවාතැන් පහසුකම්',
+    items: [
+      { id: 'Study Table & Chair', labelEn: 'Study Table & Chair', labelSi: 'පාඩම් මේස සහ පුටු (Study Table & Chair)', icon: LuBookOpen, col: 'text-indigo-500' },
+      { id: 'WiFi', labelEn: 'High-speed Wi-Fi', labelSi: 'අධිවේගී Wi-Fi පහසුකම (WiFi)', icon: LuWifi, col: 'text-blue-500' },
+      { id: 'Beds Provided', labelEn: 'Beds & Mattresses', labelSi: 'ඇඳන් සහ මෙට්ට (Beds Provided)', icon: LuBedDouble, col: 'text-emerald-500' },
+      { id: 'Wardrobe', labelEn: 'Wardrobe / Cupboard', labelSi: 'ඇඳුම් අල්මාරි (Wardrobe / Cupboard)', icon: LuDoorClosed, col: 'text-amber-500' },
+      { id: 'Ceiling Fan', labelEn: 'Ceiling Fan', labelSi: 'සිවිලිම් පංකා (Ceiling Fan)', icon: LuWind, col: 'text-cyan-500' },
+      { id: 'A/C', labelEn: 'Air Conditioning', labelSi: 'වායු සමීකරණය (Air Conditioning)', icon: LuSnowflake, col: 'text-sky-500' },
+    ]
+  },
+  {
+    categoryEn: 'Utilities & Power',
+    categorySi: 'විදුලිය සහ ජල පහසුකම්',
+    items: [
+      { id: 'Attached Bath', labelEn: 'Attached Bath', labelSi: 'අනුයුක්ත නාන කාමරය (Attached Bath)', icon: LuBath, col: 'text-teal-500' },
+      { id: 'Hot Water', labelEn: 'Hot Water / Geyser', labelSi: 'උණු වතුර පහසුකම් (Hot Water / Geyser)', icon: LuFlame, col: 'text-orange-500' },
+      { id: 'Water Tank', labelEn: '24h Water Storage Tank', labelSi: '24 පැය ජල ටැංකි පහසුකම (Water Tank)', icon: LuDroplets, col: 'text-blue-500' },
+      { id: 'Power Backup', labelEn: 'Power Generator / UPS', labelSi: 'විදුලි ජනක යන්ත්‍ර / UPS (Power Backup)', icon: LuZap, col: 'text-yellow-500' },
+      { id: 'Separate Meter', labelEn: 'Separate Electricity Meter', labelSi: 'වෙනම විදුලි මීටරය (Separate Meter)', icon: LuGauge, col: 'text-purple-500' },
+    ]
+  },
+  {
+    categoryEn: 'Kitchen & Laundry',
+    categorySi: 'ආහාර සහ රෙදි සේදීම',
+    items: [
+      { id: 'Kitchen', labelEn: 'Kitchen / Cooking Allowed', labelSi: 'කුස්සිය / කෑම පිසීමේ පහසුකම් (Kitchen)', icon: LuUtensils, col: 'text-rose-500' },
+      { id: 'Refrigerator', labelEn: 'Refrigerator', labelSi: 'ශීතකරණය (Refrigerator)', icon: LuRefrigerator, col: 'text-cyan-600' },
+      { id: 'Washing Machine', labelEn: 'Washing Machine', labelSi: 'රෙදි සෝදන යන්ත්‍රය (Washing Machine)', icon: LuShirt, col: 'text-blue-600' },
+      { id: 'Drinking Water', labelEn: 'Drinking Water Filter', labelSi: 'පිරිසිදු පානීය ජලය / Filter (Drinking Water)', icon: LuCupSoda, col: 'text-emerald-600' },
+    ]
+  },
+  {
+    categoryEn: 'Security & Convenience',
+    categorySi: 'ආරක්ෂාව සහ පහසුව',
+    items: [
+      { id: 'Separate Entrance', labelEn: 'Separate Entrance / Key', labelSi: 'ස්වාධීන පිවිසුම (Separate Entrance)', icon: LuKey, col: 'text-amber-600' },
+      { id: 'CCTV', labelEn: 'CCTV Security', labelSi: 'CCTV කැමරා ආරක්ෂාව (CCTV Security)', icon: LuShieldCheck, col: 'text-indigo-600' },
+      { id: 'Safe Parking', labelEn: 'Safe Vehicle Parking', labelSi: 'ආරක්ෂිත වාහන නැවැත්වීම (Vehicle Parking)', icon: LuCar, col: 'text-orange-500' },
+      { id: 'Balcony', labelEn: 'Balcony / Terrace', labelSi: 'බැල්කනිය / එළිමහන (Balcony / Terrace)', icon: LuSun, col: 'text-yellow-600' },
+      { id: 'Garbage Collection', labelEn: 'Garbage Collection Service', labelSi: 'කසළ බැහැර කිරීමේ සේවාව (Garbage Collection)', icon: LuTrash2, col: 'text-slate-500' },
+    ]
+  }
 ];
+
+export const AMENITIES_LIST = FACILITIES_CATEGORIES.flatMap(cat => cat.items);
 
 const STEPS = [
   { id: 'specs', titleEn: 'General Specs', titleSi: 'ප්‍රධාන තොරතුරු', icon: LuFileText },
-  { id: 'amenities', titleEn: 'Amenities', titleSi: 'පහසුකම්', icon: LuLayoutDashboard },
+  { id: 'facilities', titleEn: 'Facilities', titleSi: 'පහසුකම්', icon: LuLayoutDashboard },
   { id: 'media', titleEn: 'Media Gallery', titleSi: 'ඡායාරූප', icon: LuImage },
   { id: 'location', titleEn: 'Location & Contact', titleSi: 'ස්ථානය සහ ඇමතුම්', icon: LuMapPin },
 ];
@@ -818,43 +859,71 @@ const AnnexAdForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel
             </motion.div>
           )}
 
-          {/* ── STEP 2: Amenities ── */}
+          {/* ── STEP 2: Facilities ── */}
           {currentStep === 1 && (
             <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-              <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6">
-                Amenities
-              </h2>
-              {errors.amenities && <p className="text-red-500 text-sm mb-4">{errors.amenities.message}</p>}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <Controller
-                  name="amenities"
-                  control={control}
-                  render={({ field }) => (
-                    <>
-                      {AMENITIES_LIST.map(amenity => {
-                        const isSelected = field.value.includes(amenity.id);
-                        return (
-                          <div
-                            key={amenity.id}
-                            onClick={() => {
-                              const newValue = isSelected
-                                ? field.value.filter(a => a !== amenity.id)
-                                : [...field.value, amenity.id];
-                              field.onChange(newValue);
-                            }}
-                            className={`cursor-pointer p-4 rounded-2xl flex flex-col gap-3 items-start border-2 transition-all hover:-translate-y-1 ${isSelected ? 'bg-blue-50/50 dark:bg-blue-900/20 border-blue-500 shadow-[0_10px_20px_rgba(59,130,246,0.15)]' : 'bg-white/50 dark:bg-slate-800/50 border-white/60 dark:border-slate-700 hover:border-blue-300'}`}
-                          >
-                            <amenity.icon className={`text-2xl ${isSelected ? amenity.col : 'text-slate-400'}`} />
-                            <span className={`text-xs md:text-sm font-bold ${isSelected ? 'text-blue-700 dark:text-blue-300' : 'text-slate-600 dark:text-slate-300'}`}>
-                              {lang === 'si' ? amenity.labelSi : amenity.labelEn}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </>
-                  )}
-                />
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2">
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white tracking-tight">
+                    {lang === 'si' ? 'නවාතැන් පහසුකම් (Facilities)' : 'Property Facilities'}
+                  </h2>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
+                    {lang === 'si' ? 'ඔබගේ බෝඩිමේ හෝ ඇනෙක්සියේ සිසුන්ට ලබාදෙන පහසුකම් තෝරන්න' : 'Select all facilities available for university students'}
+                  </p>
+                </div>
               </div>
+              {errors.amenities && <p className="text-red-500 text-sm font-bold bg-red-50 dark:bg-red-950/40 p-3 rounded-xl border border-red-200">{errors.amenities.message}</p>}
+              
+              <Controller
+                name="amenities"
+                control={control}
+                render={({ field }) => (
+                  <div className="space-y-6">
+                    {FACILITIES_CATEGORIES.map((category, catIdx) => (
+                      <div key={catIdx} className="bg-slate-50/70 dark:bg-slate-900/50 p-4 sm:p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+                        <div className="flex items-center gap-2 mb-3.5 pb-2 border-b border-slate-200/60 dark:border-slate-800">
+                          <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0"></span>
+                          <h3 className="text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 dark:text-slate-200">
+                            {lang === 'si' ? category.categorySi : category.categoryEn}
+                          </h3>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {category.items.map(amenity => {
+                            const isSelected = field.value.includes(amenity.id);
+                            return (
+                              <div
+                                key={amenity.id}
+                                onClick={() => {
+                                  const newValue = isSelected
+                                    ? field.value.filter(a => a !== amenity.id)
+                                    : [...field.value, amenity.id];
+                                  field.onChange(newValue);
+                                }}
+                                className={`cursor-pointer p-3 sm:p-3.5 rounded-xl flex items-center gap-3 border-2 transition-all select-none ${
+                                  isSelected
+                                    ? 'bg-blue-50 dark:bg-blue-950/40 border-blue-600 shadow-sm ring-1 ring-blue-500/20'
+                                    : 'bg-white dark:bg-slate-800/80 border-slate-200/70 dark:border-slate-700/80 hover:border-blue-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                }`}
+                              >
+                                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                                  isSelected ? 'bg-blue-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-700/70 text-slate-500 dark:text-slate-400'
+                                }`}>
+                                  <amenity.icon className="text-lg" />
+                                </div>
+                                <span className={`text-xs sm:text-[13px] font-bold leading-tight ${
+                                  isSelected ? 'text-blue-900 dark:text-blue-200' : 'text-slate-700 dark:text-slate-300'
+                                }`}>
+                                  {lang === 'si' ? amenity.labelSi : amenity.labelEn}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              />
             </motion.div>
           )}
 
