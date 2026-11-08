@@ -5,7 +5,7 @@ import {
   LuShieldCheck, LuHouse, LuUsers, LuBus, LuFootprints,
   LuDroplets, LuLock, LuLightbulb, LuBanknote, LuShare2, 
   LuChevronLeft, LuMapPin, LuGraduationCap, LuPhone, LuCamera,
-  LuCalendar, LuBadgePercent, LuInfo, LuHeart,
+  LuCalendar, LuBadgePercent, LuInfo, LuHeart, LuPencil, LuInbox,
   LuBookOpen, LuBedDouble, LuDoorClosed, LuWind, LuFlame, LuGauge, LuRefrigerator, LuShirt, LuCupSoda, LuKey, LuSun, LuTrash2
 } from 'react-icons/lu';
 import { FaWhatsapp } from 'react-icons/fa6';
@@ -418,52 +418,88 @@ const AnnexDetailsPage = () => {
                 </div>
 
                 {/* Primary Action Buttons */}
-                <div className="pt-2 space-y-2.5">
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      const token = localStorage.getItem('userToken');
-                      if (!token) {
-                        toast.error('Please login to send an inquiry.');
-                        return;
-                      }
-                      try {
-                        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/annexes/chats/start`, {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${token}`
-                          },
-                          body: JSON.stringify({
-                            annexId: annex.id,
-                            initialMessage: `Hi! I saw your Annex listing "${annex.title}" on The Uni Gang. Is it available?`
-                          })
-                        });
-                        const data = await res.json();
-                        if (!res.ok) throw new Error(data.message || 'Failed to start chat');
+                {(() => {
+                  const currentUserId = localStorage.getItem('userId');
+                  const ownerId = annex.owner_id || annex.ownerId || annex.owner?.id;
+                  const isOwner = Boolean(currentUserId && ownerId && String(currentUserId) === String(ownerId));
 
-                        toast.success('Inquiry sent! Redirecting to your Messages Hub...');
-                        navigate(`/profile?tab=annex_inbox&chatId=${data.chat.id}`);
-                      } catch (err: any) {
-                        toast.error(err.message || 'Failed to send inquiry.');
-                      }
-                    }}
-                    className="w-full py-3.5 sm:py-4 px-4 sm:px-6 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white rounded-2xl font-bold text-xs sm:text-sm shadow-xl shadow-blue-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer border-none"
-                  >
-                    <LuMessageCircle size={18} />
-                    <span>Send Inquiry to Landlord</span>
-                  </button>
+                  return (
+                    <div className="pt-2 space-y-2.5">
+                      {isOwner ? (
+                        <>
+                          <div className="p-3 bg-blue-50 dark:bg-blue-950/40 rounded-2xl border border-blue-200 dark:border-blue-900/60 text-center mb-1">
+                            <span className="text-[11px] font-bold text-blue-700 dark:text-blue-300">
+                              ℹ️ මෙය ඔබ විසින් පළ කළ දැන්වීමකි (Your Listing)
+                            </span>
+                          </div>
 
-                  <a
-                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this student accommodation on The Uni Gang: ${annex.title}\n\nhttps://unigang.lk/share/annex/${annex.id}`)}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-full py-3 sm:py-3.5 px-4 sm:px-6 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2 border border-emerald-200 dark:border-emerald-800 cursor-pointer"
-                  >
-                    <LuShare2 size={16} />
-                    <span>Share on WhatsApp</span>
-                  </a>
-                </div>
+                          <button
+                            type="button"
+                            onClick={() => navigate(`/post-ad?editAd=${annex.id}`)}
+                            className="w-full py-3.5 sm:py-4 px-4 sm:px-6 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white rounded-2xl font-bold text-xs sm:text-sm shadow-xl shadow-blue-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer border-none"
+                          >
+                            <LuPencil size={17} />
+                            <span>Edit My Listing (දැන්වීම සංස්කරණය)</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => navigate('/profile?tab=annex_inbox')}
+                            className="w-full py-3 sm:py-3.5 px-4 sm:px-6 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2 border border-indigo-200 dark:border-indigo-800 cursor-pointer"
+                          >
+                            <LuInbox size={16} />
+                            <span>View Received Messages & Inquiries</span>
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            const token = localStorage.getItem('userToken');
+                            if (!token) {
+                              toast.error('Please login to send a message to the landlord.');
+                              return;
+                            }
+                            try {
+                              const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/annexes/chats/start`, {
+                                method: 'POST',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  Authorization: `Bearer ${token}`
+                                },
+                                body: JSON.stringify({
+                                  annexId: annex.id,
+                                  initialMessage: `Hi! I saw your Annex listing "${annex.title}" on The Uni Gang. Is it available?`
+                                })
+                              });
+                              const data = await res.json();
+                              if (!res.ok) throw new Error(data.message || 'Failed to start chat');
+
+                              toast.success('Message sent! Opening chat...');
+                              navigate(`/profile?tab=annex_inbox&chatId=${data.chat.id}`);
+                            } catch (err: any) {
+                              toast.error(err.message || 'Failed to send message.');
+                            }
+                          }}
+                          className="w-full py-3.5 sm:py-4 px-4 sm:px-6 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white rounded-2xl font-bold text-xs sm:text-sm shadow-xl shadow-blue-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer border-none"
+                        >
+                          <LuMessageCircle size={18} />
+                          <span>Send Message to Landlord</span>
+                        </button>
+                      )}
+
+                      <a
+                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out this student accommodation on The Uni Gang: ${annex.title}\n\nhttps://unigang.lk/share/annex/${annex.id}`)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="w-full py-3 sm:py-3.5 px-4 sm:px-6 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2 border border-emerald-200 dark:border-emerald-800 cursor-pointer"
+                      >
+                        <LuShare2 size={16} />
+                        <span>Share on WhatsApp</span>
+                      </a>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Landlord Contact Box */}

@@ -58,7 +58,23 @@ const PostAdPage = () => {
       setCurrentView('myAds');
       fetchMyAds();
     }
-  }, [tab, isLoggedIn]);
+    const editId = searchParams.get('editAd');
+    if (editId) {
+      const token = localStorage.getItem('userToken');
+      if (token) {
+        fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/annexes/${editId}`)
+          .then(res => res.json())
+          .then(data => {
+            const ad = data?.data || data;
+            if (ad) {
+              setEditingAd(ad);
+              setCurrentView('postAdForm');
+            }
+          })
+          .catch(console.error);
+      }
+    }
+  }, [tab, isLoggedIn, searchParams]);
 
   const handleAuthSuccess = () => {
     setIsLoggedIn(true);
