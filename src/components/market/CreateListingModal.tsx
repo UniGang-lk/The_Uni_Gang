@@ -22,12 +22,12 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
   const [emailStep, setEmailStep] = useState<'enter_email' | 'enter_code'>('enter_email');
   // 'live' = verified student published, 'pending' = awaiting email verification code
   const [successType, setSuccessType] = useState<'live' | 'pending'>('live');
-  const [countdown, setCountdown] = useState(4);
+  const [countdown, setCountdown] = useState(5);
 
   // Auto-close countdown when on success step
   useEffect(() => {
     if (step !== 3) return;
-    setCountdown(4);
+    setCountdown(5);
     const interval = setInterval(() => {
       setCountdown(prev => {
         if (prev <= 1) {
@@ -67,13 +67,29 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
       formData.append('description', description);
       if (type === 'PRODUCT') formData.append('condition', condition);
       
-      images.forEach(img => {
-        formData.append('images', img);
-      });
+      // Convert images to Base64 so they persist reliably
+      if (images.length > 0) {
+        const base64List: string[] = await Promise.all(
+          images.map(file => new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => resolve(ev.target?.result as string);
+            reader.onerror = () => resolve('');
+            reader.readAsDataURL(file);
+          }))
+        );
+        formData.append('base64Images', JSON.stringify(base64List.filter(Boolean)));
+
+        // Also append as file objects for multipart compatibility
+        images.forEach(img => {
+          formData.append('images', img);
+        });
+      }
 
       const responseItem = await onSubmit(formData);
       if (responseItem && responseItem.status === 'PENDING_VERIFICATION') {
-        setStep(2);
+        // Pending verification / review by admin
+        setSuccessType('pending');
+        setStep(3);
       } else {
         // Verified student — show success screen
         setSuccessType('live');
@@ -429,16 +445,16 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
                     <LuClock className="w-9 h-9 text-amber-500" />
                   </div>
                 </div>
-                <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-2">Under Review ⏳</h3>
-                <p className="text-gray-500 dark:text-slate-400 max-w-xs mb-6">
-                  Your listing is saved and your Student ID is submitted for verification. Once our team approves you, your listing goes <span className="font-bold text-indigo-500">live automatically</span>! We'll notify you right away.
+                <h3 className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white mb-2">Submitted for Review ⏳</h3>
+                <p className="text-gray-600 dark:text-slate-300 max-w-sm mb-6 text-xs sm:text-sm leading-relaxed">
+                  ඔබගේ දැන්වීම සාර්ථකව ඉදිරිපත් කරන ලදී! Admin කණ්ඩායම විසින් එය සමාලෝචනය කර අනුමත කළ පසු (Usually within a few hours), එය marketplace එකේ <span className="font-bold text-indigo-600 dark:text-indigo-400">සජීවීව පළවනු ඇත</span>.
                 </p>
-                <div className="flex flex-wrap gap-3 justify-center mb-6">
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 text-xs font-semibold">
-                    <LuClock className="w-3.5 h-3.5" /> Usually approved within 24 hours
+                <div className="flex flex-wrap gap-2.5 justify-center mb-6">
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs font-semibold">
+                    <LuClock className="w-3.5 h-3.5" /> Usually approved within a few hours
                   </div>
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-xs font-semibold">
-                    <LuShieldCheck className="w-3.5 h-3.5" /> ID deleted after verification
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-semibold">
+                    <LuShieldCheck className="w-3.5 h-3.5" /> Zero Scam Protected
                   </div>
                 </div>
               </>
@@ -448,10 +464,10 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
             <div className="w-full max-w-xs bg-gray-100 dark:bg-slate-800 rounded-full h-1.5 mb-4 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all ${successType === 'live' ? 'bg-emerald-500' : 'bg-amber-500'}`}
-                style={{ width: `${(countdown / 4) * 100}%`, transition: 'width 1s linear' }}
+                style={{ width: `${(countdown / 5) * 100}%`, transition: 'width 1s linear' }}
               />
             </div>
-            <p className="text-xs text-gray-400 dark:text-slate-500 mb-6">Closing in {countdown}s…</p>
+            <p className="text-xs text-gray-400 dark:text-slate-500 mb-6">ස්වයංක්‍රීයව වැසෙමින් පවතී... ({countdown}s)</p>
 
             <button
               onClick={onClose}

@@ -8,6 +8,7 @@ import MyAdsList from './annex/MyAdsList';
 import SEO from '../components/SEO';
 import toast from 'react-hot-toast';
 import { Annex } from '../types/annex';
+import { SubmissionSuccessModal } from '../components/ui/SubmissionSuccessModal';
 
 import PremiumPageLoader from '../components/ui/PremiumPageLoader';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,6 +23,8 @@ const PostAdPage = () => {
   const tab = searchParams.get('tab');
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isEditSuccess, setIsEditSuccess] = useState(false);
 
   const fetchMyAds = async () => {
     const token = localStorage.getItem('userToken');
@@ -194,6 +197,8 @@ const PostAdPage = () => {
       if (response.ok) {
         toast.success(isEditing ? 'Ad updated successfully!' : 'Ad posted! Awaiting admin approval.', { id: toastId });
         await fetchMyAds();
+        setIsEditSuccess(isEditing);
+        setShowSuccessModal(true);
         setEditingAd(null);
         setCurrentView('myAds');
       } else {
@@ -324,6 +329,21 @@ const PostAdPage = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <SubmissionSuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        isPendingApproval={!isEditSuccess}
+        title={isEditSuccess ? 'දැන්වීම සාර්ථකව යාවත්කාලීන විය!' : 'නවාතැන් දැන්වීම සාර්ථකව ඉදිරිපත් කරන ලදී!'}
+        subtitle={isEditSuccess ? 'Listing Updated Successfully' : 'Annex Submitted • Awaiting Admin Approval'}
+        description={
+          isEditSuccess
+            ? 'ඔබ විසින් සිදුකරන ලද වෙනස්කම් සාර්ථකව සුරැකිණි.'
+            : 'ඔබගේ බෝඩිං / ඇනෙක්ස් දැන්වීම අපගේ Admin කණ්ඩායම විසින් සමාලෝචනය කර අනුමත කළ විගස, එය The Uni Gang හි සියලුම සිසුන්ට සජීවීව දිස්වනු ඇත.'
+        }
+        primaryActionLabel="View My Listings (මගේ දැන්වීම්)"
+        onPrimaryAction={() => setCurrentView('myAds')}
+      />
     </div>
   );
 };
