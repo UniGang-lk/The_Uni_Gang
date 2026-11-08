@@ -18,6 +18,7 @@ import AdBanner from '../../components/advertise/AdBanner';
 import AdNativeFeed from '../../components/advertise/AdNativeFeed';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import SEO from '../../components/SEO';
+import { getFreshToken } from '../../utils/authToken';
 
 const MarketplaceHome: React.FC = () => {
   const navigate = useNavigate();
@@ -408,14 +409,36 @@ const MarketplaceHome: React.FC = () => {
   };
 
   const handleCreateListing = async (formData: FormData) => {
-    const token = localStorage.getItem('userToken');
-    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/market`, {
+    let token = await getFreshToken(false);
+    if (!token) {
+      setAuthTarget('post_ad');
+      setShowAuthModal(true);
+      throw new Error('Please login to post a listing.');
+    }
+
+    let res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/market`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`
       },
       body: formData
     });
+
+    // If 401 Unauthorized, force-refresh the Firebase token once and retry automatically!
+    if (res.status === 401) {
+      console.warn('⚠️ 401 Unauthorized encountered. Force-refreshing token and retrying...');
+      const freshToken = await getFreshToken(true);
+      if (freshToken) {
+        token = freshToken;
+        res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/market`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formData
+        });
+      }
+    }
 
     const responseText = await res.text();
     let data: any;
@@ -426,6 +449,11 @@ const MarketplaceHome: React.FC = () => {
     }
 
     if (!res.ok) {
+      if (res.status === 401) {
+        setAuthTarget('post_ad');
+        setShowAuthModal(true);
+        throw new Error('Your session has expired. Please sign in again.');
+      }
       throw new Error(data?.message || `Failed to post listing (${res.status})`);
     }
 
