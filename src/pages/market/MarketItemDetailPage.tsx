@@ -263,7 +263,7 @@ const MarketItemDetailPage: React.FC = () => {
   }
 
   const images = item.images && item.images.length > 0
-    ? item.images.map((img: string) => img.startsWith('http') ? img : `${BASE_URL}${img.startsWith('/') ? '' : '/'}${img}`)
+    ? item.images.map((img: string) => (img.startsWith('http') || img.startsWith('data:image')) ? img : `${BASE_URL}${img.startsWith('/') ? '' : '/'}${img}`)
     : ['https://images.unsplash.com/photo-1521556906631-0c58e7ce65e5?q=80&w=800&auto=format&fit=crop'];
 
   const displayPrice = parseFloat(String(item.price || 0)).toLocaleString();

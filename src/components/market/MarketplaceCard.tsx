@@ -31,7 +31,7 @@ interface MarketplaceCardProps {
 const MarketplaceCard: React.FC<MarketplaceCardProps> = ({ item, onClick, onAddToCart }) => {
   const firstImage = item.images && item.images.length > 0 ? item.images[0] : '';
   const imageUrl = firstImage
-    ? (firstImage.startsWith('http://') || firstImage.startsWith('https://')
+    ? (firstImage.startsWith('http://') || firstImage.startsWith('https://') || firstImage.startsWith('data:image')
         ? firstImage
         : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${firstImage.startsWith('/') ? '' : '/'}${firstImage}`)
     : 'https://images.unsplash.com/photo-1521556906631-0c58e7ce65e5?q=80&w=600&auto=format&fit=crop';

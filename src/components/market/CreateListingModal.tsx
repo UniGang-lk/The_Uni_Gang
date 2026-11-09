@@ -43,6 +43,46 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
 
   if (!isOpen) return null;
 
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+      img.src = objectUrl;
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const MAX_WIDTH = 1000;
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          // Fallback to simple FileReader
+          const reader = new FileReader();
+          reader.onload = (ev) => resolve(ev.target?.result as string || '');
+          reader.onerror = () => resolve('');
+          reader.readAsDataURL(file);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.72);
+        resolve(dataUrl);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        const reader = new FileReader();
+        reader.onload = (ev) => resolve(ev.target?.result as string || '');
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(file);
+      };
+    });
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files).slice(0, 5);
@@ -67,22 +107,12 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
       formData.append('description', description);
       if (type === 'PRODUCT') formData.append('condition', condition);
       
-      // Convert images to Base64 so they persist reliably
+      // Convert images to compressed Base64 (~100-200KB each) to prevent payload exceeding server limits
       if (images.length > 0) {
         const base64List: string[] = await Promise.all(
-          images.map(file => new Promise<string>((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (ev) => resolve(ev.target?.result as string);
-            reader.onerror = () => resolve('');
-            reader.readAsDataURL(file);
-          }))
+          images.map(file => compressImage(file))
         );
         formData.append('base64Images', JSON.stringify(base64List.filter(Boolean)));
-
-        // Also append as file objects for multipart compatibility
-        images.forEach(img => {
-          formData.append('images', img);
-        });
       }
 
       const responseItem = await onSubmit(formData);

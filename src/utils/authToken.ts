@@ -23,3 +23,4 @@ export const getFreshToken = async (forceRefresh = false): Promise<string | null
   // Fallback to whatever is currently stored in localStorage
   return localStorage.getItem('userToken');
 };
+
