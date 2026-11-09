@@ -19,6 +19,7 @@ import AdNativeFeed from '../../components/advertise/AdNativeFeed';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import SEO from '../../components/SEO';
 import { getFreshToken } from '../../utils/authToken';
+import { subscribeToMarketUpdates } from '../../services/realtime';
 
 const MarketplaceHome: React.FC = () => {
   const navigate = useNavigate();
@@ -281,6 +282,19 @@ const MarketplaceHome: React.FC = () => {
   useEffect(() => {
     setCurrentPage(1);
     fetchItems();
+  }, [filter]);
+
+  // ⚡ Live Real-time Sync: Instantly re-fetch marketplace items when admin approves or updates an item without user refreshing page!
+  useEffect(() => {
+    const unsubscribe = subscribeToMarketUpdates((data) => {
+      if (data) {
+        // Silently reload items so newly approved products / gigs appear live
+        fetchItems();
+      }
+    });
+    return () => {
+      unsubscribe();
+    };
   }, [filter]);
 
   useEffect(() => {

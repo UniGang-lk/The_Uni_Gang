@@ -90,6 +90,17 @@ export const subscribeToEventUpdates = (callback: (data: any) => void): (() => v
 };
 
 /**
+ * Subscribe to marketplace updates (approvals, new listings, edits, deletions)
+ */
+export const subscribeToMarketUpdates = (callback: (data: any) => void): (() => void) => {
+  const socket = getSocket();
+  socket.on('market_updated', callback);
+  return () => {
+    socket.off('market_updated', callback);
+  };
+};
+
+/**
  * Subscribe to author notifications
  */
 export const subscribeToNotifications = (callback: (data: any) => void): (() => void) => {
