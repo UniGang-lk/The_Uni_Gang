@@ -24,6 +24,22 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
   const [successType, setSuccessType] = useState<'live' | 'pending'>('live');
   const [countdown, setCountdown] = useState(5);
 
+  const resetForm = () => {
+    setTitle('');
+    setPrice('');
+    setCondition('Good');
+    setDescription('');
+    setImages([]);
+    setError('');
+    setStep(1);
+    setCountdown(5);
+  };
+
+  const handleModalClose = () => {
+    resetForm();
+    onClose();
+  };
+
   // Auto-close countdown when on success step
   useEffect(() => {
     if (step !== 3) return;
@@ -32,7 +48,7 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
       setCountdown(prev => {
         if (prev <= 1) {
           clearInterval(interval);
-          setTimeout(() => onClose(), 0);
+          setTimeout(() => handleModalClose(), 0);
           return 0;
         }
         return prev - 1;
@@ -116,15 +132,9 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
       }
 
       const responseItem = await onSubmit(formData);
-      if (responseItem && responseItem.status === 'PENDING_VERIFICATION') {
-        // Pending verification / review by admin
-        setSuccessType('pending');
-        setStep(3);
-      } else {
-        // Verified student — show success screen
-        setSuccessType('live');
-        setStep(3);
-      }
+      // All listings go into review mode as requested by user
+      setSuccessType(responseItem?.status === 'AVAILABLE' ? 'live' : 'pending');
+      setStep(3);
     } catch (err: any) {
       setError(err.message || 'Failed to create listing');
     } finally {
@@ -200,7 +210,7 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 Post to Hustle Hub
               </h2>
-              <button onClick={onClose} className="p-2 text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-slate-800 rounded-full transition-colors">
+              <button onClick={handleModalClose} className="p-2 text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-slate-800 rounded-full transition-colors">
                 <LuX className="w-5 h-5" />
               </button>
             </div>
@@ -320,7 +330,7 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
             </div>
 
             <div className="px-6 py-4 border-t border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-slate-800/40 flex justify-end gap-3">
-              <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl font-semibold text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-800 transition-colors">
+              <button type="button" onClick={handleModalClose} className="px-5 py-2.5 rounded-xl font-semibold text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-800 transition-colors">
                 Cancel
               </button>
               <button 
@@ -344,7 +354,7 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
           <>
             <div className="px-6 py-4 border-b border-gray-100 dark:border-white/10 flex justify-between items-center bg-gray-50 dark:bg-slate-800/40">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">Verify Student Status</h2>
-              <button onClick={onClose} className="p-2 text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-slate-800 rounded-full transition-colors border-none bg-transparent cursor-pointer">
+              <button onClick={handleModalClose} className="p-2 text-gray-400 dark:text-slate-400 hover:text-gray-600 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-slate-800 rounded-full transition-colors border-none bg-transparent cursor-pointer">
                 <LuX className="w-5 h-5" />
               </button>
             </div>
@@ -379,7 +389,7 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
                   <div className="mt-8 flex justify-end gap-3 w-full max-w-sm">
                     <button
                       type="button"
-                      onClick={onClose}
+                      onClick={handleModalClose}
                       className="px-5 py-2.5 rounded-xl font-semibold text-gray-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-800 transition-colors border-none bg-transparent cursor-pointer"
                     >
                       Verify Later
@@ -500,7 +510,7 @@ const CreateListingModal: React.FC<CreateListingModalProps> = ({ isOpen, onClose
             <p className="text-xs text-gray-400 dark:text-slate-500 mb-6">ස්වයංක්‍රීයව වැසෙමින් පවතී... ({countdown}s)</p>
 
             <button
-              onClick={onClose}
+              onClick={handleModalClose}
               className={`px-8 py-3 rounded-xl font-bold text-white transition-all shadow-lg ${
                 successType === 'live'
                   ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/30'

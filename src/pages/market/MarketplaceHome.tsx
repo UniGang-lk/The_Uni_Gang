@@ -588,20 +588,25 @@ const MarketplaceHome: React.FC = () => {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={handlePostAdClick}
-                  className="group relative inline-flex items-center justify-center gap-3 bg-white text-slate-950 px-8 py-4 rounded-2xl font-black text-lg hover:bg-purple-50 transition-all overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.3)] w-full sm:w-auto cursor-pointer border-none"
+                  className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-black text-base text-white bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-[0_10px_35px_rgba(147,51,234,0.38)] hover:shadow-[0_15px_45px_rgba(147,51,234,0.55)] transition-all overflow-hidden w-full sm:w-auto cursor-pointer border border-white/20 backdrop-blur-xl"
                 >
-                  <span className="relative z-10 flex items-center gap-2">
-                    <LuPlus className="w-6 h-6 text-purple-600" /> Post an Ad / Gig
+                  {/* Subtle pulsing background glow */}
+                  <span className="absolute -inset-x-2 -bottom-2 h-1/2 bg-gradient-to-t from-white/20 to-transparent blur-sm pointer-events-none" />
+                  <span className="relative z-10 flex items-center gap-2.5">
+                    <span className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center group-hover:rotate-90 transition-transform duration-300">
+                      <LuPlus className="w-5 h-5 text-white" />
+                    </span>
+                    <span>Post an Ad / Gig</span>
                   </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-white via-purple-100 to-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out pointer-events-none" />
                 </motion.button>
 
                 <Link
                   to="/profile?tab=listings"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-base border border-white/20 transition-all backdrop-blur-md w-full sm:w-auto text-center no-underline"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-base border border-white/20 transition-all backdrop-blur-md w-full sm:w-auto text-center no-underline hover:border-white/40"
                 >
                   <LuShoppingBag className="w-5 h-5 text-purple-300" /> My Listings
                 </Link>
