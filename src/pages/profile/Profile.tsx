@@ -960,7 +960,7 @@ const Profile = () => {
         if (selectedChat) {
           socket.emit('leave_chat', selectedChat.id);
         }
-        socket.disconnect();
+        // Keep shared socket connected
       }
     };
   }, [selectedChat]);
@@ -1003,7 +1003,7 @@ const Profile = () => {
         if (selectedEventChat) {
           socket.emit('leave_chat', selectedEventChat.id);
         }
-        socket.disconnect();
+        // Keep shared socket connected
       }
     };
   }, [selectedEventChat]);

@@ -26,6 +26,7 @@ import NotFound from './pages/NotFound';
 import './App.css';
 
 // Lazy-Loaded Sub-Pages (Splits heavy chunks for 4x faster initial loading)
+const LoginPage = lazy(() => import('./pages/LoginPage'));
 const FindAccommodationPage = lazy(() => import('./pages/FindAccommodationPage'));
 const PostAdPage = lazy(() => import('./pages/PostAdPage'));
 const ContactUsPage = lazy(() => import('./pages/ContactUsPage'));
@@ -98,6 +99,8 @@ function App() {
           <Route path="/annex/:id" element={<Layout><AnnexDetailsPage /></Layout>} />
 
           {/* Post Advertiesment using SubLayout */}
+          <Route path="/login" element={<SubLayout><LoginPage /></SubLayout>} />
+          <Route path="/signin" element={<Navigate to="/login" replace />} />
           <Route path="/post-ad" element={<SubLayout><PostAdPage /></SubLayout>} />
 
           {/* Profile using SubLayout */}
