@@ -2806,8 +2806,11 @@ const Profile = () => {
                           <div className="grid grid-cols-1 gap-4">
                             {myOrders.map((order) => {
                               const item = order.item || {};
-                              const img = item.images && item.images.length > 0
-                                ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${item.images[0]}`
+                              const firstImg = item.images && item.images.length > 0 ? item.images[0] : '';
+                              const img = firstImg
+                                ? (firstImg.startsWith('http://') || firstImg.startsWith('https://') || firstImg.startsWith('data:image')
+                                    ? firstImg
+                                    : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${firstImg.startsWith('/') ? '' : '/'}${firstImg}`)
                                 : 'https://images.unsplash.com/photo-1521556906631-0c58e7ce65e5?q=80&w=600';
                               
                               const statusSteps = ['PENDING', 'PROCESSING', 'DELIVERED'];
@@ -2956,8 +2959,11 @@ const Profile = () => {
                         ) : (
                           <div className="grid grid-cols-1 gap-4">
                             {myListings.map((listing) => {
-                              const img = listing.images && listing.images.length > 0
-                                ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${listing.images[0]}`
+                              const firstImg = listing.images && listing.images.length > 0 ? listing.images[0] : '';
+                              const img = firstImg
+                                ? (firstImg.startsWith('http://') || firstImg.startsWith('https://') || firstImg.startsWith('data:image')
+                                    ? firstImg
+                                    : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${firstImg.startsWith('/') ? '' : '/'}${firstImg}`)
                                 : 'https://images.unsplash.com/photo-1521556906631-0c58e7ce65e5?q=80&w=600&auto=format&fit=crop';
                               return (
                                 <div key={listing.id} className="p-5 bg-slate-50 dark:bg-slate-900 border border-slate-150 dark:border-white/10 rounded-3xl flex flex-col sm:flex-row items-center gap-4">
