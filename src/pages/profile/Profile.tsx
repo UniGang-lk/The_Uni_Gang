@@ -17,6 +17,7 @@ import toast from 'react-hot-toast';
 import { api } from '../../api';
 import { celebrate } from '../../utils/celebrate';
 import { playNotificationSound, requestNotificationPermission, triggerPushNotification } from '../../utils/sound';
+import { getSocket } from '../../services/realtime';
 
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
 
@@ -321,52 +322,63 @@ const Profile = () => {
   useEffect(() => {
     requestNotificationPermission();
 
-    const socketUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
-    const socket = io(socketUrl, {
-      auth: { token: localStorage.getItem('userToken') }
-    });
-
+    const socket = getSocket();
     const userId = localStorage.getItem('userId');
     if (userId) {
+      socket.emit('register', userId);
       socket.emit('join_user_room', userId);
     }
 
-    socket.on('new_annex_message', (data: any) => {
+    const handleNewAnnexMsg = (data: any) => {
       playNotificationSound();
       triggerPushNotification('New Annex Inquiry Message', {
         body: data.message?.message || 'You received a new inquiry message for your annex listing.'
       });
       fetchAnnexChats();
-    });
+    };
 
-    socket.on('new_market_message', (data: any) => {
+    const handleNewMarketMsg = (data: any) => {
       playNotificationSound();
       triggerPushNotification('New Marketplace Message', {
         body: data.message?.message || 'You received a new message regarding a marketplace item.'
       });
-    });
+      fetchChats();
+    };
 
-    socket.on('new_event_message', (data: any) => {
+    const handleNewEventMsg = (data: any) => {
       playNotificationSound();
       triggerPushNotification('New Event Inquiry Message', {
         body: data.message?.message || 'You received a new message regarding a campus event.'
       });
       fetchEventChats();
-    });
+    };
 
-    socket.on('new_notification', (data: any) => {
+    const handleNewNotification = (data: any) => {
       playNotificationSound();
       triggerPushNotification(data.title || 'Notification', {
         body: data.message || 'You have a new update.'
       });
-    });
+      // Also reload relevant inbox/annex data
+      fetchAnnexChats();
+      fetchChats();
+    };
 
-    socket.on('blog_updated', (data: any) => {
+    const handleBlogUpdated = (data: any) => {
       setSubmittedBlogs(prev => prev.map(b => b.id === data.blogId ? { ...b, status: data.status, ...(data.blog || {}) } : b));
-    });
+    };
+
+    socket.on('new_annex_message', handleNewAnnexMsg);
+    socket.on('new_market_message', handleNewMarketMsg);
+    socket.on('new_event_message', handleNewEventMsg);
+    socket.on('new_notification', handleNewNotification);
+    socket.on('blog_updated', handleBlogUpdated);
 
     return () => {
-      socket.disconnect();
+      socket.off('new_annex_message', handleNewAnnexMsg);
+      socket.off('new_market_message', handleNewMarketMsg);
+      socket.off('new_event_message', handleNewEventMsg);
+      socket.off('new_notification', handleNewNotification);
+      socket.off('blog_updated', handleBlogUpdated);
     };
   }, []);
 
@@ -540,6 +552,7 @@ const Profile = () => {
     fetchListings();
     fetchMyAnnexes();
     fetchUserProfile();
+    fetchAnnexChats();
     fetchChats();
     fetchEventChats();
     fetchMyOrders();
