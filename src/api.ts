@@ -555,23 +555,39 @@ export const api = {
   },
 
   markNotificationAsRead: async (id: string, token: string): Promise<any> => {
-    const response = await fetch(`${BASE_URL}/api/notifications/${id}/read`, {
+    let response = await fetch(`${BASE_URL}/api/notifications/${id}/read`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
+    if (!response.ok && (response.status === 404 || response.status === 405)) {
+      response = await fetch(`${BASE_URL}/api/notifications/${id}/read`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    }
     if (!response.ok) throw new Error('Failed to mark notification as read');
     return response.json();
   },
 
   markAllNotificationsAsRead: async (token: string): Promise<any> => {
-    const response = await fetch(`${BASE_URL}/api/notifications/read-all`, {
+    let response = await fetch(`${BASE_URL}/api/notifications/read-all`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
+    if (!response.ok && (response.status === 404 || response.status === 405)) {
+      response = await fetch(`${BASE_URL}/api/notifications/read-all`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+    }
     if (!response.ok) throw new Error('Failed to mark all as read');
     return response.json();
   },

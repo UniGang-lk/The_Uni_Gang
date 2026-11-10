@@ -125,7 +125,8 @@ export const NotificationDropdown = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const isItemUnread = (n: any) => n.isRead === false || n.is_read === false;
+  const unreadCount = notifications.filter(isItemUnread).length;
 
   const handleMarkAsRead = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -133,19 +134,20 @@ export const NotificationDropdown = () => {
       const token = localStorage.getItem('userToken');
       if (token) {
         await api.markNotificationAsRead(id, token);
-        setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true, is_read: true } : n));
       }
     } catch (error) {
       console.error('Error marking as read:', error);
     }
   };
 
-  const handleMarkAllAsRead = async () => {
+  const handleMarkAllAsRead = async (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     try {
       const token = localStorage.getItem('userToken');
       if (token) {
         await api.markAllNotificationsAsRead(token);
-        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true, is_read: true })));
       }
     } catch (error) {
       console.error('Error marking all as read:', error);
@@ -153,11 +155,11 @@ export const NotificationDropdown = () => {
   };
 
   const handleNotificationClick = async (notification: any) => {
-    if (!notification.isRead) {
+    if (isItemUnread(notification)) {
       const token = localStorage.getItem('userToken');
       if (token) {
         await api.markNotificationAsRead(notification.id, token);
-        setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, isRead: true } : n));
+        setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, isRead: true, is_read: true } : n));
       }
     }
     setIsOpen(false);
@@ -231,58 +233,61 @@ export const NotificationDropdown = () => {
                   className="space-y-1"
                 >
                   <AnimatePresence>
-                    {notifications.map(notification => (
-                      <motion.div 
-                        variants={itemVariants}
-                        layout
-                        key={notification.id}
-                        onClick={() => handleNotificationClick(notification)}
-                        className={`group relative p-4 rounded-2xl cursor-pointer transition-all duration-300 ease-out border overflow-hidden
-                          ${!notification.isRead 
-                            ? 'bg-white dark:bg-slate-800/90 border-slate-200/60 dark:border-slate-700 shadow-sm hover:shadow-md' 
-                            : 'bg-transparent border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/40'}`}
-                      >
-                        {/* Soft background glow for unread */}
-                        {!notification.isRead && (
-                          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.03] to-transparent pointer-events-none" />
-                        )}
-
-                        <div className="flex gap-4 relative">
-                          {/* Icon Badge */}
-                          <div className="flex-shrink-0 mt-0.5">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center border shadow-sm ${getNotificationColor(notification.type)}`}>
-                              {getNotificationIcon(notification.type)}
-                            </div>
-                          </div>
-
-                          {/* Content */}
-                          <div className="flex-1 min-w-0 pr-8">
-                            <p className={`text-[14px] leading-tight ${!notification.isRead ? 'font-semibold text-slate-900 dark:text-white' : 'font-medium text-slate-600 dark:text-slate-300'}`}>
-                              {notification.title}
-                            </p>
-                            <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 line-clamp-2 leading-relaxed">
-                              {notification.message}
-                            </p>
-                            <p className="text-[10px] text-slate-400 mt-2 font-semibold tracking-wider uppercase flex items-center gap-1.5">
-                              {!notification.isRead && <span className="w-1.5 h-1.5 bg-blue-500 rounded-full inline-block"></span>}
-                              {new Date(notification.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                          </div>
-
-                          {/* Action Button: Stylish visible tick inside a small circle */}
-                          {!notification.isRead && (
-                            <button 
-                              type="button"
-                              onClick={(e) => handleMarkAsRead(notification.id, e)}
-                              className="shrink-0 self-center w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-700/60 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-white hover:border-emerald-500 transition-all duration-200 flex items-center justify-center cursor-pointer shadow-xs group/btn"
-                              title="Mark as read"
-                            >
-                              <FiCheck className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
-                            </button>
+                    {notifications.map(notification => {
+                      const unread = isItemUnread(notification);
+                      return (
+                        <motion.div 
+                          variants={itemVariants}
+                          layout
+                          key={notification.id}
+                          onClick={() => handleNotificationClick(notification)}
+                          className={`group relative p-4 rounded-2xl cursor-pointer transition-all duration-300 ease-out border overflow-hidden
+                            ${unread 
+                              ? 'bg-white dark:bg-slate-800/90 border-slate-200/60 dark:border-slate-700 shadow-sm hover:shadow-md' 
+                              : 'bg-transparent border-transparent hover:bg-slate-50 dark:hover:bg-slate-800/40'}`}
+                        >
+                          {/* Soft background glow for unread */}
+                          {unread && (
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.03] to-transparent pointer-events-none" />
                           )}
-                        </div>
-                      </motion.div>
-                    ))}
+
+                          <div className="flex gap-4 relative">
+                            {/* Icon Badge */}
+                            <div className="flex-shrink-0 mt-0.5">
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center border shadow-sm ${getNotificationColor(notification.type)}`}>
+                                {getNotificationIcon(notification.type)}
+                              </div>
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex-1 min-w-0 pr-8">
+                              <p className={`text-[14px] leading-tight ${unread ? 'font-semibold text-slate-900 dark:text-white' : 'font-medium text-slate-600 dark:text-slate-300'}`}>
+                                {notification.title}
+                              </p>
+                              <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 line-clamp-2 leading-relaxed">
+                                {notification.message}
+                              </p>
+                              <p className="text-[10px] text-slate-400 mt-2 font-semibold tracking-wider uppercase flex items-center gap-1.5">
+                                {unread && <span className="w-1.5 h-1.5 bg-blue-500 rounded-full inline-block"></span>}
+                                {new Date(notification.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                            </div>
+
+                            {/* Action Button: Stylish visible tick inside a small circle */}
+                            {unread && (
+                              <button 
+                                type="button"
+                                onClick={(e) => handleMarkAsRead(notification.id, e)}
+                                className="shrink-0 self-center w-8 h-8 rounded-full bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-700/60 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-white hover:border-emerald-500 transition-all duration-200 flex items-center justify-center cursor-pointer shadow-xs group/btn"
+                                title="Mark as read"
+                              >
+                                <FiCheck className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
+                              </button>
+                            )}
+                          </div>
+                        </motion.div>
+                      );
+                    })}
                   </AnimatePresence>
                 </motion.div>
               )}
