@@ -1,3 +1,4 @@
+import { openGlobalChat } from '../../components/chat/GlobalFloatingChat';
 ﻿import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   LuStar, LuWifi, LuBath, LuSnowflake, LuCar, LuUtensils,
@@ -475,8 +476,14 @@ const AnnexDetailsPage = () => {
                               const data = await res.json();
                               if (!res.ok) throw new Error(data.message || 'Failed to start chat');
 
-                              toast.success('Message sent! Opening chat...');
-                              navigate(`/profile?tab=annex_inbox&chatId=${data.chat.id}`);
+                              toast.success('Chat started!');
+                              openGlobalChat({
+                                chatId: data.chat.id,
+                                type: 'annex',
+                                partnerName: annex.owner?.name || 'Landlord',
+                                partnerAvatar: annex.owner?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${annex.owner?.name || 'Owner'}`,
+                                subtitle: `About: ${annex.title}`
+                              });
                             } catch (err: any) {
                               toast.error(err.message || 'Failed to send message.');
                             }

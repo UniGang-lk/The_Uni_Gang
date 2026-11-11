@@ -1,3 +1,4 @@
+import GlobalFloatingChat from './components/chat/GlobalFloatingChat';
 import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/layout/Layout';
@@ -159,6 +160,7 @@ function App() {
       <AdPopup />
       <GoogleOneTap />
       <AuthSynchronizer />
+      <GlobalFloatingChat />
     </Router>
   );
 }
