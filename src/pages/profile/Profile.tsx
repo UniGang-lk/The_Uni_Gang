@@ -18,6 +18,7 @@ import { api } from '../../api';
 import { celebrate } from '../../utils/celebrate';
 import { playNotificationSound, requestNotificationPermission, triggerPushNotification } from '../../utils/sound';
 import { getSocket } from '../../services/realtime';
+import { openGlobalChat } from '../../components/chat/GlobalFloatingChat';
 
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
 
@@ -3322,7 +3323,18 @@ const Profile = () => {
                                       return (
                                         <div
                                           key={chat.id}
-                                          onClick={() => setSelectedAnnexChat(chat)}
+                                          onClick={() => {
+                                            const currentUserId = localStorage.getItem('userId');
+                                            const otherUser = chat.student_id === currentUserId ? chat.landlord : chat.student;
+                                            setShowInboxModal(false);
+                                            openGlobalChat({
+                                              chatId: chat.id,
+                                              type: 'annex',
+                                              partnerName: otherUser?.name || 'Landlord / Student',
+                                              partnerAvatar: otherUser?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${otherUser?.name || 'User'}`,
+                                              subtitle: chat.annex?.title || 'Annex Listing',
+                                            });
+                                          }}
                                           className="cursor-pointer p-4 sm:p-5 bg-white dark:bg-slate-900/70 border border-slate-200/70 dark:border-white/10 rounded-2xl hover:border-blue-500 hover:shadow-lg dark:hover:border-blue-500/60 hover:bg-blue-500/5 dark:hover:bg-blue-500/10 transition-all duration-200 shadow-xs flex items-center justify-between gap-4 group"
                                         >
                                           <div className="flex items-center gap-3.5 min-w-0">
@@ -3471,7 +3483,18 @@ const Profile = () => {
                                       return (
                                         <div
                                           key={chat.id}
-                                          onClick={() => setSelectedChat(chat)}
+                                          onClick={() => {
+                                            const currentUserId = localStorage.getItem('userId');
+                                            const otherUser = chat.buyer_id === currentUserId ? chat.seller : chat.buyer;
+                                            setShowInboxModal(false);
+                                            openGlobalChat({
+                                              chatId: chat.id,
+                                              type: 'marketplace',
+                                              partnerName: otherUser?.name || 'Seller',
+                                              partnerAvatar: otherUser?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${otherUser?.name || 'User'}`,
+                                              subtitle: chat.item?.title || 'Marketplace Item',
+                                            });
+                                          }}
                                           className="cursor-pointer p-4 sm:p-5 bg-white dark:bg-slate-900/70 border border-slate-200/70 dark:border-white/10 rounded-2xl hover:border-indigo-500 hover:shadow-lg dark:hover:border-indigo-500/60 hover:bg-indigo-500/5 dark:hover:bg-indigo-500/10 transition-all duration-200 shadow-xs flex items-center justify-between gap-4 group"
                                         >
                                           <div className="flex items-center gap-3.5 min-w-0">
@@ -3620,7 +3643,18 @@ const Profile = () => {
                                       return (
                                         <div
                                           key={chat.id}
-                                          onClick={() => setSelectedEventChat(chat)}
+                                          onClick={() => {
+                                            const currentUserId = localStorage.getItem('userId');
+                                            const otherUser = chat.buyer_id === currentUserId ? chat.host : chat.buyer;
+                                            setShowInboxModal(false);
+                                            openGlobalChat({
+                                              chatId: chat.id,
+                                              type: 'event',
+                                              partnerName: otherUser?.name || 'Organizer',
+                                              partnerAvatar: otherUser?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${otherUser?.name || 'User'}`,
+                                              subtitle: chat.event?.title || 'Event Inquiry',
+                                            });
+                                          }}
                                           className="cursor-pointer p-4 sm:p-5 bg-white dark:bg-slate-900/70 border border-slate-200/70 dark:border-white/10 rounded-2xl hover:border-pink-500 hover:shadow-lg dark:hover:border-pink-500/60 hover:bg-pink-500/5 dark:hover:bg-pink-500/10 transition-all duration-200 shadow-xs flex items-center justify-between gap-4 group"
                                         >
                                           <div className="flex items-center gap-3.5 min-w-0">
