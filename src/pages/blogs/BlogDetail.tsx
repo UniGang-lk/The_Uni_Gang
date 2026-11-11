@@ -750,7 +750,7 @@ const BlogDetail: React.FC = () => {
                         )}
                       </div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-1">
-                        Contributor from {blog.author?.university || 'University of Colombo'}. Sharing genuine student perspectives and campus insights.
+                        {blog.author?.university ? `Contributor from ${blog.author.university}. ` : 'Student contributor. '}Sharing genuine student perspectives and campus insights.
                       </p>
                     </div>
                   </div>

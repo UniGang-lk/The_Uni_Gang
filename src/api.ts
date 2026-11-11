@@ -71,7 +71,7 @@ export const api = {
         ...author,
         name: author.name || 'Anonymous',
         avatar: author.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${author.name || 'Author'}`,
-        university: author.university || 'University of Colombo'
+        university: author.university || ''
       },
       featuredImage: blog.featuredImage
         ? (blog.featuredImage.startsWith('http') ? blog.featuredImage : `${BASE_URL}${blog.featuredImage}`)

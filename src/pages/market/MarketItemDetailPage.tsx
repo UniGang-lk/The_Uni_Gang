@@ -660,7 +660,7 @@ const MarketItemDetailPage: React.FC = () => {
                       {isProfessionalVerified && !isStudentVerified && <VerifiedBadge size={16} title="Verified Professional" />}
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Contributor from {item.seller?.university || 'University of Colombo'}
+                      {item.seller?.university ? `Contributor from ${item.seller.university}` : (isStudentVerified ? 'Verified Campus Student' : 'Community Member')}
                     </p>
                   </div>
                 </>
