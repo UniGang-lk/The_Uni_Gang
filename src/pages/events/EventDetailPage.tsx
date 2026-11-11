@@ -11,6 +11,7 @@ import { FaWhatsapp } from 'react-icons/fa6';
 import confetti from 'canvas-confetti';
 import { api } from '../../api';
 import toast from 'react-hot-toast';
+import { openGlobalChat } from '../../components/chat/GlobalFloatingChat';
 import SEO from '../../components/SEO';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
@@ -231,14 +232,20 @@ const EventDetailPage: React.FC = () => {
     }
     try {
       const chat = await api.startEventChat(event.id.toString());
-      navigate(`/profile?tab=inbox&chatId=${chat.id}&type=event`);
+      openGlobalChat({
+        chatId: chat.id,
+        type: 'event',
+        partnerName: event.user?.name || 'Event Organizer',
+        partnerAvatar: event.user?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${event.user?.name || 'Host'}`,
+        subtitle: `Event: ${event.title}`
+      });
+      toast.success("Chat opened with event organizer!");
     } catch (err: any) {
       if (err?.message?.includes('organizer') || err?.message?.includes('yourself')) {
         toast.error("You are the organizer of this event.");
         return;
       }
-      toast.success("Opening chat with event organizer...");
-      navigate(`/profile?tab=inbox&type=event&eventId=${event.id}`);
+      toast.error(err?.message || "Failed to start event chat.");
     }
   };
 

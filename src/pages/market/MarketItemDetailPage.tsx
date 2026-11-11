@@ -21,6 +21,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { FaWhatsapp } from 'react-icons/fa6';
 import { api } from '../../api';
+import { openGlobalChat } from '../../components/chat/GlobalFloatingChat';
 import SEO from '../../components/SEO';
 import PremiumPageLoader from '../../components/ui/PremiumPageLoader';
 import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
@@ -147,9 +148,13 @@ const MarketItemDetailPage: React.FC = () => {
     setLoadingChat(true);
     try {
       const chat = await api.startMarketplaceChat(item.id);
-      chat.partner = item.seller;
-      chat.item = item;
-      setActiveChat(chat);
+      openGlobalChat({
+        chatId: chat.id,
+        type: 'marketplace',
+        partnerName: item.seller?.name || 'Seller',
+        partnerAvatar: item.seller?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${item.seller?.name || 'Seller'}`,
+        subtitle: `About: ${item.title}`
+      });
       toast.success(`Direct message opened with ${item.seller?.name || 'Seller'}!`);
     } catch (err: any) {
       toast.error(err.message || 'Failed to start conversation.');

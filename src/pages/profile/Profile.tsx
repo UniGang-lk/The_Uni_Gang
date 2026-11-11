@@ -3350,13 +3350,13 @@ const Profile = () => {
                                           key={msg.id}
                                           className={`flex flex-col max-w-[80%] ${isMe ? 'self-end items-end text-right' : 'self-start items-start text-left'}`}
                                         >
-                                          <span className="text-[9px] font-bold text-slate-400 dark:text-slate-550 mb-0.5 px-1.5">
+                                          <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 mb-0.5 px-1.5">
                                             {isMe ? 'You' : msg.sender?.name} • {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                           </span>
-                                          <div className={`p-3.5 rounded-2xl text-xs font-semibold leading-relaxed ${
+                                          <div className={`p-3.5 rounded-2xl text-xs font-semibold leading-relaxed shadow-sm ${
                                             isMe
                                               ? 'bg-blue-600 text-white rounded-tr-none'
-                                              : 'bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none'
+                                              : 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-tl-none'
                                           }`}>
                                             {msg.message}
                                           </div>
@@ -3479,13 +3479,13 @@ const Profile = () => {
                                           key={msg.id}
                                           className={`flex flex-col max-w-[80%] ${isMe ? 'self-end items-end text-right' : 'self-start items-start text-left'}`}
                                         >
-                                          <span className="text-[9px] font-bold text-slate-400 dark:text-slate-550 mb-0.5 px-1.5">
+                                          <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 mb-0.5 px-1.5">
                                             {isMe ? 'You' : msg.sender?.name} • {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                           </span>
-                                          <div className={`p-3.5 rounded-2xl text-xs font-semibold leading-relaxed ${
+                                          <div className={`p-3.5 rounded-2xl text-xs font-semibold leading-relaxed shadow-sm ${
                                             isMe
-                                              ? 'bg-indigo-650 text-white rounded-tr-none'
-                                              : 'bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none'
+                                              ? 'bg-indigo-600 text-white rounded-tr-none'
+                                              : 'bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-tl-none'
                                           }`}>
                                             {msg.message}
                                           </div>
@@ -3611,10 +3611,10 @@ const Profile = () => {
                                           <span className="text-[9px] font-bold text-slate-400 dark:text-slate-550 mb-0.5 px-1.5">
                                             {isMe ? 'You' : msg.sender?.name} • {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                           </span>
-                                          <div className={`p-3.5 rounded-2xl text-xs font-semibold leading-relaxed ${
+                                          <div className={`p-3.5 rounded-2xl text-xs font-semibold leading-relaxed shadow-sm ${
                                             isMe
                                               ? 'bg-pink-600 text-white rounded-tr-none'
-                                              : 'bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-none'
+                                              : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200/60 dark:border-white/5 rounded-tl-none'
                                           }`}>
                                             {msg.message}
                                           </div>

@@ -20,6 +20,7 @@ import PageBreadcrumb from '../../components/ui/PageBreadcrumb';
 import SEO from '../../components/SEO';
 import { getFreshToken } from '../../utils/authToken';
 import { subscribeToMarketUpdates } from '../../services/realtime';
+import { openGlobalChat } from '../../components/chat/GlobalFloatingChat';
 
 const MarketplaceHome: React.FC = () => {
   const navigate = useNavigate();
@@ -376,10 +377,13 @@ const MarketplaceHome: React.FC = () => {
       const chat = await api.startMarketplaceChat(item.id);
 
       const partner = item.seller || { name: 'Seller' };
-      chat.partner = partner;
-      chat.item = item;
-
-      setActiveChat(chat);
+      openGlobalChat({
+        chatId: chat.id,
+        type: 'marketplace',
+        partnerName: partner.name || 'Seller',
+        partnerAvatar: partner.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${partner.name || 'Seller'}`,
+        subtitle: `About: ${item.title}`
+      });
       setSelectedItem(null);
       toast.success(`Chat started with ${partner.name || 'Seller'}!`);
     } catch (err: any) {

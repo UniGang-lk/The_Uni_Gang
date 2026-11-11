@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LuX, LuSend, LuMinimize2, LuMaximize2, LuMessageCircle } from 'react-icons/lu';
 import { getSocket } from '../../services/realtime';
-import { playNotificationSound } from '../../utils/sound';
+import { playNotificationSound, triggerPushNotification } from '../../utils/sound';
+import { listenToAuthUpdate } from '../../utils/authEvents';
 import { api } from '../../api';
 
 export interface GlobalChatTarget {
@@ -30,6 +31,8 @@ const GlobalFloatingChat: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const currentChatIdRef = useRef<string | null>(null);
   currentChatIdRef.current = activeChat ? activeChat.chatId : null;
+  const isMinimizedRef = useRef<boolean>(isMinimized);
+  isMinimizedRef.current = isMinimized;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -73,12 +76,13 @@ const GlobalFloatingChat: React.FC = () => {
     socket.emit('join_chat', activeChat.chatId);
 
     const handleReceiveMsg = (msg: any) => {
-      if (msg.chat_id === activeChat.chatId || msg.chatId === activeChat.chatId) {
+      const msgChatId = msg.chat_id || msg.chatId || msg.ChatID;
+      if (msgChatId === activeChat.chatId) {
         setMessages(prev => {
           if (prev.some(m => m.id === msg.id)) return prev;
           return [...prev, msg];
         });
-        if (isMinimized) {
+        if (isMinimizedRef.current) {
           setUnreadCount(c => c + 1);
         }
       }
@@ -110,35 +114,51 @@ const GlobalFloatingChat: React.FC = () => {
   // Global socket listener: when a new message arrives from anywhere, auto-popup this floating chat box like FB!
   useEffect(() => {
     const socket = getSocket();
-    const myUserId = localStorage.getItem('userId');
-    const token = localStorage.getItem('userToken');
 
-    if (!token || !myUserId) return;
+    const syncUserRoom = () => {
+      const myUserId = localStorage.getItem('userId');
+      const token = localStorage.getItem('userToken');
+      if (token && myUserId) {
+        socket.emit('register', myUserId);
+        socket.emit('join_user_room', myUserId);
+      }
+    };
 
-    // Register user room
-    socket.emit('register', myUserId);
-    socket.emit('join_user_room', myUserId);
+    // Initial sync
+    syncUserRoom();
+
+    // Re-sync on socket reconnect
+    socket.on('connect', syncUserRoom);
+
+    // Re-sync on auth events (e.g. login)
+    const cleanupAuth = listenToAuthUpdate(syncUserRoom);
 
     const triggerAutoPopup = async (type: 'annex' | 'marketplace' | 'event', chatId: string, messageObj: any) => {
+      const currentUserId = localStorage.getItem('userId');
+      const senderId = messageObj?.sender_id || messageObj?.senderId || messageObj?.SenderID;
+
       // Don't auto-popup if sender is current user
-      if (messageObj?.sender_id === myUserId || messageObj?.senderId === myUserId) return;
+      if (currentUserId && String(senderId) === String(currentUserId)) return;
 
       playNotificationSound();
 
+      const senderName = messageObj?.sender?.name || (type === 'annex' ? 'Landlord / Student' : type === 'event' ? 'Event Organizer' : 'Market Seller');
+      const senderAvatar = messageObj?.sender?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${senderName}`;
+
+      triggerPushNotification(`💬 New Message from ${senderName}`, {
+        body: messageObj?.message || 'Tap to reply...'
+      });
+
       // If this chat is already open and not minimized, just let receive_message append it
-      if (currentChatIdRef.current === chatId && !isMinimized) {
+      if (currentChatIdRef.current === chatId && !isMinimizedRef.current) {
         return;
       }
 
       // If minimized for this chat, increment unread badge
-      if (currentChatIdRef.current === chatId && isMinimized) {
+      if (currentChatIdRef.current === chatId && isMinimizedRef.current) {
         setUnreadCount(prev => prev + 1);
         return;
       }
-
-      // Fetch partner & title info to display rich header
-      const senderName = messageObj?.sender?.name || 'A user';
-      const senderAvatar = messageObj?.sender?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${senderName}`;
 
       let subtitle = 'New Inquiry';
       if (type === 'annex') subtitle = 'About: Accommodation';
@@ -179,6 +199,8 @@ const GlobalFloatingChat: React.FC = () => {
     socket.on('new_event_message', onNewEvent);
 
     return () => {
+      socket.off('connect', syncUserRoom);
+      cleanupAuth();
       socket.off('new_annex_message', onNewAnnex);
       socket.off('new_market_message', onNewMarket);
       socket.off('new_event_message', onNewEvent);
