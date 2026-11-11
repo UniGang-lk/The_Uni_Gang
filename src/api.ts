@@ -937,6 +937,51 @@ export const api = {
     return response.json();
   },
 
+  startAnnexChat: async (annexId: string, initialMessage?: string): Promise<any> => {
+    const token = localStorage.getItem('userToken');
+    const response = await fetch(`${BASE_URL}/api/annexes/chats/start`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ annexId, initialMessage })
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || 'Failed to start annex chat');
+    }
+    const data = await response.json();
+    return data.chat;
+  },
+
+  getAnnexMessages: async (chatId: string): Promise<any[]> => {
+    const token = localStorage.getItem('userToken');
+    const response = await fetch(`${BASE_URL}/api/annexes/chats/${chatId}/messages`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    if (!response.ok) throw new Error('Failed to fetch annex messages');
+    const data = await response.json();
+    return data.messages || [];
+  },
+
+  sendAnnexMessage: async (chatId: string, message: string): Promise<any> => {
+    const token = localStorage.getItem('userToken');
+    const response = await fetch(`${BASE_URL}/api/annexes/chats/${chatId}/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ message })
+    });
+    if (!response.ok) throw new Error('Failed to send annex message');
+    const data = await response.json();
+    return data.message;
+  },
+
   createMarketOrder: async (formData: FormData): Promise<any> => {
     const token = localStorage.getItem('userToken');
     const response = await fetch(`${BASE_URL}/api/market/orders`, {
