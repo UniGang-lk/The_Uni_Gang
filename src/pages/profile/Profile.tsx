@@ -3203,53 +3203,88 @@ const Profile = () => {
 
                       {/* Tab Selection Row (Hidden if a specific chat or ticket detail is open) */}
                       {!selectedChat && !selectedEventChat && !selectedSupportTicket && !selectedAnnexChat && (
-                        <div className="flex flex-wrap gap-2 mb-6 bg-slate-100 dark:bg-slate-900/50 p-1.5 rounded-2xl w-fit">
+                        <div className="flex flex-wrap items-center gap-1.5 mb-6 p-1.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200/60 dark:border-white/5 w-fit max-w-full">
                           <button
                             type="button"
                             onClick={() => {
                               setInboxTab('annex');
                               fetchAnnexChats();
                             }}
-                            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all inline-flex items-center gap-1.5 ${
+                            className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all inline-flex items-center gap-2 cursor-pointer border-none ${
                               inboxTab === 'annex'
-                                ? 'bg-blue-600 text-white shadow-md'
-                                : 'text-slate-400 hover:text-slate-700 dark:hover:text-white bg-transparent border-none cursor-pointer'
+                                ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm ring-1 ring-slate-200/50 dark:ring-white/10'
+                                : 'text-slate-500 hover:text-slate-900 dark:hover:text-white bg-transparent'
                             }`}
                           >
-                            <LuHouse size={14} /> Bodim / Annexes ({annexChats.length})
+                            <span className="p-1 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                              <LuHouse size={13} />
+                            </span>
+                            Bodim / Annexes
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              inboxTab === 'annex' ? 'bg-blue-600 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                            }`}>
+                              {annexChats.length}
+                            </span>
                           </button>
+
                           <button
                             type="button"
                             onClick={() => setInboxTab('marketplace')}
-                            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all inline-flex items-center gap-1.5 ${
+                            className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all inline-flex items-center gap-2 cursor-pointer border-none ${
                               inboxTab === 'marketplace'
-                                ? 'bg-indigo-600 text-white shadow-md'
-                                : 'text-slate-400 hover:text-slate-700 dark:hover:text-white bg-transparent border-none cursor-pointer'
+                                ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm ring-1 ring-slate-200/50 dark:ring-white/10'
+                                : 'text-slate-500 hover:text-slate-900 dark:hover:text-white bg-transparent'
                             }`}
                           >
-                            <LuShoppingBag size={14} /> Marketplace ({marketplaceChats.length})
+                            <span className="p-1 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                              <LuShoppingBag size={13} />
+                            </span>
+                            Marketplace
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              inboxTab === 'marketplace' ? 'bg-indigo-600 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                            }`}>
+                              {marketplaceChats.length}
+                            </span>
                           </button>
+
                           <button
                             type="button"
                             onClick={() => setInboxTab('events')}
-                            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all inline-flex items-center gap-1.5 ${
+                            className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all inline-flex items-center gap-2 cursor-pointer border-none ${
                               inboxTab === 'events'
-                                ? 'bg-pink-600 text-white shadow-md'
-                                : 'text-slate-400 hover:text-slate-700 dark:hover:text-white bg-transparent border-none cursor-pointer'
+                                ? 'bg-white dark:bg-slate-800 text-pink-600 dark:text-pink-400 shadow-sm ring-1 ring-slate-200/50 dark:ring-white/10'
+                                : 'text-slate-500 hover:text-slate-900 dark:hover:text-white bg-transparent'
                             }`}
                           >
-                            <LuCalendar size={14} /> Events ({eventChats.length})
+                            <span className="p-1 rounded-lg bg-pink-500/10 text-pink-600 dark:text-pink-400">
+                              <LuCalendar size={13} />
+                            </span>
+                            Events
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              inboxTab === 'events' ? 'bg-pink-600 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                            }`}>
+                              {eventChats.length}
+                            </span>
                           </button>
+
                           <button
                             type="button"
                             onClick={() => setInboxTab('support')}
-                            className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all inline-flex items-center gap-1.5 ${
+                            className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all inline-flex items-center gap-2 cursor-pointer border-none ${
                               inboxTab === 'support'
-                                ? 'bg-rose-600 text-white shadow-md'
-                                : 'text-slate-400 hover:text-slate-700 dark:hover:text-white bg-transparent border-none cursor-pointer'
+                                ? 'bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 shadow-sm ring-1 ring-slate-200/50 dark:ring-white/10'
+                                : 'text-slate-500 hover:text-slate-900 dark:hover:text-white bg-transparent'
                             }`}
                           >
-                            <LuLifeBuoy size={14} /> Support ({supportProblems.length})
+                            <span className="p-1 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                              <LuLifeBuoy size={13} />
+                            </span>
+                            Support
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              inboxTab === 'support' ? 'bg-rose-600 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                            }`}>
+                              {supportProblems.length}
+                            </span>
                           </button>
                         </div>
                       )}
@@ -3276,7 +3311,7 @@ const Profile = () => {
                                     <p className="text-[10px] text-slate-400 font-semibold">Click "Send Inquiry" on any Annex card to chat with landlords in real-time.</p>
                                   </div>
                                 ) : (
-                                  <div className="grid grid-cols-1 gap-4">
+                                  <div className="grid grid-cols-1 gap-3">
                                     {annexChats.map((chat) => {
                                       const currentUserId = localStorage.getItem('userId');
                                       const otherUser = chat.student_id === currentUserId ? chat.landlord : chat.student;
@@ -3288,18 +3323,38 @@ const Profile = () => {
                                         <div
                                           key={chat.id}
                                           onClick={() => setSelectedAnnexChat(chat)}
-                                          className="cursor-pointer p-5 bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-white/10 rounded-3xl hover:border-blue-500/30 hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-all duration-300 shadow-sm flex items-center justify-between gap-4 group"
+                                          className="cursor-pointer p-4 sm:p-5 bg-white dark:bg-slate-900/70 border border-slate-200/70 dark:border-white/10 rounded-2xl hover:border-blue-500 hover:shadow-lg dark:hover:border-blue-500/60 hover:bg-blue-500/5 dark:hover:bg-blue-500/10 transition-all duration-200 shadow-xs flex items-center justify-between gap-4 group"
                                         >
-                                          <div className="flex items-center gap-4 min-w-0">
-                                            <img src={otherPic} alt={otherName} className="w-12 h-12 rounded-full object-cover border border-slate-200 dark:border-white/10 shrink-0" />
+                                          <div className="flex items-center gap-3.5 min-w-0">
+                                            <div className="relative shrink-0">
+                                              <img src={otherPic} alt={otherName} className="w-12 h-12 rounded-2xl object-cover ring-2 ring-slate-200/80 dark:ring-white/10 group-hover:ring-blue-500/50 transition-all" />
+                                              <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[9px] shadow-sm">
+                                                <LuHouse size={9} />
+                                              </span>
+                                            </div>
                                             <div className="min-w-0 text-left">
-                                              <h4 className="text-base font-black text-slate-800 dark:text-white group-hover:text-blue-500 transition-colors truncate">
-                                                {otherName}
-                                              </h4>
-                                              <p className="text-slate-400 dark:text-slate-500 text-xs font-bold truncate mt-0.5 flex items-center gap-1">Regarding: <LuHouse size={12} className="text-blue-500 shrink-0" /> {annexTitle}</p>
+                                              <div className="flex items-center gap-2">
+                                                <h4 className="text-sm sm:text-base font-extrabold text-slate-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                                                  {otherName}
+                                                </h4>
+                                                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-800/40 shrink-0">
+                                                  Bodim
+                                                </span>
+                                              </div>
+                                              <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold truncate mt-0.5 flex items-center gap-1.5">
+                                                <span className="text-slate-400 dark:text-slate-500 font-medium">Listing:</span>
+                                                <span className="text-slate-700 dark:text-slate-300 font-bold truncate">{annexTitle}</span>
+                                              </p>
                                             </div>
                                           </div>
-                                          <LuChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                                          <div className="flex items-center gap-2 shrink-0">
+                                            <span className="hidden sm:inline-flex text-[11px] font-bold text-blue-600 dark:text-blue-400 group-hover:underline">
+                                              Open Chat
+                                            </span>
+                                            <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 group-hover:bg-blue-600 group-hover:text-white transition-all flex items-center justify-center">
+                                              <LuChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                                            </div>
+                                          </div>
                                         </div>
                                       );
                                     })}
@@ -3407,7 +3462,7 @@ const Profile = () => {
                                     <p className="text-[10px] text-slate-400 font-semibold">Start chat on any product card in the marketplace.</p>
                                   </div>
                                 ) : (
-                                  <div className="grid grid-cols-1 gap-4">
+                                  <div className="grid grid-cols-1 gap-3">
                                     {marketplaceChats.map((chat) => {
                                       const otherUser = chat.buyer_id === localStorage.getItem('userId') ? chat.seller : chat.buyer;
                                       const otherName = otherUser?.name || 'Unknown User';
@@ -3417,18 +3472,38 @@ const Profile = () => {
                                         <div
                                           key={chat.id}
                                           onClick={() => setSelectedChat(chat)}
-                                          className="cursor-pointer p-5 bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-white/10 rounded-3xl hover:border-indigo-500/30 hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-all duration-300 shadow-sm flex items-center justify-between gap-4 group"
+                                          className="cursor-pointer p-4 sm:p-5 bg-white dark:bg-slate-900/70 border border-slate-200/70 dark:border-white/10 rounded-2xl hover:border-indigo-500 hover:shadow-lg dark:hover:border-indigo-500/60 hover:bg-indigo-500/5 dark:hover:bg-indigo-500/10 transition-all duration-200 shadow-xs flex items-center justify-between gap-4 group"
                                         >
-                                          <div className="flex items-center gap-4 min-w-0">
-                                            <img src={otherPic} alt={otherName} className="w-12 h-12 rounded-full object-cover border border-slate-200 dark:border-white/10 shrink-0" />
+                                          <div className="flex items-center gap-3.5 min-w-0">
+                                            <div className="relative shrink-0">
+                                              <img src={otherPic} alt={otherName} className="w-12 h-12 rounded-2xl object-cover ring-2 ring-slate-200/80 dark:ring-white/10 group-hover:ring-indigo-500/50 transition-all" />
+                                              <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[9px] shadow-sm">
+                                                <LuShoppingBag size={9} />
+                                              </span>
+                                            </div>
                                             <div className="min-w-0 text-left">
-                                              <h4 className="text-base font-black text-slate-800 dark:text-white group-hover:text-indigo-500 transition-colors truncate">
-                                                {otherName}
-                                              </h4>
-                                              <p className="text-slate-400 dark:text-slate-500 text-xs font-bold truncate mt-0.5">Regarding: {itemTitle}</p>
+                                              <div className="flex items-center gap-2">
+                                                <h4 className="text-sm sm:text-base font-extrabold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
+                                                  {otherName}
+                                                </h4>
+                                                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-800/40 shrink-0">
+                                                  Item
+                                                </span>
+                                              </div>
+                                              <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold truncate mt-0.5 flex items-center gap-1.5">
+                                                <span className="text-slate-400 dark:text-slate-500 font-medium">Item:</span>
+                                                <span className="text-slate-700 dark:text-slate-300 font-bold truncate">{itemTitle}</span>
+                                              </p>
                                             </div>
                                           </div>
-                                          <LuChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                                          <div className="flex items-center gap-2 shrink-0">
+                                            <span className="hidden sm:inline-flex text-[11px] font-bold text-indigo-600 dark:text-indigo-400 group-hover:underline">
+                                              Open Chat
+                                            </span>
+                                            <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 group-hover:bg-indigo-600 group-hover:text-white transition-all flex items-center justify-center">
+                                              <LuChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                                            </div>
+                                          </div>
                                         </div>
                                       );
                                     })}
@@ -3536,7 +3611,7 @@ const Profile = () => {
                                     <p className="text-[10px] text-slate-400 font-semibold">Start chat on any event listing card.</p>
                                   </div>
                                 ) : (
-                                  <div className="grid grid-cols-1 gap-4">
+                                  <div className="grid grid-cols-1 gap-3">
                                     {eventChats.map((chat) => {
                                       const otherUser = chat.buyer_id === localStorage.getItem('userId') ? chat.host : chat.buyer;
                                       const otherName = otherUser?.name || 'Unknown User';
@@ -3546,18 +3621,38 @@ const Profile = () => {
                                         <div
                                           key={chat.id}
                                           onClick={() => setSelectedEventChat(chat)}
-                                          className="cursor-pointer p-5 bg-slate-50 dark:bg-slate-900/40 border border-slate-100 dark:border-white/10 rounded-3xl hover:border-pink-500/30 hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-all duration-300 shadow-sm flex items-center justify-between gap-4 group"
+                                          className="cursor-pointer p-4 sm:p-5 bg-white dark:bg-slate-900/70 border border-slate-200/70 dark:border-white/10 rounded-2xl hover:border-pink-500 hover:shadow-lg dark:hover:border-pink-500/60 hover:bg-pink-500/5 dark:hover:bg-pink-500/10 transition-all duration-200 shadow-xs flex items-center justify-between gap-4 group"
                                         >
-                                          <div className="flex items-center gap-4 min-w-0">
-                                            <img src={otherPic} alt={otherName} className="w-12 h-12 rounded-full object-cover border border-slate-200 dark:border-white/10 shrink-0" />
+                                          <div className="flex items-center gap-3.5 min-w-0">
+                                            <div className="relative shrink-0">
+                                              <img src={otherPic} alt={otherName} className="w-12 h-12 rounded-2xl object-cover ring-2 ring-slate-200/80 dark:ring-white/10 group-hover:ring-pink-500/50 transition-all" />
+                                              <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-pink-600 text-white flex items-center justify-center text-[9px] shadow-sm">
+                                                <LuCalendar size={9} />
+                                              </span>
+                                            </div>
                                             <div className="min-w-0 text-left">
-                                              <h4 className="text-base font-black text-slate-805 dark:text-white group-hover:text-pink-500 transition-colors truncate">
-                                                {otherName}
-                                              </h4>
-                                              <p className="text-slate-400 dark:text-slate-500 text-xs font-bold truncate mt-0.5">Regarding Event: {eventTitle}</p>
+                                              <div className="flex items-center gap-2">
+                                                <h4 className="text-sm sm:text-base font-extrabold text-slate-800 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors truncate">
+                                                  {otherName}
+                                                </h4>
+                                                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-pink-50 dark:bg-pink-950/60 text-pink-600 dark:text-pink-400 border border-pink-200/50 dark:border-pink-800/40 shrink-0">
+                                                  Event
+                                                </span>
+                                              </div>
+                                              <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold truncate mt-0.5 flex items-center gap-1.5">
+                                                <span className="text-slate-400 dark:text-slate-500 font-medium">Event:</span>
+                                                <span className="text-slate-700 dark:text-slate-300 font-bold truncate">{eventTitle}</span>
+                                              </p>
                                             </div>
                                           </div>
-                                          <LuChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                                          <div className="flex items-center gap-2 shrink-0">
+                                            <span className="hidden sm:inline-flex text-[11px] font-bold text-pink-600 dark:text-pink-400 group-hover:underline">
+                                              Open Chat
+                                            </span>
+                                            <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 group-hover:bg-pink-600 group-hover:text-white transition-all flex items-center justify-center">
+                                              <LuChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                                            </div>
+                                          </div>
                                         </div>
                                       );
                                     })}
