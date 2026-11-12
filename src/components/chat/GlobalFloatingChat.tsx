@@ -76,10 +76,10 @@ const GlobalFloatingChat: React.FC = () => {
     socket.emit('join_chat', activeChat.chatId);
 
     const handleReceiveMsg = (msg: any) => {
-      const msgChatId = msg.chat_id || msg.chatId || msg.ChatID;
-      if (msgChatId === activeChat.chatId) {
+      const msgChatId = msg?.chat_id || msg?.chatId || msg?.ChatID;
+      if (String(msgChatId) === String(activeChat.chatId)) {
         setMessages(prev => {
-          if (prev.some(m => m.id === msg.id)) return prev;
+          if (prev.some(m => String(m.id) === String(msg.id))) return prev;
           return [...prev, msg];
         });
         if (isMinimizedRef.current) {
@@ -137,6 +137,14 @@ const GlobalFloatingChat: React.FC = () => {
       const currentUserId = localStorage.getItem('userId');
       const senderId = messageObj?.sender_id || messageObj?.senderId || messageObj?.SenderID;
 
+      // Also append immediately to messages if this active chat is open
+      if (currentChatIdRef.current && String(currentChatIdRef.current) === String(chatId)) {
+        setMessages(prev => {
+          if (prev.some(m => String(m.id) === String(messageObj.id))) return prev;
+          return [...prev, messageObj];
+        });
+      }
+
       // Don't auto-popup if sender is current user
       if (currentUserId && String(senderId) === String(currentUserId)) return;
 
@@ -177,26 +185,50 @@ const GlobalFloatingChat: React.FC = () => {
     };
 
     const onNewAnnex = (data: any) => {
-      if (data?.chatId && data?.message) {
-        triggerAutoPopup('annex', data.chatId, data.message);
+      const chatId = data?.chatId || data?.chat_id || data?.ChatID;
+      const message = data?.message || data;
+      if (chatId && message) {
+        triggerAutoPopup('annex', String(chatId), message);
       }
     };
 
     const onNewMarket = (data: any) => {
-      if (data?.chatId && data?.message) {
-        triggerAutoPopup('marketplace', data.chatId, data.message);
+      const chatId = data?.chatId || data?.chat_id || data?.ChatID;
+      const message = data?.message || data;
+      if (chatId && message) {
+        triggerAutoPopup('marketplace', String(chatId), message);
       }
     };
 
     const onNewEvent = (data: any) => {
-      if (data?.chatId && data?.message) {
-        triggerAutoPopup('event', data.chatId, data.message);
+      const chatId = data?.chatId || data?.chat_id || data?.ChatID;
+      const message = data?.message || data;
+      if (chatId && message) {
+        triggerAutoPopup('event', String(chatId), message);
+      }
+    };
+
+    // Also support fallback from new_notification if it's a chat inquiry
+    const onNewNotification = (notif: any) => {
+      if (notif?.link && typeof notif.link === 'string') {
+        const urlParams = new URLSearchParams(notif.link.split('?')[1] || '');
+        const chatId = urlParams.get('chatId');
+        const tab = urlParams.get('tab');
+        if (chatId) {
+          const type = tab === 'annex_inbox' ? 'annex' : tab === 'marketplace_inbox' ? 'marketplace' : 'event';
+          triggerAutoPopup(type, chatId, {
+            id: notif.id || Date.now(),
+            message: notif.message,
+            sender: { name: notif.title?.replace(/^.*from\s+/i, '') || 'User' }
+          });
+        }
       }
     };
 
     socket.on('new_annex_message', onNewAnnex);
     socket.on('new_market_message', onNewMarket);
     socket.on('new_event_message', onNewEvent);
+    socket.on('new_notification', onNewNotification);
 
     return () => {
       socket.off('connect', syncUserRoom);
@@ -204,6 +236,7 @@ const GlobalFloatingChat: React.FC = () => {
       socket.off('new_annex_message', onNewAnnex);
       socket.off('new_market_message', onNewMarket);
       socket.off('new_event_message', onNewEvent);
+      socket.off('new_notification', onNewNotification);
     };
   }, []);
 
