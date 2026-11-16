@@ -211,15 +211,25 @@ const GlobalFloatingChat: React.FC = () => {
     // Also support fallback from new_notification if it's a chat inquiry
     const onNewNotification = (notif: any) => {
       if (notif?.link && typeof notif.link === 'string') {
-        const urlParams = new URLSearchParams(notif.link.split('?')[1] || '');
-        const chatId = urlParams.get('chatId');
+        const [path, queryString] = notif.link.split('?');
+        const urlParams = new URLSearchParams(queryString || '');
+        const chatId = urlParams.get('chatId') || urlParams.get('chat');
         const tab = urlParams.get('tab');
-        if (chatId) {
-          const type = tab === 'annex_inbox' ? 'annex' : tab === 'marketplace_inbox' ? 'marketplace' : 'event';
-          triggerAutoPopup(type, chatId, {
+
+        let type: 'annex' | 'marketplace' | 'event' | null = null;
+        if (notif.type === 'Annex' || tab === 'annex_inbox' || path.includes('/annex')) {
+          type = 'annex';
+        } else if (notif.type === 'Marketplace' || tab === 'marketplace_inbox' || path.includes('/market')) {
+          type = 'marketplace';
+        } else if (notif.type === 'Event' || tab === 'events_inbox' || path.includes('/events')) {
+          type = 'event';
+        }
+
+        if (chatId && type) {
+          triggerAutoPopup(type, String(chatId), {
             id: notif.id || Date.now(),
             message: notif.message,
-            sender: { name: notif.title?.replace(/^.*from\s+/i, '') || 'User' }
+            sender: { name: notif.title?.replace(/^.*from\s+/i, '').replace(/^[^\w]+/, '').trim() || 'User' }
           });
         }
       }
