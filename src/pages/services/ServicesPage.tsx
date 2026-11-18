@@ -1088,29 +1088,7 @@ const ServicesPage = () => {
 
 
 
-                                <div className="space-y-4 pt-2">
-                                  {/* Dynamic Real-time Price & Delivery Estimation Card */}
-                                  {(() => {
-                                    const est = calculateEstimate();
-                                    return (
-                                      <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-blue-500/5 dark:from-blue-500/15 dark:via-indigo-500/15 dark:to-transparent border border-blue-500/20 dark:border-blue-500/30">
-                                        <div className="flex items-center justify-between text-[11px] font-black uppercase text-blue-600 dark:text-blue-400 tracking-wider mb-2">
-                                          <span className="flex items-center gap-1.5"><LuDollarSign size={14} /> Estimated Investment</span>
-                                          <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400 text-[9px] font-bold">Dynamic Quote</span>
-                                        </div>
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                                          <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                                            LKR {est.minPrice.toLocaleString()} - {est.maxPrice.toLocaleString()}
-                                          </div>
-                                          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-350">
-                                            <LuClock size={14} className="text-blue-600 dark:text-blue-400" />
-                                            <span>Est. Delivery: <strong className="text-slate-900 dark:text-white">~ {est.days} Days</strong></span>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    );
-                                  })()}
-
+                                <div className="pt-2">
                                   <button
                                     type="button"
                                     onClick={() => setStep(2)}
