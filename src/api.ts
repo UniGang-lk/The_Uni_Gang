@@ -399,7 +399,7 @@ export const api = {
       throw new Error(err.message || 'Failed to submit comment');
     }
     const data = await response.json();
-    return data.data;
+    return data?.data ?? data;
   },
 
   // Events API

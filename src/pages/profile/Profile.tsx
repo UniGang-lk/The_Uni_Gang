@@ -1050,7 +1050,9 @@ const Profile = () => {
     if (!token) return;
     try {
       const sent = await api.addServiceMessage(selectedRequest.id, newMessageText, token);
-      setMessages([...messages, sent]);
+      if (sent) {
+        setMessages((prev) => [...prev, sent]);
+      }
       setNewMessageText('');
     } catch (err) {
       console.error('Failed to send message:', err);
@@ -2200,11 +2202,11 @@ const Profile = () => {
                                       Thread initialized. Send details to start chat.
                                     </div>
                                   ) : (
-                                    messages.map((msg) => {
-                                      const isAdmin = msg.senderType === 'admin';
+                                    messages.filter(Boolean).map((msg) => {
+                                      const isAdmin = msg.senderType === 'admin' || msg.sender_type === 'admin';
                                       return (
                                         <div
-                                          key={msg.id}
+                                          key={msg.id || Math.random()}
                                           className={`flex flex-col max-w-[85%] ${isAdmin ? 'self-start items-start text-left' : 'self-end items-end text-right'}`}
                                         >
                                           <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 mb-0.5 px-1.5">
