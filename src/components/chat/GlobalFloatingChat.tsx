@@ -118,9 +118,23 @@ const GlobalFloatingChat: React.FC = () => {
     const syncUserRoom = () => {
       const myUserId = localStorage.getItem('userId');
       const token = localStorage.getItem('userToken');
-      if (token && myUserId) {
+      if (myUserId) {
         socket.emit('register', myUserId);
         socket.emit('join_user_room', myUserId);
+      } else if (token) {
+        // If userId is not yet populated, fetch it immediately to ensure room connection
+        fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/users/profile`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data?.user?.id) {
+              localStorage.setItem('userId', String(data.user.id));
+              socket.emit('register', String(data.user.id));
+              socket.emit('join_user_room', String(data.user.id));
+            }
+          })
+          .catch(() => {});
       }
     };
 
@@ -286,7 +300,9 @@ const GlobalFloatingChat: React.FC = () => {
   const currentUserId = localStorage.getItem('userId');
 
   return (
-    <div className="fixed bottom-6 right-6 z-[99999] flex flex-col items-end pointer-events-none font-sans">
+    <div className={`fixed z-[99999] flex flex-col items-end pointer-events-none font-sans transition-all ${
+      isMinimized ? 'bottom-24 right-6' : 'bottom-6 right-6'
+    }`}>
       <AnimatePresence>
         {!isMinimized && (
           <motion.div
